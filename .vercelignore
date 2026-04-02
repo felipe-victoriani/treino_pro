@@ -1,0 +1,5 @@
+node_modules
+.git
+README.md
+assets/icons/generate-icons.html
+assets/icons/generate-icons.css
