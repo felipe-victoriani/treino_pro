@@ -1,0 +1,555 @@
+﻿<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml" />
+    <link rel="icon" href="assets/icons/icon-72.png" type="image/png" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>Meu Painel — Treino Pro</title>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#6B35C3" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+  </head>
+  <body>
+    <div class="aluno-layout" id="app">
+      <!-- ===== HEADER ===== -->
+      <header class="aluno-header">
+        <div class="aluno-header-top">
+          <div class="aluno-logo">
+            <div class="aluno-logo-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                <path
+                  d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"
+                />
+              </svg>
+            </div>
+            <h1>Treino Pro</h1>
+          </div>
+          <button class="btn-icon btn-icon-ghost" id="logout-btn" title="Sair">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"
+              />
+            </svg>
+          </button>
+        </div>
+        <p class="aluno-header-sub" id="header-professor-info">Carregando...</p>
+      </header>
+
+      <!-- ===== CONTEÚDO PRINCIPAL ===== -->
+      <main class="aluno-content">
+        <!-- -------- SEÇÃO: INÍCIO -------- -->
+        <section class="app-section" id="section-inicio">
+          <!-- Banner de boas-vindas -->
+          <div class="welcome-banner">
+            <h2 id="welcome-name">Olá, Aluno! 💪</h2>
+            <p id="welcome-subtitle">Pronto para mais um treino incrível?</p>
+            <span class="treino-badge" id="welcome-treino-badge">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"
+                />
+              </svg>
+              Treino do dia: <span id="treino-dia-letra">-</span>
+            </span>
+          </div>
+
+          <!-- Quick cards -->
+          <div class="quick-grid">
+            <div class="quick-card" onclick="alunoNavigate('treino')">
+              <div class="quick-card-icon icon-bg-purple">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  class="text-purple"
+                >
+                  <path
+                    d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"
+                  />
+                </svg>
+              </div>
+              <h3>Meu Treino</h3>
+              <p id="quick-treino-info">Carregando...</p>
+            </div>
+
+            <div class="quick-card" onclick="openIMCModal()">
+              <div class="quick-card-icon icon-bg-red">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  class="text-red"
+                >
+                  <path
+                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"
+                  />
+                </svg>
+              </div>
+              <h3>Meu IMC</h3>
+              <p id="quick-imc-info">Calcular agora</p>
+            </div>
+
+            <div class="quick-card" onclick="alunoNavigate('dieta')">
+              <div class="quick-card-icon icon-bg-green">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  class="text-green"
+                >
+                  <path
+                    d="M18.06 22.99h1.66c.84 0 1.53-.64 1.63-1.46L23 5.05h-5V1h-1.97v4.05h-4.97l.3 2.34c1.71.47 3.31 1.32 4.27 2.26 1.44 1.42 2.43 2.89 2.43 5.29v8.05zM1 21.99V21h15.03v.99c0 .55-.45 1-1.01 1H2.01c-.56 0-1.01-.45-1.01-1zm15.03-7c0-8.17-15.03-8.17-15.03 0h15.03zM1.02 17h15v2h-15z"
+                  />
+                </svg>
+              </div>
+              <h3>Minha Dieta</h3>
+              <p id="quick-dieta-info">Ver plano</p>
+            </div>
+
+            <div class="quick-card" onclick="alunoNavigate('mensagens')">
+              <div class="quick-card-icon icon-bg-orange pos-relative">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  class="text-orange"
+                >
+                  <path
+                    d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"
+                  />
+                </svg>
+                <span id="quick-msg-badge" class="nav-badge-dot hidden"></span>
+              </div>
+              <h3>Mensagens</h3>
+              <p id="quick-msg-info">Do professor</p>
+            </div>
+          </div>
+
+          <!-- Treino de hoje (resumo) -->
+          <div class="section-header">
+            <h2>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"
+                />
+              </svg>
+              Treino de Hoje
+            </h2>
+            <button class="btn-ghost btn-sm" onclick="alunoNavigate('treino')">
+              Ver completo
+            </button>
+          </div>
+
+          <div id="inicio-treino-preview" class="card">
+            <div class="empty-state">
+              <div class="spinner"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- -------- SEÇÃO: TREINO -------- -->
+        <section class="app-section hidden" id="section-treino">
+          <div class="mb-16">
+            <h1 class="page-title">Meu Treino</h1>
+            <p class="page-subtitle" id="treino-foco-info">
+              Selecione um treino abaixo
+            </p>
+          </div>
+
+          <!-- Abas dos treinos A-E -->
+          <div class="workout-tabs" id="aluno-workout-tabs">
+            <button class="workout-tab-btn active" data-letra="A">A</button>
+            <button class="workout-tab-btn" data-letra="B">B</button>
+            <button class="workout-tab-btn" data-letra="C">C</button>
+            <button class="workout-tab-btn" data-letra="D">D</button>
+            <button class="workout-tab-btn" data-letra="E">E</button>
+          </div>
+
+          <!-- Progresso do treino atual -->
+          <div class="workout-progress" id="workout-progress-wrap">
+            <div class="progress-header">
+              <span class="progress-label">Progresso de hoje</span>
+              <span class="progress-value" id="progress-text">0 / 0</span>
+            </div>
+            <div class="workout-progress-bar">
+              <div
+                class="workout-progress-fill"
+                id="progress-fill"
+                style="width: 0%"
+              ></div>
+            </div>
+          </div>
+
+          <!-- Lista de exercícios com checkbox -->
+          <div class="exercise-list" id="aluno-exercise-list">
+            <div class="empty-state">
+              <div class="spinner"></div>
+            </div>
+          </div>
+
+          <!-- Botão finalizar treino -->
+          <button class="finish-workout-btn" id="finish-workout-btn" disabled>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"
+              />
+            </svg>
+            Finalizar Treino
+          </button>
+
+          <!-- Histórico -->
+          <div class="mt-28">
+            <div class="section-header">
+              <h2>
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"
+                  />
+                </svg>
+                Histórico de Treinos
+              </h2>
+            </div>
+            <div id="aluno-historico-list" class="history-list">
+              <div class="empty-state">
+                <h3>Nenhum treino finalizado ainda</h3>
+                <p>Complete seu primeiro treino!</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- -------- SEÇÃO: DIETA -------- -->
+        <section class="app-section hidden" id="section-dieta">
+          <div class="mb-16">
+            <h1 class="page-title">Minha Dieta</h1>
+            <p class="page-subtitle">Plano alimentar personalizado</p>
+          </div>
+
+          <div id="aluno-dieta-content">
+            <div class="empty-state">
+              <div class="spinner"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- -------- SEÇÃO: MENSAGENS -------- -->
+        <section class="app-section hidden" id="section-mensagens">
+          <div class="mb-16">
+            <h1 class="page-title">Mensagens</h1>
+            <p class="page-subtitle" id="msgs-professor-name">
+              Com o professor
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="messages-container" id="aluno-messages-container">
+              <div class="empty-state">
+                <h3>Nenhuma mensagem</h3>
+                <p>Envie uma mensagem ao seu professor</p>
+              </div>
+            </div>
+            <div class="message-send-form">
+              <textarea
+                class="form-control"
+                id="aluno-msg-input"
+                placeholder="Escreva para o seu professor..."
+                rows="2"
+              ></textarea>
+              <button class="btn-primary btn-send" id="aluno-send-msg-btn">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- -------- SEÇÃO: PERFIL -------- -->
+        <section class="app-section hidden" id="section-perfil">
+          <div class="mb-16">
+            <h1 class="page-title">Meu Perfil</h1>
+          </div>
+
+          <!-- Card de dados pessoais -->
+          <div class="card mb-16">
+            <div class="profile-header-sm">
+              <div class="avatar avatar-lg avatar-gradient" id="perfil-avatar">
+                A
+              </div>
+              <div>
+                <h2 class="profile-name-sm" id="perfil-nome">-</h2>
+                <p class="profile-role-sm">Aluno</p>
+                <p class="profile-email" id="perfil-email">-</p>
+              </div>
+            </div>
+            <div class="profile-info-box">
+              <div class="profile-info-row">
+                <span class="text-muted">Professor</span>
+                <span class="text-primary-c fw-600" id="perfil-professor"
+                  >-</span
+                >
+              </div>
+              <div class="profile-info-row">
+                <span class="text-muted">Treino atual</span>
+                <span class="text-purple fw-700" id="perfil-treino-atual"
+                  >-</span
+                >
+                >
+              </div>
+              <div class="profile-info-row">
+                <span class="text-muted">Membro desde</span>
+                <span class="text-primary-c fw-600" id="perfil-data-cadastro"
+                  >-</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- IMC Card -->
+          <div class="card mb-16">
+            <div class="card-header">
+              <h3 class="card-title">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"
+                  />
+                </svg>
+                Índice de Massa Corporal (IMC)
+              </h3>
+              <button class="btn-secondary btn-sm" onclick="openIMCModal()">
+                Atualizar
+              </button>
+            </div>
+
+            <div id="imc-display-perfil">
+              <div class="empty-state p-24">
+                <div class="empty-state-icon">
+                  <svg
+                    width="28"
+                    height="28"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    class="text-purple-500"
+                  >
+                    <path
+                      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"
+                    />
+                  </svg>
+                </div>
+                <h3>IMC não calculado</h3>
+                <p>Clique em "Atualizar" para calcular seu IMC</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Logout -->
+          <button class="btn-danger btn-block" id="aluno-logout-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"
+              />
+            </svg>
+            Sair da conta
+          </button>
+        </section>
+      </main>
+
+      <!-- ===== BOTTOM NAVIGATION ===== -->
+      <nav class="bottom-nav">
+        <button class="nav-item active" data-section="inicio">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+          </svg>
+          <span>Início</span>
+        </button>
+        <button class="nav-item" data-section="treino">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"
+            />
+          </svg>
+          <span>Treino</span>
+        </button>
+        <button class="nav-item" data-section="dieta">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M18.06 22.99h1.66c.84 0 1.53-.64 1.63-1.46L23 5.05h-5V1h-1.97v4.05h-4.97l.3 2.34c1.71.47 3.31 1.32 4.27 2.26 1.44 1.42 2.43 2.89 2.43 5.29v8.05zM1 21.99V21h15.03v.99c0 .55-.45 1-1.01 1H2.01c-.56 0-1.01-.45-1.01-1zm15.03-7c0-8.17-15.03-8.17-15.03 0h15.03zM1.02 17h15v2h-15z"
+            />
+          </svg>
+          <span>Dieta</span>
+        </button>
+        <button class="nav-item" data-section="mensagens" id="nav-msg-btn">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"
+            />
+          </svg>
+          <span>Mensagens</span>
+          <span class="nav-badge-dot hidden" id="nav-msg-dot"></span>
+        </button>
+        <button class="nav-item" data-section="perfil">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+            />
+          </svg>
+          <span>Perfil</span>
+        </button>
+      </nav>
+    </div>
+    <!-- /aluno-layout -->
+
+    <!-- ============================================================
+     MODAL - IMC
+     ============================================================ -->
+    <div class="modal" id="modal-imc">
+      <div class="modal-content modal-content-md">
+        <div class="modal-header">
+          <span class="modal-title">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              class="text-purple"
+            >
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"
+              />
+            </svg>
+            Calcular IMC
+          </span>
+          <button class="modal-close" id="close-imc">×</button>
+        </div>
+
+        <!-- Formulário -->
+        <div id="imc-form-view">
+          <p class="modal-description">
+            Informe seu peso e altura para calcular seu Índice de Massa
+            Corporal.
+          </p>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Peso (kg)</label>
+              <input
+                class="form-control"
+                type="number"
+                id="imc-peso"
+                placeholder="70.5"
+                min="20"
+                max="300"
+                step="0.1"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Altura (m)</label>
+              <input
+                class="form-control"
+                type="number"
+                id="imc-altura"
+                placeholder="1.75"
+                min="1.0"
+                max="2.5"
+                step="0.01"
+              />
+            </div>
+          </div>
+          <button class="btn-primary btn-block" id="calcular-imc-btn">
+            Calcular IMC
+          </button>
+        </div>
+
+        <!-- Resultado -->
+        <div id="imc-result-view" class="hidden">
+          <div class="imc-display">
+            <div class="imc-value" id="imc-result-value">-</div>
+            <div class="imc-class" id="imc-result-class">-</div>
+
+            <div class="imc-bar-container">
+              <div class="imc-bar-fill" id="imc-bar" style="width: 0%"></div>
+            </div>
+            <div class="imc-scale">
+              <span>&lt;18.5</span>
+              <span>18.5</span>
+              <span>25</span>
+              <span>30</span>
+              <span>&gt;35</span>
+            </div>
+
+            <div class="imc-info-grid">
+              <div class="imc-info-card">
+                <div class="label">Peso</div>
+                <div class="value" id="imc-peso-display">-</div>
+              </div>
+              <div class="imc-info-card">
+                <div class="label">Altura</div>
+                <div class="value" id="imc-altura-display">-</div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer mt-0">
+            <button class="btn-secondary" id="imc-recalcular">
+              Recalcular
+            </button>
+            <button class="btn-primary" id="imc-salvar">Salvar dados</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <script src="js/firebase-config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/pwa.js"></script>
+    <script src="js/imc.js"></script>
+    <script src="js/treinos.js"></script>
+    <script src="js/dietas.js"></script>
+    <script src="js/mensagens.js"></script>
+    <script src="js/aluno.js"></script>
+  </body>
+</html>

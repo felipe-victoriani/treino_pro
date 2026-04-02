@@ -1,0 +1,204 @@
+﻿<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml" />
+    <link rel="icon" href="assets/icons/icon-72.png" type="image/png" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>Cadastro — Treino Pro</title>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#6B35C3" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+  </head>
+  <body class="login-page login-page-scroll">
+    <div class="login-card login-card-wide">
+      <!-- Logo -->
+      <div class="login-logo mb-24">
+        <div class="login-logo-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="white">
+            <path
+              d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"
+            />
+          </svg>
+        </div>
+        <h1>Criar Conta</h1>
+        <p>Preencha os dados abaixo para começar</p>
+      </div>
+
+      <!-- Formulário de Cadastro -->
+      <form id="cadastro-form" novalidate>
+        <!-- Nome -->
+        <div class="form-group">
+          <label class="form-label" for="nome">Nome completo</label>
+          <div class="input-icon-wrap">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+              />
+            </svg>
+            <input
+              class="form-control"
+              type="text"
+              id="nome"
+              placeholder="Seu nome completo"
+              required
+              autocomplete="name"
+            />
+          </div>
+          <span class="form-error hidden" id="nome-error"></span>
+        </div>
+
+        <!-- E-mail -->
+        <div class="form-group">
+          <label class="form-label" for="email">E-mail</label>
+          <div class="input-icon-wrap">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"
+              />
+            </svg>
+            <input
+              class="form-control"
+              type="email"
+              id="email"
+              placeholder="seu@email.com"
+              required
+              autocomplete="email"
+            />
+          </div>
+          <span class="form-error hidden" id="email-error"></span>
+        </div>
+
+        <!-- Senha -->
+        <div class="form-group">
+          <label class="form-label" for="senha">Senha</label>
+          <div class="input-icon-wrap">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"
+              />
+            </svg>
+            <input
+              class="form-control"
+              type="password"
+              id="senha"
+              placeholder="Mínimo 6 caracteres"
+              required
+              autocomplete="new-password"
+            />
+            <button type="button" class="toggle-password" id="toggle-pw">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
+                />
+              </svg>
+            </button>
+          </div>
+          <span class="form-error hidden" id="senha-error"></span>
+        </div>
+
+        <!-- Confirmar Senha -->
+        <div class="form-group">
+          <label class="form-label" for="confirmar-senha"
+            >Confirmar senha</label
+          >
+          <div class="input-icon-wrap">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"
+              />
+            </svg>
+            <input
+              class="form-control"
+              type="password"
+              id="confirmar-senha"
+              placeholder="Repita a senha"
+              required
+              autocomplete="new-password"
+            />
+          </div>
+          <span class="form-error hidden" id="confirm-error"></span>
+        </div>
+
+        <!-- Selecionar Professor -->
+        <div class="form-group" id="professor-group">
+          <label class="form-label" for="professor">Professor</label>
+          <select class="form-select" id="professor">
+            <option value="">Carregando professores...</option>
+          </select>
+          <span class="form-hint"
+            >Selecione o professor responsável pelo seu treino</span
+          >
+          <span class="form-error hidden" id="professor-error"></span>
+        </div>
+
+        <!-- Dados opcionais -->
+        <div class="mb-8">
+          <p class="section-label">Dados físicos (opcional)</p>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="peso">Peso (kg)</label>
+            <input
+              class="form-control"
+              type="number"
+              id="peso"
+              placeholder="70"
+              min="20"
+              max="300"
+              step="0.1"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="altura">Altura (m)</label>
+            <input
+              class="form-control"
+              type="number"
+              id="altura"
+              placeholder="1.75"
+              min="1"
+              max="2.5"
+              step="0.01"
+            />
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="btn-primary btn-block btn-lg mt-8"
+          id="cadastro-btn"
+        >
+          <span id="cadastro-btn-text">Criar conta</span>
+          <div class="spinner spinner-sm hidden" id="cadastro-spinner"></div>
+        </button>
+      </form>
+
+      <div class="login-link">
+        Já tem conta?
+        <a href="login.html">Fazer login</a>
+      </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <script src="js/firebase-config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/pwa.js"></script>
+    <script src="js/cadastro.js"></script>
+  </body>
+</html>

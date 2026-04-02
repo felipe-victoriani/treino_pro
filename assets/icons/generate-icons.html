@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Gerador de Ícones — Treino Pro</title>
+    <link rel="stylesheet" href="generate-icons.css" />
+  </head>
+  <body>
+    <h1>🏋️ Gerador de Ícones — Treino Pro</h1>
+    <p>
+      Clique no botão abaixo para gerar todos os tamanhos de ícone necessários
+      para o PWA e baixar automaticamente.
+    </p>
+    <p>
+      O ícone base (<code>icon.svg</code>) deve estar na mesma pasta que este
+      arquivo.
+    </p>
+
+    <button class="btn-primary" onclick="generateAll()">
+      ⬇️ Gerar e Baixar Todos os Ícones
+    </button>
+    <button onclick="previewAll()">👁️ Visualizar Previews</button>
+
+    <div id="status"></div>
+    <canvas id="canvas"></canvas>
+    <div class="preview" id="preview-area"></div>
+
+    <script>
+      const SIZES = [72, 96, 128, 144, 152, 192, 384, 512];
+      const SVG_FILE = "icon.svg";
+
+      function drawIcon(ctx, size) {
+        // Background gradient
+        const bgGrad = ctx.createLinearGradient(0, 0, size, size);
+        bgGrad.addColorStop(0, "#1A0A3C");
+        bgGrad.addColorStop(1, "#0A0A14");
+
+        // Rounded rect background
+        const r = size * 0.1875; // ~96/512 ratio
+        ctx.beginPath();
+        ctx.moveTo(r, 0);
+        ctx.lineTo(size - r, 0);
+        ctx.quadraticCurveTo(size, 0, size, r);
+        ctx.lineTo(size, size - r);
+        ctx.quadraticCurveTo(size, size, size - r, size);
+        ctx.lineTo(r, size);
+        ctx.quadraticCurveTo(0, size, 0, size - r);
+        ctx.lineTo(0, r);
+        ctx.quadraticCurveTo(0, 0, r, 0);
+        ctx.closePath();
+        ctx.fillStyle = bgGrad;
+        ctx.fill();
+
+        // Scale factor
+        const s = size / 512;
+
+        // Dumbbell gradient (purple)
+        const dGrad = ctx.createLinearGradient(
+          48 * s,
+          196 * s,
+          472 * s,
+          316 * s,
+        );
+        dGrad.addColorStop(0, "#8B5CF6");
+        dGrad.addColorStop(1, "#6B35C3");
+
+        ctx.fillStyle = dGrad;
+
+        // Left outer plate
+        roundRect(ctx, 48 * s, 196 * s, 60 * s, 120 * s, 14 * s);
+        // Left inner plate
+        roundRect(ctx, 112 * s, 216 * s, 36 * s, 80 * s, 10 * s);
+        // Bar
+        roundRect(ctx, 148 * s, 238 * s, 216 * s, 36 * s, 18 * s);
+        // Right inner plate
+        roundRect(ctx, 364 * s, 216 * s, 36 * s, 80 * s, 10 * s);
+        // Right outer plate
+        roundRect(ctx, 404 * s, 196 * s, 60 * s, 120 * s, 14 * s);
+
+        // "A" letter — red accent
+        const aGrad = ctx.createLinearGradient(
+          176 * s,
+          320 * s,
+          336 * s,
+          420 * s,
+        );
+        aGrad.addColorStop(0, "#FF4560");
+        aGrad.addColorStop(1, "#FF1744");
+        ctx.fillStyle = aGrad;
+        ctx.font = `900 ${96 * s}px "Arial Black", Arial, sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "alphabetic";
+        ctx.fillText("A", 256 * s, 420 * s);
+
+        // "PRO" text — purple
+        ctx.fillStyle = "#8B5CF6";
+        ctx.font = `700 ${32 * s}px Arial, sans-serif`;
+        ctx.letterSpacing = `${8 * s}px`;
+        ctx.fillText("PRO", 256 * s, 460 * s);
+      }
+
+      function roundRect(ctx, x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      function generatePNG(size) {
+        const canvas = document.getElementById("canvas");
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, size, size);
+        drawIcon(ctx, size);
+        return canvas.toDataURL("image/png");
+      }
+
+      function downloadPNG(size, dataUrl) {
+        const a = document.createElement("a");
+        a.href = dataUrl;
+        a.download = `icon-${size}.png`;
+        a.click();
+      }
+
+      async function generateAll() {
+        const status = document.getElementById("status");
+        status.textContent = "Gerando ícones...";
+
+        for (let i = 0; i < SIZES.length; i++) {
+          const size = SIZES[i];
+          status.textContent = `Gerando icon-${size}.png... (${i + 1}/${SIZES.length})`;
+          const dataUrl = generatePNG(size);
+          downloadPNG(size, dataUrl);
+          await new Promise((r) => setTimeout(r, 300)); // pequena pausa entre downloads
+        }
+
+        status.textContent = `✅ Todos os ${SIZES.length} ícones foram gerados! Mova os arquivos baixados para esta pasta (assets/icons/).`;
+      }
+
+      function previewAll() {
+        const area = document.getElementById("preview-area");
+        area.innerHTML = "";
+
+        for (const size of SIZES) {
+          const dataUrl = generatePNG(size);
+          const displaySize = Math.min(size, 128);
+
+          const div = document.createElement("div");
+          div.className = "preview-item";
+          div.innerHTML = `
+          <img src="${dataUrl}" width="${displaySize}" height="${displaySize}" alt="icon-${size}">
+          <div style="margin-top:4px">${size}×${size}</div>
+        `;
+          area.appendChild(div);
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,182 @@
+﻿<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml" />
+    <link rel="icon" href="assets/icons/icon-72.png" type="image/png" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>Login — Treino Pro</title>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#6B35C3" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+    <link rel="stylesheet" href="css/splash.css" />
+  </head>
+  <body class="login-page">
+    <div class="login-card">
+      <!-- Logo -->
+      <div class="login-logo">
+        <div class="login-logo-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="white">
+            <path
+              d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"
+            />
+          </svg>
+        </div>
+        <h1>Treino Pro</h1>
+        <p>Seu sistema de treinos e performance</p>
+      </div>
+
+      <!-- Formulário de Login -->
+      <form id="login-form" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="email">E-mail</label>
+          <div class="input-icon-wrap">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"
+              />
+            </svg>
+            <input
+              class="form-control"
+              type="email"
+              id="email"
+              name="email"
+              placeholder="seu@email.com"
+              autocomplete="email"
+              required
+            />
+          </div>
+          <span class="form-error hidden" id="email-error"></span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Senha</label>
+          <div class="input-icon-wrap">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"
+              />
+            </svg>
+            <input
+              class="form-control"
+              type="password"
+              id="password"
+              name="password"
+              placeholder="••••••••"
+              autocomplete="current-password"
+              required
+            />
+            <button
+              type="button"
+              class="toggle-password"
+              id="toggle-pw"
+              aria-label="Ver senha"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                id="eye-icon"
+              >
+                <path
+                  d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
+                />
+              </svg>
+            </button>
+          </div>
+          <span class="form-error hidden" id="password-error"></span>
+        </div>
+
+        <div class="forgot-wrap">
+          <button type="button" id="forgot-password-btn" class="btn-link">
+            Esqueci minha senha
+          </button>
+        </div>
+
+        <button
+          type="submit"
+          class="btn-primary btn-block btn-lg"
+          id="login-btn"
+        >
+          <span id="login-btn-text">Entrar</span>
+          <div class="spinner spinner-sm hidden" id="login-spinner"></div>
+        </button>
+      </form>
+
+      <div class="login-divider"><span>ou</span></div>
+
+      <div class="login-link">
+        Ainda não tem conta?
+        <a href="cadastro.html">Cadastre-se como aluno</a>
+      </div>
+    </div>
+
+    <a href="admin-login.html" class="btn-admin-icon" title="Acesso Admin">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path
+          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"
+        />
+      </svg>
+    </a>
+
+    <!-- Modal recuperação de senha -->
+    <div class="modal" id="modal-forgot">
+      <div class="modal-content modal-content-sm">
+        <div class="modal-header">
+          <span class="modal-title">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              class="text-purple"
+            >
+              <path
+                d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"
+              />
+            </svg>
+            Recuperar senha
+          </span>
+          <button class="modal-close" id="close-forgot">×</button>
+        </div>
+        <p class="modal-description">
+          Digite seu e-mail e enviaremos um link para redefinir sua senha.
+        </p>
+        <div class="form-group">
+          <label class="form-label">E-mail</label>
+          <input
+            class="form-control"
+            type="email"
+            id="forgot-email"
+            placeholder="seu@email.com"
+          />
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary" id="cancel-forgot">Cancelar</button>
+          <button class="btn-primary" id="send-reset-btn">Enviar link</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <script src="js/firebase-config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/pwa.js"></script>
+    <script src="js/login.js"></script>
+  </body>
+</html>

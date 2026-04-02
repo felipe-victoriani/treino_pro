@@ -1,0 +1,325 @@
+/* ============================================================
+   TREINO PRO - Estilos Responsivos (Mobile First)
+   ============================================================ */
+
+/* ============================================================
+   TABLET - 768px
+   ============================================================ */
+@media (max-width: 768px) {
+  /* Sidebar -> oculta em mobile */
+  .sidebar {
+    position: fixed;
+    left: -100%;
+    top: 0;
+    height: 100%;
+    z-index: 200;
+    width: 280px;
+    transition: left 0.3s ease;
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+
+  .sidebar-overlay {
+    display: block !important;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Main content ocupa tudo */
+  .app-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .main-content {
+    margin-left: 0 !important;
+    padding: 16px 12px;
+    padding-bottom: calc(var(--bottom-nav-height, 70px) + 20px);
+  }
+
+  /* Header do professor */
+  .professor-header {
+    padding: 0 16px;
+  }
+
+  .menu-toggle {
+    display: flex !important;
+  }
+
+  /* Bottom nav do aluno sempre visível */
+  .bottom-nav {
+    display: flex !important;
+  }
+
+  /* Cards */
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .stat-card h3 {
+    font-size: 1.6rem;
+  }
+
+  /* Formulários */
+  .form-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .form-row > * {
+    width: 100%;
+  }
+
+  /* Treino: letras */
+  .workout-tabs {
+    gap: 6px;
+  }
+
+  .workout-tab-btn {
+    padding: 8px 14px;
+    font-size: 0.85rem;
+  }
+
+  /* Exercício cards */
+  .exercise-meta {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Modal */
+  .modal-content {
+    width: 95%;
+    max-width: none;
+    padding: 24px 16px;
+    margin: 0 auto;
+  }
+
+  /* Lista de alunos */
+  .student-list-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Mensagens */
+  .messages-container {
+    padding: 12px;
+  }
+
+  /* Painel aluno: header */
+  .aluno-header {
+    padding: 16px 12px;
+  }
+
+  .aluno-header h1 {
+    font-size: 1.3rem;
+  }
+
+  /* Seção treino: checklist */
+  .exercise-check-card {
+    padding: 14px;
+  }
+}
+
+/* ============================================================
+   MOBILE PEQUENO - 480px
+   ============================================================ */
+@media (max-width: 480px) {
+  :root {
+    --header-height: 60px;
+    --bottom-nav-height: 65px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .workout-tab-btn {
+    padding: 7px 10px;
+    font-size: 0.8rem;
+    min-width: 40px;
+  }
+
+  .workout-tabs {
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-danger {
+    padding: 12px 20px;
+    font-size: 0.9rem;
+  }
+
+  .page-title {
+    font-size: 1.4rem;
+  }
+
+  .bottom-nav .nav-item span {
+    font-size: 0.65rem;
+  }
+
+  .bottom-nav .nav-item svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .modal-content {
+    padding: 20px 14px;
+    border-radius: 16px;
+  }
+
+  .login-card {
+    padding: 28px 20px;
+  }
+
+  /* IMC resultado */
+  .imc-value {
+    font-size: 3rem;
+  }
+}
+
+/* ============================================================
+   DESKTOP - 1024px+
+   ============================================================ */
+@media (min-width: 1024px) {
+  /* Bottom nav some no desktop (professor) */
+  .professor-view .bottom-nav {
+    display: none;
+  }
+
+  /* Sidebar sempre visível */
+  .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+
+  .menu-toggle {
+    display: none;
+  }
+
+  /* Grid de stats */
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  /* Grid de alunos */
+  .student-list-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .main-content {
+    padding: 32px;
+  }
+
+  /* Exercícios em grid horizontal */
+  .exercise-meta {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  /* Dieta: refeições em grid */
+  .refeicoes-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ============================================================
+   WIDE DESKTOP - 1440px+
+   ============================================================ */
+@media (min-width: 1440px) {
+  .student-list-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .refeicoes-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ============================================================
+   LANDSCAPE MOBILE
+   ============================================================ */
+@media (max-height: 500px) and (orientation: landscape) {
+  .bottom-nav {
+    padding: 6px 0;
+  }
+
+  .bottom-nav .nav-item {
+    padding: 6px 8px;
+  }
+
+  .bottom-nav .nav-item span {
+    display: none;
+  }
+
+  .main-content {
+    padding-bottom: calc(var(--bottom-nav-height) + 10px);
+  }
+}
+
+/* ============================================================
+   PWA STANDALONE MODE
+   ============================================================ */
+@media (display-mode: standalone) {
+  /* Safe area para iPhone X+ */
+  .header,
+  .professor-header {
+    padding-top: env(safe-area-inset-top, 0);
+  }
+
+  .bottom-nav {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    height: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0));
+  }
+
+  body {
+    padding-top: env(safe-area-inset-top, 0);
+  }
+}
+
+/* ============================================================
+   ACESSIBILIDADE - Reduzir animações
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================
+   PRINT
+   ============================================================ */
+@media print {
+  .sidebar,
+  .bottom-nav,
+  .header,
+  .btn-primary,
+  .btn-danger,
+  .pwa-install-btn,
+  #toast-container,
+  .modal {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+    color: black;
+  }
+
+  .card {
+    border: 1px solid #ccc;
+    box-shadow: none;
+    background: white;
+  }
+}

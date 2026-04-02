@@ -1,0 +1,1115 @@
+﻿<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml" />
+    <link rel="icon" href="assets/icons/icon-72.png" type="image/png" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>Painel do Professor — Treino Pro</title>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#6B35C3" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+    <!-- Tom Select (autocomplete elegante) -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.min.css"
+    />
+  </head>
+  <body>
+    <!-- ======================================================
+     LAYOUT PRINCIPAL
+     ====================================================== -->
+    <div class="app-layout" id="app">
+      <!-- ===== OVERLAY MOBILE ===== -->
+      <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+      <!-- ===== SIDEBAR ===== -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+          <div class="sidebar-logo-inner">
+            <div class="sidebar-logo-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+                <path
+                  d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"
+                />
+              </svg>
+            </div>
+            <div>
+              <h2>Treino Pro</h2>
+              <p id="sidebar-logo-nome">Professor</p>
+            </div>
+          </div>
+        </div>
+
+        <nav class="sidebar-nav">
+          <div class="sidebar-nav-section">
+            <div class="sidebar-nav-label">Principal</div>
+            <button class="sidebar-nav-btn active" data-section="dashboard">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"
+                />
+              </svg>
+              Dashboard
+            </button>
+            <button class="sidebar-nav-btn" data-section="alunos">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"
+                />
+              </svg>
+              Meus Alunos
+            </button>
+            <button class="sidebar-nav-btn" data-section="mensagens">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"
+                />
+              </svg>
+              Mensagens
+              <span class="nav-badge hidden" id="msg-badge-sidebar">0</span>
+            </button>
+          </div>
+
+          <div class="sidebar-nav-section">
+            <div class="sidebar-nav-label">Conta</div>
+            <button class="sidebar-nav-btn" data-section="perfil">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+                />
+              </svg>
+              Meu Perfil
+            </button>
+          </div>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="sidebar-user-info">
+            <div class="avatar avatar-gradient" id="sidebar-avatar">P</div>
+            <div class="user-details">
+              <div class="user-name" id="sidebar-name">Professor</div>
+              <div class="user-role">Professor</div>
+            </div>
+          </div>
+          <button class="btn-ghost btn-block" id="logout-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"
+              />
+            </svg>
+            Sair
+          </button>
+        </div>
+      </aside>
+
+      <!-- ===== CONTEÚDO PRINCIPAL ===== -->
+      <div class="app-main-column">
+        <!-- Header do Professor -->
+        <header class="professor-header">
+          <button class="menu-toggle" id="menu-toggle">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
+            </svg>
+          </button>
+          <h1 class="header-title" id="header-title">Dashboard</h1>
+          <div class="header-actions">
+            <button class="btn-icon" id="header-notif-btn" title="Mensagens">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"
+                />
+              </svg>
+            </button>
+          </div>
+        </header>
+
+        <!-- ===== SEÇÕES PRINCIPAIS ===== -->
+        <main class="main-content" id="main-content">
+          <!-- -------- SEÇÃO: DASHBOARD -------- -->
+          <section class="app-section" id="section-dashboard">
+            <div class="mb-24">
+              <h1 class="page-title" id="dashboard-welcome">
+                Olá, Professor! 👋
+              </h1>
+              <p class="page-subtitle">Aqui está o resumo do seu dia</p>
+            </div>
+
+            <!-- Cards de estatísticas -->
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-icon">
+                  <svg
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path
+                      d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"
+                    />
+                  </svg>
+                </div>
+                <h3 id="stat-alunos">0</h3>
+                <p>Alunos</p>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon">
+                  <svg
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path
+                      d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"
+                    />
+                  </svg>
+                </div>
+                <h3 id="stat-treinos">0</h3>
+                <p>Treinos criados</p>
+              </div>
+              <div
+                class="stat-card"
+                onclick="professorNavigate('mensagens')"
+                style="cursor: pointer"
+                title="Ver mensagens não lidas"
+              >
+                <div class="stat-icon red">
+                  <svg
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path
+                      d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"
+                    />
+                  </svg>
+                </div>
+                <h3 id="stat-msgs">0</h3>
+                <p>Não lidas</p>
+              </div>
+            </div>
+
+            <!-- Lista rápida de alunos -->
+            <div class="card mt-8">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path
+                      d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"
+                    />
+                  </svg>
+                  Alunos recentes
+                </h3>
+                <button
+                  class="btn-ghost btn-sm"
+                  onclick="professorNavigate('alunos')"
+                >
+                  Ver todos
+                </button>
+              </div>
+              <div id="dashboard-alunos-list">
+                <div class="empty-state">
+                  <div class="spinner"></div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- -------- SEÇÃO: ALUNOS -------- -->
+          <section class="app-section hidden" id="section-alunos">
+            <!-- Lista de alunos (padrão) -->
+            <div id="alunos-list-view">
+              <div class="section-top">
+                <div>
+                  <h1 class="page-title">Meus Alunos</h1>
+                  <p class="page-subtitle">Gerencie e acompanhe seus alunos</p>
+                </div>
+              </div>
+
+              <!-- Busca -->
+              <div class="search-bar">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+                  />
+                </svg>
+                <input
+                  type="text"
+                  id="search-alunos"
+                  placeholder="Buscar aluno..."
+                />
+              </div>
+
+              <div id="alunos-grid" class="student-list-grid">
+                <div class="empty-state col-span-full">
+                  <div class="spinner"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Detalhe de um aluno selecionado -->
+            <div id="aluno-detail-view" class="hidden">
+              <!-- Botão voltar -->
+              <button class="btn-ghost btn-sm mb-16 gap-6" id="btn-back-alunos">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
+                  />
+                </svg>
+                Voltar para lista
+              </button>
+
+              <!-- Header do aluno -->
+              <div class="aluno-detail-header" id="aluno-detail-header">
+                <div
+                  class="avatar avatar-lg avatar-gradient"
+                  id="aluno-detail-avatar"
+                >
+                  A
+                </div>
+                <div class="aluno-detail-info">
+                  <div class="badge-row">
+                    <span class="badge badge-purple" id="aluno-detail-treino"
+                      >Treino -</span
+                    >
+                    <span class="badge badge-gray" id="aluno-detail-imc"
+                      >IMC -</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sub-tabs -->
+              <div class="sub-tabs">
+                <button class="sub-tab-btn active" data-subtab="treinos">
+                  💪 Treinos
+                </button>
+                <button class="sub-tab-btn" data-subtab="dieta">
+                  🥗 Dieta
+                </button>
+                <button class="sub-tab-btn" data-subtab="historico">
+                  📊 Histórico
+                </button>
+                <button class="sub-tab-btn" data-subtab="msgs">
+                  💬 Mensagens
+                </button>
+              </div>
+
+              <!-- Sub-aba: Treinos -->
+              <div id="subtab-treinos" class="subtab-panel">
+                <!-- Seletor de foco -->
+                <div class="card mb-16">
+                  <div class="card-header">
+                    <h3 class="card-title">
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path
+                          d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"
+                        />
+                      </svg>
+                      Gerenciar Treinos
+                    </h3>
+                  </div>
+
+                  <!-- Tabs de treino A-E -->
+                  <div class="workout-tabs" id="prof-workout-tabs">
+                    <button class="workout-tab-btn active" data-letra="A">
+                      A
+                    </button>
+                    <button class="workout-tab-btn" data-letra="B">B</button>
+                    <button class="workout-tab-btn" data-letra="C">C</button>
+                    <button class="workout-tab-btn" data-letra="D">D</button>
+                    <button class="workout-tab-btn" data-letra="E">E</button>
+                  </div>
+
+                  <!-- Foco do treino -->
+                  <div class="mb-16">
+                    <p class="form-label">Foco do treino</p>
+                    <div class="workout-focus-selector" id="focus-selector">
+                      <button class="focus-chip" data-foco="emagrecimento">
+                        🔥 Emagrecimento
+                      </button>
+                      <button class="focus-chip" data-foco="hipertrofia">
+                        💪 Hipertrofia
+                      </button>
+                      <button class="focus-chip" data-foco="resistencia">
+                        🏃 Resistência
+                      </button>
+                      <button class="focus-chip" data-foco="mobilidade">
+                        🤸 Mobilidade
+                      </button>
+                      <button class="focus-chip" data-foco="condicionamento">
+                        ⚡ Condicionamento
+                      </button>
+                      <button class="focus-chip" data-foco="outro">
+                        📋 Outro
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Definir treino atual do aluno -->
+                  <div class="field-inline">
+                    <label class="form-label">Treino atual do aluno:</label>
+                    <select
+                      class="form-select select-inline"
+                      id="treino-atual-select"
+                    >
+                      <option value="A">Treino A</option>
+                      <option value="B">Treino B</option>
+                      <option value="C">Treino C</option>
+                      <option value="D">Treino D</option>
+                      <option value="E">Treino E</option>
+                    </select>
+                    <button
+                      class="btn-secondary btn-sm"
+                      id="set-treino-atual-btn"
+                    >
+                      Definir
+                    </button>
+                  </div>
+
+                  <!-- Lista de exercícios -->
+                  <div class="workout-header">
+                    <h4 class="workout-title" id="current-workout-label">
+                      Treino A
+                    </h4>
+                    <button class="btn-primary btn-sm" id="add-exercise-btn">
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                      </svg>
+                      Adicionar exercício
+                    </button>
+                  </div>
+
+                  <!-- Form de exercício com autocomplete da biblioteca -->
+                  <div class="exercise-form hidden" id="exercise-form">
+                    <div class="exercise-form-title">
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                      </svg>
+                      <span id="exercise-form-title-text">Novo exercício</span>
+                    </div>
+
+                    <!-- Campos hidden: preenchidos automaticamente pelo autocomplete -->
+                    <input type="hidden" id="exercise-edit-id" />
+                    <input type="hidden" id="ex-nome" />
+                    <input type="hidden" id="ex-exercicio-id" />
+                    <input type="hidden" id="ex-grupo-muscular" />
+                    <input type="hidden" id="ex-tipo" />
+                    <input type="hidden" id="ex-instrucoes" />
+
+                    <!-- PASSO 1: Buscar exercício -->
+                    <div class="ex-search-section">
+                      <p class="form-label ex-search-label">
+                        🔍 Buscar exercício na biblioteca *
+                      </p>
+
+                      <!-- Filtros por grupo muscular -->
+                      <div class="ex-filters-bar" id="ex-filters-grupo">
+                        <button
+                          class="ex-filter-chip"
+                          data-filter="grupoMuscular"
+                          data-value="peito"
+                        >
+                          Peito
+                        </button>
+                        <button
+                          class="ex-filter-chip"
+                          data-filter="grupoMuscular"
+                          data-value="costas"
+                        >
+                          Costas
+                        </button>
+                        <button
+                          class="ex-filter-chip"
+                          data-filter="grupoMuscular"
+                          data-value="pernas"
+                        >
+                          Pernas
+                        </button>
+                        <button
+                          class="ex-filter-chip"
+                          data-filter="grupoMuscular"
+                          data-value="ombros"
+                        >
+                          Ombros
+                        </button>
+                        <button
+                          class="ex-filter-chip"
+                          data-filter="grupoMuscular"
+                          data-value="biceps"
+                        >
+                          Bíceps
+                        </button>
+                        <button
+                          class="ex-filter-chip"
+                          data-filter="grupoMuscular"
+                          data-value="triceps"
+                        >
+                          Tríceps
+                        </button>
+                        <button
+                          class="ex-filter-chip"
+                          data-filter="grupoMuscular"
+                          data-value="abdomen"
+                        >
+                          Abdômen
+                        </button>
+                        <button
+                          class="ex-filter-chip"
+                          data-filter="grupoMuscular"
+                          data-value="gluteos"
+                        >
+                          Glúteos
+                        </button>
+                        <button
+                          class="ex-filter-chip"
+                          data-filter="grupoMuscular"
+                          data-value="cardio"
+                        >
+                          Cardio
+                        </button>
+                        <button
+                          class="ex-filter-chip"
+                          data-filter="grupoMuscular"
+                          data-value="mobilidade"
+                        >
+                          Mobilidade
+                        </button>
+                      </div>
+
+                      <!-- Filtros por tipo de equipamento -->
+                      <div
+                        class="ex-filters-bar ex-filters-bar--tipo"
+                        id="ex-filters-tipo"
+                      >
+                        <button
+                          class="ex-filter-chip"
+                          data-filter="tipo"
+                          data-value="peso_livre"
+                        >
+                          🏋️ Peso Livre
+                        </button>
+                        <button
+                          class="ex-filter-chip"
+                          data-filter="tipo"
+                          data-value="maquina"
+                        >
+                          ⚙️ Máquina
+                        </button>
+                        <button
+                          class="ex-filter-chip"
+                          data-filter="tipo"
+                          data-value="cabo"
+                        >
+                          🔗 Cabo
+                        </button>
+                        <button
+                          class="ex-filter-chip"
+                          data-filter="tipo"
+                          data-value="cardio"
+                        >
+                          🏃 Cardio
+                        </button>
+                        <button
+                          class="ex-filter-chip"
+                          data-filter="tipo"
+                          data-value="funcional"
+                        >
+                          🤸 Funcional
+                        </button>
+                        <button
+                          class="ex-filter-chip"
+                          data-filter="tipo"
+                          data-value="peso_corporal"
+                        >
+                          🧘 Peso Corporal
+                        </button>
+                      </div>
+
+                      <!-- Tom Select -->
+                      <select
+                        id="ex-exercicio-select"
+                        placeholder="Buscar exercício..."
+                      ></select>
+
+                      <!-- Painel de informações do exercício selecionado -->
+                      <div class="ex-info-panel hidden" id="ex-info-panel">
+                        <div class="ex-info-row">
+                          <div class="ex-info-main">
+                            <div class="ex-info-nome" id="ex-info-nome">-</div>
+                            <div class="ex-info-tags">
+                              <span
+                                class="ex-tag ex-tag-grupo"
+                                id="ex-info-grupo"
+                                >-</span
+                              >
+                              <span class="ex-tag ex-tag-tipo" id="ex-info-tipo"
+                                >-</span
+                              >
+                              <span
+                                class="ex-tag ex-tag-nivel"
+                                id="ex-info-nivel"
+                                >-</span
+                              >
+                            </div>
+                            <div
+                              class="ex-info-instrucoes"
+                              id="ex-info-instrucoes"
+                            ></div>
+                          </div>
+                          <button
+                            type="button"
+                            class="ex-fav-btn"
+                            id="ex-fav-btn"
+                            title="Favoritar"
+                          >
+                            ☆
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- Exercício personalizado -->
+                      <div class="ex-custom-hint">
+                        <span>Não encontrou?</span>
+                        <button
+                          type="button"
+                          class="btn-link"
+                          id="btn-criar-custom"
+                        >
+                          + Criar exercício personalizado
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- PASSO 2: Parâmetros do exercício -->
+                    <div class="ex-params-section">
+                      <div class="ex-params-divider">
+                        <span>⚙️ Parâmetros</span>
+                      </div>
+                      <div class="form-row">
+                        <div class="form-group">
+                          <label class="form-label">Séries</label>
+                          <input
+                            class="form-control"
+                            type="number"
+                            id="ex-series"
+                            placeholder="3"
+                            min="1"
+                            max="20"
+                          />
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">Repetições</label>
+                          <input
+                            class="form-control"
+                            type="text"
+                            id="ex-reps"
+                            placeholder="10-12"
+                          />
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">Carga (kg)</label>
+                          <input
+                            class="form-control"
+                            type="text"
+                            id="ex-carga"
+                            placeholder="20"
+                          />
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">Descanso</label>
+                          <input
+                            class="form-control"
+                            type="text"
+                            id="ex-descanso"
+                            placeholder="60s"
+                          />
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">Observações</label>
+                        <textarea
+                          class="form-control"
+                          id="ex-obs"
+                          placeholder="Dicas de execução, variações..."
+                          rows="2"
+                        ></textarea>
+                      </div>
+                    </div>
+
+                    <div class="form-actions">
+                      <button class="btn-ghost btn-sm" id="cancel-exercise-btn">
+                        Cancelar
+                      </button>
+                      <button class="btn-primary btn-sm" id="save-exercise-btn">
+                        Salvar exercício
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Lista de exercícios do treino selecionado -->
+                  <div class="exercise-list" id="prof-exercise-list">
+                    <div class="empty-state">
+                      <div class="empty-state-icon">
+                        <svg
+                          width="28"
+                          height="28"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                          class="text-purple-500"
+                        >
+                          <path
+                            d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"
+                          />
+                        </svg>
+                      </div>
+                      <h3>Nenhum exercício</h3>
+                      <p>
+                        Clique em "Adicionar exercício" para criar o primeiro
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sub-aba: Dieta -->
+              <div id="subtab-dieta" class="subtab-panel hidden">
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path
+                          d="M18.06 22.99h1.66c.84 0 1.53-.64 1.63-1.46L23 5.05h-5V1h-1.97v4.05h-4.97l.3 2.34c1.71.47 3.31 1.32 4.27 2.26 1.44 1.42 2.43 2.89 2.43 5.29v8.05zM1 21.99V21h15.03v.99c0 .55-.45 1-1.01 1H2.01c-.56 0-1.01-.45-1.01-1zm15.03-7c0-8.17-15.03-8.17-15.03 0h15.03zM1.02 17h15v2h-15z"
+                        />
+                      </svg>
+                      Dieta Personalizada
+                    </h3>
+                    <button class="btn-primary btn-sm" id="save-diet-btn">
+                      Salvar dia
+                    </button>
+                  </div>
+
+                  <div class="form-row mb-16">
+                    <div class="form-group">
+                      <label class="form-label">Título do plano</label>
+                      <input
+                        class="form-control"
+                        type="text"
+                        id="diet-titulo"
+                        placeholder="Ex: Dieta para hipertrofia"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Objetivo</label>
+                      <input
+                        class="form-control"
+                        type="text"
+                        id="diet-objetivo"
+                        placeholder="Ex: Ganho de massa muscular"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="form-group mb-20">
+                    <label class="form-label">Observações gerais</label>
+                    <textarea
+                      class="form-control"
+                      id="diet-obs"
+                      placeholder="Orientações, restrições alimentares..."
+                      rows="2"
+                    ></textarea>
+                  </div>
+
+                  <!-- Seletor de dia da semana -->
+                  <div class="diet-dias-tabs" id="diet-dias-tabs"></div>
+                  <div class="diet-dia-label" id="diet-dia-label"></div>
+
+                  <!-- Refeições do dia selecionado -->
+                  <div class="list-header" style="margin-top: 12px">
+                    <h4 class="workout-title">Refeições</h4>
+                    <button class="btn-secondary btn-sm" id="add-refeicao-btn">
+                      + Adicionar refeição
+                    </button>
+                  </div>
+
+                  <div id="refeicoes-list">
+                    <!-- Refeições são adicionadas dinamicamente -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sub-aba: Histórico -->
+              <div id="subtab-historico" class="subtab-panel hidden">
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path
+                          d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"
+                        />
+                      </svg>
+                      Histórico de Treinos
+                    </h3>
+                  </div>
+                  <div id="prof-historico-list" class="history-list">
+                    <div class="empty-state">
+                      <div class="empty-state-icon">
+                        <svg
+                          width="28"
+                          height="28"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                          class="text-purple-500"
+                        >
+                          <path
+                            d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"
+                          />
+                        </svg>
+                      </div>
+                      <h3>Sem histórico</h3>
+                      <p>O aluno ainda não finalizou nenhum treino</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sub-aba: Mensagens -->
+              <div id="subtab-msgs" class="subtab-panel hidden">
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path
+                          d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"
+                        />
+                      </svg>
+                      Conversa
+                    </h3>
+                  </div>
+                  <div class="messages-container" id="prof-messages-container">
+                    <div class="empty-state">
+                      <h3>Nenhuma mensagem</h3>
+                      <p>Inicie a conversa com o aluno</p>
+                    </div>
+                  </div>
+                  <div class="message-send-form">
+                    <textarea
+                      class="form-control"
+                      id="prof-msg-input"
+                      placeholder="Digite sua mensagem..."
+                      rows="2"
+                    ></textarea>
+                    <button class="btn-primary btn-send" id="prof-send-msg-btn">
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- -------- SEÇÃO: MENSAGENS (Overview) -------- -->
+          <section class="app-section hidden" id="section-mensagens">
+            <div class="mb-24">
+              <h1 class="page-title">Mensagens</h1>
+              <p class="page-subtitle">Conversas com seus alunos</p>
+            </div>
+            <div id="messages-alunos-list" class="student-list-grid">
+              <div class="empty-state col-span-full">
+                <div class="spinner"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- -------- SEÇÃO: PERFIL -------- -->
+          <section class="app-section hidden" id="section-perfil">
+            <div class="mb-24">
+              <h1 class="page-title">Meu Perfil</h1>
+              <p class="page-subtitle">Informações da sua conta</p>
+            </div>
+            <div class="card card-wide">
+              <div class="profile-header-inner">
+                <div
+                  class="avatar avatar-lg avatar-gradient"
+                  id="prof-avatar-big"
+                >
+                  P
+                </div>
+                <div>
+                  <h2 class="profile-name" id="prof-nome-big">-</h2>
+                  <p class="profile-role">Professor</p>
+                  <p class="profile-email" id="prof-email-big">-</p>
+                </div>
+              </div>
+              <div class="profile-info-box">
+                <p class="profile-note">
+                  Para alterar seus dados, acesse o console do Firebase ou
+                  contate o administrador do sistema.
+                </p>
+              </div>
+              <div class="mt-20">
+                <button class="btn-danger btn-block" id="prof-logout-btn">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path
+                      d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"
+                    />
+                  </svg>
+                  Sair da conta
+                </button>
+              </div>
+            </div>
+          </section>
+        </main>
+        <!-- /main-content -->
+      </div>
+      <!-- /direita -->
+    </div>
+    <!-- /app-layout -->
+
+    <!-- ============================================================
+     MODAIS
+     ============================================================ -->
+
+    <!-- Modal confirmar exclusão de exercício -->
+    <div class="modal" id="modal-delete-exercise">
+      <div class="modal-content modal-content-sm">
+        <div class="modal-header">
+          <span class="modal-title text-red">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
+              />
+            </svg>
+            Excluir exercício
+          </span>
+          <button class="modal-close" id="close-delete-ex">×</button>
+        </div>
+        <p class="text-secondary text-sm mb-8">
+          Tem certeza que deseja excluir o exercício
+          <strong id="delete-ex-name" class="text-white"></strong>?
+        </p>
+        <p class="text-muted text-xs">Esta ação não pode ser desfeita.</p>
+        <div class="modal-footer">
+          <button class="btn-secondary" id="cancel-delete-ex">Cancelar</button>
+          <button class="btn-danger" id="confirm-delete-ex">Excluir</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal confirmar exclusão de refeição -->
+    <div class="modal" id="modal-delete-refeicao">
+      <div class="modal-content modal-content-sm">
+        <div class="modal-header">
+          <span class="modal-title text-red">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
+              />
+            </svg>
+            Excluir refeição
+          </span>
+          <button class="modal-close" id="close-delete-ref">×</button>
+        </div>
+        <p class="text-secondary text-sm">
+          Tem certeza que deseja excluir esta refeição?
+        </p>
+        <div class="modal-footer">
+          <button class="btn-secondary" id="cancel-delete-ref">Cancelar</button>
+          <button class="btn-danger" id="confirm-delete-ref">Excluir</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Criar Exercício Personalizado -->
+    <div class="modal-overlay hidden" id="custom-exercise-modal">
+      <div class="modal-content modal-content-md">
+        <div class="modal-header">
+          <h3 class="modal-title">✨ Criar Exercício Personalizado</h3>
+          <button class="modal-close" id="btn-close-custom-modal" type="button">
+            ×
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Nome do exercício *</label>
+            <input
+              class="form-control"
+              type="text"
+              id="custom-ex-nome"
+              placeholder="Ex: Agachamento Búlgaro"
+            />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Grupo muscular</label>
+              <select class="form-select" id="custom-ex-grupo">
+                <option value="">Selecionar...</option>
+                <option value="peito">Peito</option>
+                <option value="costas">Costas</option>
+                <option value="pernas">Pernas</option>
+                <option value="ombros">Ombros</option>
+                <option value="biceps">Bíceps</option>
+                <option value="triceps">Tríceps</option>
+                <option value="gluteos">Glúteos</option>
+                <option value="abdomen">Abdômen</option>
+                <option value="cardio">Cardio</option>
+                <option value="mobilidade">Mobilidade</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tipo</label>
+              <select class="form-select" id="custom-ex-tipo">
+                <option value="peso_livre">Peso Livre</option>
+                <option value="maquina">Máquina</option>
+                <option value="cabo">Cabo</option>
+                <option value="cardio">Cardio</option>
+                <option value="funcional">Funcional</option>
+                <option value="peso_corporal">Peso Corporal</option>
+                <option value="alongamento">Alongamento</option>
+                <option value="mobilidade">Mobilidade</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Equipamento</label>
+              <select class="form-select" id="custom-ex-equipamento">
+                <option value="">Selecionar...</option>
+                <option value="barra">Barra</option>
+                <option value="haltere">Haltere</option>
+                <option value="maquina">Máquina</option>
+                <option value="cabo">Cabo</option>
+                <option value="kettlebell">Kettlebell</option>
+                <option value="elastico">Elástico</option>
+                <option value="sem_equipamento">Sem equipamento</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nível</label>
+              <select class="form-select" id="custom-ex-nivel">
+                <option value="iniciante">Iniciante</option>
+                <option value="intermediario">Intermediário</option>
+                <option value="avancado">Avançado</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Foco</label>
+            <select class="form-select" id="custom-ex-foco">
+              <option value="hipertrofia">Hipertrofia</option>
+              <option value="emagrecimento">Emagrecimento</option>
+              <option value="resistencia">Resistência</option>
+              <option value="forca">Força</option>
+              <option value="condicionamento">Condicionamento</option>
+              <option value="mobilidade">Mobilidade</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Instruções de execução</label>
+            <textarea
+              class="form-control"
+              id="custom-ex-instrucoes"
+              placeholder="Descreva como executar o exercício corretamente..."
+              rows="3"
+            ></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-ghost" id="btn-cancel-custom" type="button">
+            Cancelar
+          </button>
+          <button class="btn-primary" id="btn-salvar-custom" type="button">
+            Criar exercício
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <!-- Tom Select JS -->
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+    <!-- Fuse.js (fuzzy search) -->
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+
+    <script src="js/firebase-config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/pwa.js"></script>
+    <script src="js/exercicios-service.js"></script>
+    <script src="js/autocomplete-exercicios.js"></script>
+    <script src="js/exercicios-seed.js"></script>
+    <script src="js/treinos.js"></script>
+    <script src="js/dietas.js"></script>
+    <script src="js/mensagens.js"></script>
+    <script src="js/professor.js"></script>
+  </body>
+</html>

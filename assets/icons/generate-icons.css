@@ -1,0 +1,71 @@
+/* ============================================================
+   TREINO PRO — Gerador de Ícones (generate-icons.html)
+   ============================================================ */
+
+body {
+  font-family: Arial, sans-serif;
+  background: #0a0a14;
+  color: #fff;
+  padding: 32px;
+}
+
+h1 {
+  color: #8b5cf6;
+}
+
+p {
+  color: #aaa;
+}
+
+button {
+  background: #6b35c3;
+  color: #fff;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  margin: 8px;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background: #8b5cf6;
+}
+
+.btn-primary {
+  background: #ff1744;
+}
+
+.btn-primary:hover {
+  background: #ff4560;
+}
+
+#status {
+  margin-top: 16px;
+  color: #50fa7b;
+  font-weight: bold;
+}
+
+canvas {
+  display: none;
+}
+
+.preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.preview-item {
+  text-align: center;
+  color: #aaa;
+  font-size: 12px;
+}
+
+.preview-item img {
+  display: block;
+  border: 2px solid #6b35c3;
+  border-radius: 8px;
+}

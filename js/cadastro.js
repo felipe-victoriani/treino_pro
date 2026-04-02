@@ -1,0 +1,188 @@
+/* ============================================================
+   TREINO PRO - Cadastro de Alunos
+   ============================================================ */
+
+document.addEventListener("DOMContentLoaded", async () => {
+  /* --- Elementos --- */
+  const form = document.getElementById("cadastro-form");
+  const nomeInput = document.getElementById("nome");
+  const emailInput = document.getElementById("email");
+  const senhaInput = document.getElementById("senha");
+  const confirmInput = document.getElementById("confirmar-senha");
+  const profSelect = document.getElementById("professor");
+  const pesoInput = document.getElementById("peso");
+  const alturaInput = document.getElementById("altura");
+  const cadastroBtn = document.getElementById("cadastro-btn");
+  const btnText = document.getElementById("cadastro-btn-text");
+  const spinner = document.getElementById("cadastro-spinner");
+  const togglePw = document.getElementById("toggle-pw");
+
+  /* --- Toggle senha --- */
+  togglePw?.addEventListener("click", () => {
+    senhaInput.type = senhaInput.type === "password" ? "text" : "password";
+  });
+
+  /* --- Carregar lista de professores --- */
+  await loadProfessores();
+
+  /* --- Submit --- */
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    clearErrors();
+
+    const nome = sanitize(nomeInput.value.trim());
+    const email = emailInput.value.trim().toLowerCase();
+    const senha = senhaInput.value;
+    const confirm = confirmInput.value;
+    const profId = profSelect.value;
+    const peso = pesoInput.value ? parseFloat(pesoInput.value) : null;
+    const altura = alturaInput.value ? parseFloat(alturaInput.value) : null;
+
+    // Validações
+    let hasError = false;
+
+    if (!nome || nome.length < 2) {
+      showFieldError("nome-error", "Informe seu nome completo");
+      hasError = true;
+    }
+    if (!email || !isValidEmail(email)) {
+      showFieldError("email-error", "Informe um e-mail válido");
+      hasError = true;
+    }
+    if (!senha || senha.length < 6) {
+      showFieldError("senha-error", "A senha deve ter ao menos 6 caracteres");
+      hasError = true;
+    }
+    if (senha !== confirm) {
+      showFieldError("confirm-error", "As senhas não coincidem");
+      hasError = true;
+    }
+    if (!profId) {
+      showFieldError("professor-error", "Selecione um professor");
+      hasError = true;
+    }
+    if (hasError) return;
+
+    // Calcular IMC se peso e altura informados
+    let imc = null;
+    if (peso && altura && altura > 0) {
+      imc = parseFloat((peso / (altura * altura)).toFixed(1));
+    }
+
+    setLoading(true);
+
+    try {
+      // 1. Criar conta no Firebase Auth
+      const credential = await auth.createUserWithEmailAndPassword(
+        email,
+        senha,
+      );
+      const uid = credential.user.uid;
+      const timestamp = Date.now();
+
+      // Buscar nome do professor no node professores/ (leitura pública)
+      const profSnap = await db.ref(`professores/${profId}`).once("value");
+      const profNome = profSnap.val()?.nome || "Professor";
+
+      const alunoData = {
+        nome,
+        email,
+        tipo: "aluno",
+        professorId: profId,
+        professorNome: profNome,
+        treinoAtual: "A",
+        peso: peso || null,
+        altura: altura || null,
+        imc: imc || null,
+        ativo: true,
+        createdAt: timestamp,
+      };
+
+      const updates = {};
+      updates[`users/${uid}`] = alunoData;
+      updates[`alunos/${uid}`] = alunoData;
+
+      await db.ref().update(updates);
+      showToast("Conta criada com sucesso! Faça o login.", "success", 3000);
+
+      await auth.signOut();
+      setTimeout(() => window.location.replace("login.html"), 2000);
+    } catch (error) {
+      setLoading(false);
+      handleRegisterError(error);
+    }
+  });
+
+  /* ---- Funções auxiliares ---- */
+
+  async function loadProfessores() {
+    try {
+      const snap = await db.ref("professores").once("value");
+      const data = snap.val();
+
+      profSelect.innerHTML =
+        '<option value="">Selecione seu professor</option>';
+
+      if (!data) {
+        profSelect.innerHTML =
+          '<option value="">Nenhum professor disponível</option>';
+        showToast(
+          "Nenhum professor cadastrado ainda. Contate o administrador.",
+          "warning",
+        );
+        return;
+      }
+
+      const professores = Object.keys(data).map((profId) => ({
+        id: profId,
+        nome: data[profId]?.nome || "Professor",
+      }));
+      professores.sort((a, b) => a.nome.localeCompare(b.nome));
+
+      professores.forEach(({ id, nome }) => {
+        const option = document.createElement("option");
+        option.value = id;
+        option.textContent = nome;
+        profSelect.appendChild(option);
+      });
+    } catch (error) {
+      console.error("[Cadastro] Erro ao carregar professores:", error);
+      profSelect.innerHTML =
+        '<option value="">Erro ao carregar professores</option>';
+    }
+  }
+
+  function setLoading(loading) {
+    cadastroBtn.disabled = loading;
+    btnText.textContent = loading ? "Criando conta..." : "Criar conta";
+    spinner.classList.toggle("hidden", !loading);
+  }
+
+  function showFieldError(id, message) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.textContent = message;
+      el.classList.remove("hidden");
+    }
+  }
+
+  function clearErrors() {
+    document.querySelectorAll(".form-error").forEach((el) => {
+      el.textContent = "";
+      el.classList.add("hidden");
+    });
+  }
+
+  function handleRegisterError(error) {
+    const codes = {
+      "auth/email-already-in-use":
+        "Este e-mail já está cadastrado. Tente fazer login.",
+      "auth/invalid-email": "E-mail inválido",
+      "auth/weak-password": "Senha muito fraca. Use ao menos 6 caracteres",
+      "auth/network-request-failed": "Sem conexão. Verifique sua internet",
+    };
+    const msg = codes[error.code] || "Erro ao criar conta. Tente novamente.";
+    showToast(msg, "error");
+    console.error("[Cadastro] Erro:", error.code, error.message);
+  }
+});

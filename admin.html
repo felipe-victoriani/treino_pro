@@ -1,0 +1,396 @@
+﻿<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml" />
+    <link rel="icon" href="assets/icons/icon-72.png" type="image/png" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>Administrador — Treino Pro</title>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#6B35C3" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+  </head>
+  <body class="app-body">
+    <!-- Loading overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+      <div class="loading-content">
+        <div class="spinner"></div>
+        <p id="loading-msg" class="loading-text">Carregando...</p>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Header -->
+    <header class="professor-header">
+      <div style="display: flex; align-items: center; gap: 12px">
+        <div
+          class="header-logo"
+          style="
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #6b35c3, #4f22a0);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+          "
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"
+            />
+          </svg>
+        </div>
+        <div>
+          <h1 class="header-title">Painel Admin</h1>
+          <div
+            style="font-size: 11px; color: var(--text-muted); margin-top: 1px"
+          >
+            Treino Pro
+          </div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span
+          id="admin-nome"
+          style="font-size: 13px; color: var(--text-muted); margin-right: 8px"
+        ></span>
+        <button class="btn-icon" onclick="logout()" title="Sair">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"
+            />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main
+      class="app-main"
+      style="max-width: 800px; margin: 0 auto; padding: 24px 16px"
+    >
+      <!-- Tabs de navegação -->
+      <div class="admin-tabs">
+        <button
+          class="admin-tab active"
+          id="tab-btn-professores"
+          onclick="switchTab('professores')"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+            />
+          </svg>
+          Professores
+        </button>
+        <button
+          class="admin-tab"
+          id="tab-btn-alunos"
+          onclick="switchTab('alunos')"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"
+            />
+          </svg>
+          Alunos
+        </button>
+      </div>
+
+      <!-- Tab Professores -->
+      <div id="tab-professores">
+        <!-- Cadastrar Novo Professor -->
+        <section class="card mb-16">
+          <div class="card-header">
+            <h2 class="card-title">Cadastrar Professor</h2>
+          </div>
+          <div class="card-body">
+            <form id="form-professor" novalidate>
+              <div class="form-group">
+                <label class="form-label" for="prof-nome">Nome completo</label>
+                <div class="input-icon-wrap">
+                  <svg
+                    class="input-icon"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path
+                      d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+                    />
+                  </svg>
+                  <input
+                    class="form-control"
+                    type="text"
+                    id="prof-nome"
+                    placeholder="Nome do professor"
+                    autocomplete="off"
+                  />
+                </div>
+                <span class="form-error hidden" id="prof-nome-error"></span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="prof-email"
+                  >E-mail de acesso</label
+                >
+                <div class="input-icon-wrap">
+                  <svg
+                    class="input-icon"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path
+                      d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"
+                    />
+                  </svg>
+                  <input
+                    class="form-control"
+                    type="email"
+                    id="prof-email"
+                    placeholder="professor@email.com"
+                    autocomplete="off"
+                  />
+                </div>
+                <span class="form-error hidden" id="prof-email-error"></span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="prof-senha"
+                  >Senha de acesso</label
+                >
+                <div class="input-icon-wrap">
+                  <svg
+                    class="input-icon"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path
+                      d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"
+                    />
+                  </svg>
+                  <input
+                    class="form-control"
+                    type="password"
+                    id="prof-senha"
+                    placeholder="Mínimo 6 caracteres"
+                    autocomplete="new-password"
+                  />
+                  <button
+                    type="button"
+                    class="toggle-password"
+                    id="toggle-prof-pw"
+                  >
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path
+                        d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
+                      />
+                    </svg>
+                  </button>
+                </div>
+                <span class="form-error hidden" id="prof-senha-error"></span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="prof-telefone"
+                  >Telefone (opcional)</label
+                >
+                <div class="input-icon-wrap">
+                  <svg
+                    class="input-icon"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path
+                      d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"
+                    />
+                  </svg>
+                  <input
+                    class="form-control"
+                    type="tel"
+                    id="prof-telefone"
+                    placeholder="(11) 99999-9999"
+                    autocomplete="off"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                class="btn-primary btn-block mt-8"
+                id="btn-cadastrar-prof"
+              >
+                <span id="btn-prof-text">Cadastrar Professor</span>
+                <div class="spinner spinner-sm hidden" id="spinner-prof"></div>
+              </button>
+            </form>
+          </div>
+        </section>
+
+        <!-- Lista de Professores -->
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">Professores Cadastrados</h2>
+            <span class="badge-count" id="total-professores">0</span>
+          </div>
+          <div class="card-body" id="lista-professores">
+            <div class="empty-state">
+              <p>Carregando...</p>
+            </div>
+          </div>
+        </section>
+      </div>
+      <!-- /tab-professores -->
+
+      <!-- Tab Alunos -->
+      <div id="tab-alunos" class="hidden">
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">Alunos Cadastrados</h2>
+            <span class="badge-count" id="total-alunos">0</span>
+          </div>
+          <div class="card-body" id="lista-alunos">
+            <div class="empty-state"><p>Carregando...</p></div>
+          </div>
+        </section>
+      </div>
+      <!-- /tab-alunos -->
+    </main>
+
+    <!-- Modal: Editar Professor -->
+    <div class="modal" id="modal-editar-prof">
+      <div class="modal-content modal-content-md">
+        <div class="modal-header">
+          <h3 class="modal-title">Editar Professor</h3>
+          <button class="modal-close" onclick="fecharEditarProf()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+              />
+            </svg>
+          </button>
+        </div>
+        <input type="hidden" id="edit-prof-id" />
+        <div class="form-group" style="padding: 0 0 12px">
+          <label class="form-label">Nome</label>
+          <input
+            class="form-control"
+            type="text"
+            id="edit-prof-nome"
+            placeholder="Nome do professor"
+          />
+          <span class="form-error hidden" id="edit-prof-nome-error"></span>
+        </div>
+        <div class="form-group" style="padding: 0 0 12px">
+          <label class="form-label">Telefone (opcional)</label>
+          <input
+            class="form-control"
+            type="tel"
+            id="edit-prof-telefone"
+            placeholder="(11) 99999-9999"
+          />
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary" onclick="fecharEditarProf()">
+            Cancelar
+          </button>
+          <button class="btn-primary" onclick="salvarEditarProf()">
+            Salvar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Editar Aluno -->
+    <div class="modal" id="modal-editar-aluno">
+      <div class="modal-content modal-content-md">
+        <div class="modal-header">
+          <h3 class="modal-title">Editar Aluno</h3>
+          <button class="modal-close" onclick="fecharEditarAluno()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+              />
+            </svg>
+          </button>
+        </div>
+        <input type="hidden" id="edit-aluno-id" />
+        <div class="form-group" style="padding: 0 0 12px">
+          <label class="form-label">Nome</label>
+          <input
+            class="form-control"
+            type="text"
+            id="edit-aluno-nome"
+            placeholder="Nome do aluno"
+          />
+        </div>
+        <div class="form-group" style="padding: 0 0 12px">
+          <label class="form-label">Professor responsável</label>
+          <select class="form-control" id="edit-aluno-prof"></select>
+        </div>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+          "
+        >
+          <div class="form-group">
+            <label class="form-label">Peso (kg)</label>
+            <input
+              class="form-control"
+              type="number"
+              step="0.1"
+              min="20"
+              max="300"
+              id="edit-aluno-peso"
+              placeholder="70.5"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Altura (m)</label>
+            <input
+              class="form-control"
+              type="number"
+              step="0.01"
+              min="1"
+              max="2.5"
+              id="edit-aluno-altura"
+              placeholder="1.75"
+            />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary" onclick="fecharEditarAluno()">
+            Cancelar
+          </button>
+          <button class="btn-primary" onclick="salvarEditarAluno()">
+            Salvar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/pwa.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/admin.js"></script>
+  </body>
+</html>
