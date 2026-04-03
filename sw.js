@@ -3,6 +3,41 @@
    Estratégia: Cache-first para assets estáticos
    ============================================================ */
 
+/* --- Firebase Messaging (background push) --- */
+importScripts(
+  "https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js",
+);
+importScripts(
+  "https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js",
+);
+
+firebase.initializeApp({
+  apiKey: "AIzaSyBnP4bA-sBcREdb4UzN9jOkxxIuPFog_Ek",
+  authDomain: "app-treino-academia.firebaseapp.com",
+  projectId: "app-treino-academia",
+  storageBucket: "app-treino-academia.firebasestorage.app",
+  messagingSenderId: "719877721910",
+  appId: "1:719877721910:web:ab1eca0d9db20d0d39ed97",
+});
+
+const _swMessaging = firebase.messaging();
+
+/* Exibe notificação quando o app está em background/fechado */
+_swMessaging.onBackgroundMessage((payload) => {
+  const notification = payload.notification || {};
+  const title = notification.title || "Nova mensagem";
+  const body = notification.body || "";
+
+  self.registration.showNotification(title, {
+    body,
+    icon: "/assets/icons/icon-192.png",
+    badge: "/assets/icons/icon-72.png",
+    tag: "mensagem",
+    renotify: true,
+    data: payload.data || {},
+  });
+});
+
 const CACHE_NAME = "treino-pro-v1.1.0";
 const STATIC_ASSETS = [
   "/",
@@ -127,14 +162,21 @@ self.addEventListener("sync", (event) => {
   }
 });
 
-/* --- Push Notifications (futuro) --- */
-self.addEventListener("push", (event) => {
-  if (event.data) {
-    const data = event.data.json();
-    self.registration.showNotification(data.title, {
-      body: data.body,
-      icon: "/assets/icons/icon-192.png",
-      badge: "/assets/icons/icon-72.png",
-    });
-  }
+/* --- Notificação clicada: abre/foca o app --- */
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  event.waitUntil(
+    clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((list) => {
+        for (const client of list) {
+          if (client.url.includes(self.location.origin) && "focus" in client) {
+            return client.focus();
+          }
+        }
+        if (clients.openWindow) {
+          return clients.openWindow("/");
+        }
+      }),
+  );
 });

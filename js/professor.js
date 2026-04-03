@@ -519,7 +519,7 @@ function initDietaTab(uid) {
 /* -- Sub-tab: Mensagens --------------------------------------- */
 function initMensagensTab(uid) {
   loadMensagens(uid, "prof-messages-container", profState.uid);
-  setupMensagemForm(uid, "prof-msg-input", "prof-send-msg-btn");
+  setupMensagemForm(uid, "prof-msg-input", "prof-send-msg-btn", uid);
 }
 /* -- Mensagens Geral ----------------------------------------- */
 async function loadMensagensGeral() {

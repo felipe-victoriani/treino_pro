@@ -242,7 +242,12 @@ async function loadDietaSection() {
 /* -- Secao Mensagens ----------------------------------------- */
 function loadMensagensSection() {
   loadMensagens(alunoState.uid, "aluno-messages-container", alunoState.uid);
-  setupMensagemForm(alunoState.uid, "aluno-msg-input", "aluno-send-msg-btn");
+  setupMensagemForm(
+    alunoState.uid,
+    "aluno-msg-input",
+    "aluno-send-msg-btn",
+    alunoState.professorId,
+  );
 }
 /* -- Secao Perfil -------------------------------------------- */
 async function loadPerfilSection() {

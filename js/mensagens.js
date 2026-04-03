@@ -93,8 +93,9 @@ function renderMensagens(container, data, currentUid, alunoId) {
  * @param {string} deUid    - UID do remetente
  * @param {string} deNome   - Nome do remetente
  * @param {string} deTipo   - 'professor' | 'aluno'
+ * @param {string} [paraUid] - UID do destinatário (usado pela Cloud Function para enviar push)
  */
-async function enviarMensagem(alunoId, texto, deUid, deNome, deTipo) {
+async function enviarMensagem(alunoId, texto, deUid, deNome, deTipo, paraUid) {
   if (!texto?.trim()) {
     showToast("Digite uma mensagem antes de enviar", "warning");
     return false;
@@ -105,15 +106,19 @@ async function enviarMensagem(alunoId, texto, deUid, deNome, deTipo) {
   }
 
   try {
-    const msgRef = db.ref(`mensagens/${alunoId}`).push();
-    await msgRef.set({
+    const msgData = {
       texto: texto.trim(),
       de: deTipo,
       deUid: deUid,
       deNome: deNome,
       timestamp: Date.now(),
       lida: false,
-    });
+    };
+    // paraUid é lido pela Cloud Function para saber quem notificar
+    if (paraUid) msgData.paraUid = paraUid;
+
+    const msgRef = db.ref(`mensagens/${alunoId}`).push();
+    await msgRef.set(msgData);
     return true;
   } catch (error) {
     showToast("Erro ao enviar mensagem. Tente novamente.", "error");
@@ -165,12 +170,13 @@ async function contarNaoLidas(alunoId, professorUid) {
 }
 
 /**
- * Configura o formulário de envio de mensagem (professor)
- * @param {string} alunoId    - UID do aluno selecionado
+ * Configura o formulário de envio de mensagem
+ * @param {string} alunoId    - UID do aluno na conversa
  * @param {string} inputId    - ID do textarea
  * @param {string} btnId      - ID do botão de envio
+ * @param {string} [paraUid] - UID do destinatário (para notificação push)
  */
-function setupMensagemForm(alunoId, inputId, btnId) {
+function setupMensagemForm(alunoId, inputId, btnId, paraUid) {
   const input = document.getElementById(inputId);
   const btn = document.getElementById(btnId);
   if (!input || !btn) return;
@@ -199,6 +205,7 @@ function setupMensagemForm(alunoId, inputId, btnId) {
       user.uid,
       data.nome || "Professor",
       data.tipo,
+      paraUid,
     );
     if (ok) input.value = "";
     newBtn.disabled = false;

@@ -187,21 +187,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Calcular IMC
   document.getElementById("calcular-imc-btn")?.addEventListener("click", () => {
-    const pesoVal = parseFloat(document.getElementById("imc-peso").value);
-    const alturaVal = parseFloat(document.getElementById("imc-altura").value);
+    // Normaliza vírgula para ponto e remove espaços
+    const pesoRaw = document
+      .getElementById("imc-peso")
+      .value.trim()
+      .replace(",", ".");
+    const alturaRaw = document
+      .getElementById("imc-altura")
+      .value.trim()
+      .replace(",", ".");
+
+    const pesoVal = parseFloat(pesoRaw);
+    let alturaVal = parseFloat(alturaRaw);
 
     if (!pesoVal || pesoVal < 20 || pesoVal > 300) {
       showToast("Informe um peso válido (20-300 kg)", "error");
       return;
     }
+
+    // Aceita altura em centímetros (ex: 175) e converte para metros automaticamente
+    if (alturaVal >= 100 && alturaVal <= 250) {
+      alturaVal = alturaVal / 100;
+      document.getElementById("imc-altura").value = alturaVal.toFixed(2);
+    }
+
     if (!alturaVal || alturaVal < 1.0 || alturaVal > 2.5) {
-      showToast("Informe uma altura válida (1.0-2.5 m)", "error");
+      showToast("Informe uma altura válida (ex: 1.75 ou 175)", "error");
       return;
     }
 
-    const imc = calcularIMC(pesoVal, alturaVal);
-    imcState = { peso: pesoVal, altura: alturaVal, imc };
-    showIMCResult(imc, pesoVal, alturaVal);
+    // Arredonda para 2 casas (evita 1.699999...)
+    alturaVal = parseFloat(alturaVal.toFixed(2));
+    const pesoFinal = parseFloat(pesoVal.toFixed(1));
+
+    const imc = calcularIMC(pesoFinal, alturaVal);
+    imcState = { peso: pesoFinal, altura: alturaVal, imc };
+    showIMCResult(imc, pesoFinal, alturaVal);
   });
 
   // Recalcular
