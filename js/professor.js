@@ -80,12 +80,16 @@ function setupNavigation() {
   document
     .getElementById("menu-toggle")
     ?.addEventListener("click", function () {
-      document.getElementById("sidebar")?.classList.toggle("open");
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("sidebar-overlay");
+      sidebar?.classList.toggle("open");
+      overlay?.classList.toggle("active", sidebar?.classList.contains("open"));
     });
   document
     .getElementById("sidebar-overlay")
     ?.addEventListener("click", function () {
       document.getElementById("sidebar")?.classList.remove("open");
+      this.classList.remove("active");
     });
 }
 function setupLogout() {

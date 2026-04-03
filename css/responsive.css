@@ -21,8 +21,8 @@
     left: 0;
   }
 
-  .sidebar-overlay {
-    display: block !important;
+  .sidebar-overlay.active {
+    display: block;
     opacity: 1;
     pointer-events: auto;
   }
