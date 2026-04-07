@@ -22,6 +22,33 @@ document.addEventListener("DOMContentLoaded", async () => {
     senhaInput.type = senhaInput.type === "password" ? "text" : "password";
   });
 
+  /* --- Sexo selector --- */
+  document.querySelectorAll(".sexo-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document
+        .querySelectorAll(".sexo-btn")
+        .forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById("sexo").value = btn.dataset.value;
+    });
+  });
+
+  /* --- Objetivo chips --- */
+  document.querySelectorAll(".objetivo-chip").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      const jaAtivo = chip.classList.contains("active");
+      document
+        .querySelectorAll(".objetivo-chip")
+        .forEach((c) => c.classList.remove("active"));
+      if (!jaAtivo) {
+        chip.classList.add("active");
+        document.getElementById("objetivo").value = chip.dataset.value;
+      } else {
+        document.getElementById("objetivo").value = "";
+      }
+    });
+  });
+
   /* --- Carregar lista de professores --- */
   await loadProfessores();
 
@@ -35,6 +62,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const senha = senhaInput.value;
     const confirm = confirmInput.value;
     const profId = profSelect.value;
+    const sexo = document.getElementById("sexo")?.value || "";
+    const objetivo = document.getElementById("objetivo")?.value || "";
     const peso = pesoInput.value ? parseFloat(pesoInput.value) : null;
     const altura = alturaInput.value ? parseFloat(alturaInput.value) : null;
 
@@ -91,6 +120,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         professorId: profId,
         professorNome: profNome,
         treinoAtual: "A",
+        sexo: sexo || null,
+        objetivo: objetivo || null,
         peso: peso || null,
         altura: altura || null,
         imc: imc || null,

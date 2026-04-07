@@ -104,6 +104,17 @@ function setupLogout() {
 /* -- Dashboard ------------------------------------------------- */
 async function loadDashboard() {
   try {
+    // Skeleton loading na lista de alunos recentes
+    var skelEl = document.getElementById("dashboard-alunos-list");
+    if (skelEl) {
+      skelEl.innerHTML = [1, 2, 3]
+        .map(
+          () =>
+            '<div class="skeleton-student-card"><div class="skeleton-avatar-sm"></div><div style="flex:1"><div class="skeleton-line sk-title"></div><div class="skeleton-line sk-meta"></div></div></div>',
+        )
+        .join("");
+    }
+
     var snap = await db
       .ref("alunos")
       .orderByChild("professorId")
@@ -135,10 +146,151 @@ async function loadDashboard() {
     var statMsgs = document.getElementById("stat-msgs");
     if (statMsgs) statMsgs.textContent = totalMsgNaoLidas;
     renderAlunosRecentes(recentes);
+    await renderAlunosInativos(alunosData);
+    await renderRelatorioSemanal(alunosData);
   } catch (e) {
     console.error("[Professor] Erro ao carregar dashboard:", e);
   }
 }
+
+async function renderAlunosInativos(alunosData) {
+  const container = document.getElementById("dashboard-inativos");
+  if (!container) return;
+  const LIMITE_DIAS = 5;
+  const hoje = new Date();
+  const inativos = [];
+  for (const [uid, aluno] of Object.entries(alunosData)) {
+    const snap = await db
+      .ref("historicoTreinos/" + uid)
+      .orderByKey()
+      .limitToLast(1)
+      .once("value");
+    const hist = snap.val();
+    let ultimoTreino = null;
+    if (hist) {
+      const chave = Object.keys(hist)[0]; // "YYYY-MM-DD"
+      ultimoTreino = chave;
+    }
+    let diasSemTreinar = LIMITE_DIAS + 1;
+    if (ultimoTreino) {
+      const diff = Math.floor(
+        (hoje - new Date(ultimoTreino + "T00:00:00")) / 86400000,
+      );
+      diasSemTreinar = diff;
+    }
+    if (diasSemTreinar >= LIMITE_DIAS) {
+      inativos.push({ uid, nome: aluno.nome, diasSemTreinar, ultimoTreino });
+    }
+  }
+  if (!inativos.length) {
+    container.innerHTML = "";
+    container.classList.add("hidden");
+    return;
+  }
+  container.classList.remove("hidden");
+  container.innerHTML =
+    '<div class="alerta-inativos-header">⚠️ Alunos sem treinar há ' +
+    LIMITE_DIAS +
+    "+ dias</div>" +
+    inativos
+      .map(function (a) {
+        const label = a.ultimoTreino
+          ? "Último treino: " +
+            new Date(a.ultimoTreino + "T00:00:00").toLocaleDateString("pt-BR") +
+            " (" +
+            a.diasSemTreinar +
+            " dias)"
+          : "Nunca treinou";
+        return (
+          '<div class="alerta-inativo-item" onclick="selecionarAlunoDosDash(\'' +
+          sanitize(a.uid) +
+          "')\">" +
+          '<div class="alerta-inativo-avatar" style="background:' +
+          getAvatarColor(a.nome) +
+          '">' +
+          sanitize(getInitials(a.nome)) +
+          "</div>" +
+          "<div><strong>" +
+          sanitize(a.nome) +
+          '</strong><p class="alerta-inativo-label">' +
+          label +
+          "</p></div>" +
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-left:auto;color:var(--text-muted)"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>' +
+          "</div>"
+        );
+      })
+      .join("");
+}
+async function renderRelatorioSemanal(alunosData) {
+  const container = document.getElementById("dashboard-relatorio");
+  if (!container) return;
+
+  const hoje = new Date();
+  const semanaKeys = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(hoje);
+    d.setDate(d.getDate() - i);
+    semanaKeys.push(d.toISOString().slice(0, 10));
+  }
+
+  let totalSemana = 0;
+  const porAluno = {};
+
+  for (const [uid, aluno] of Object.entries(alunosData)) {
+    let count = 0;
+    for (const dia of semanaKeys) {
+      const snap = await db.ref(`historicoTreinos/${uid}/${dia}`).once("value");
+      const hist = snap.val();
+      if (hist && hist.completado) {
+        totalSemana++;
+        count++;
+      }
+    }
+    if (count > 0) porAluno[uid] = { nome: aluno.nome, count };
+  }
+
+  const topAlunos = Object.values(porAluno)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 3);
+
+  container.classList.remove("hidden");
+  const medalhas = ["🥇", "🥈", "🥉"];
+  container.innerHTML =
+    '<div class="relatorio-header">📊 Relatório da Semana</div>' +
+    '<div class="relatorio-total">' +
+    '<span class="relatorio-num">' +
+    totalSemana +
+    "</span>" +
+    '<span class="relatorio-label">treino' +
+    (totalSemana !== 1 ? "s" : "") +
+    " completado" +
+    (totalSemana !== 1 ? "s" : "") +
+    " pelos alunos</span>" +
+    "</div>" +
+    (topAlunos.length > 0
+      ? '<div class="relatorio-top"><p class="relatorio-top-label">🏆 Destaque da semana</p>' +
+        topAlunos
+          .map(
+            (a, i) =>
+              '<div class="relatorio-top-item">' +
+              '<span class="relatorio-rank">' +
+              medalhas[i] +
+              "</span>" +
+              '<span class="relatorio-nome">' +
+              sanitize(a.nome) +
+              "</span>" +
+              '<span class="relatorio-count badge badge-purple">' +
+              a.count +
+              " treino" +
+              (a.count > 1 ? "s" : "") +
+              "</span>" +
+              "</div>",
+          )
+          .join("") +
+        "</div>"
+      : '<p class="relatorio-vazio">Nenhum treino concluído esta semana.</p>');
+}
+
 function renderAlunosRecentes(alunos) {
   var el = document.getElementById("dashboard-alunos-list");
   if (!el) return;

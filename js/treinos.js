@@ -89,6 +89,7 @@ function renderTreinoEditor(letra, data) {
       return `
     <div class="exercise-card-prof" data-id="${sanitize(ex.id)}">
       <div class="exercise-card-header">
+        <span class="drag-handle" title="Arrastar para reordenar">⠿</span>
         <span class="exercise-number">${i + 1}</span>
         <div class="exercise-info">
           <strong>${sanitize(ex.nome || "")}</strong>
@@ -109,6 +110,35 @@ function renderTreinoEditor(letra, data) {
     </div>`;
     })
     .join("");
+
+  // Inicializa drag-and-drop
+  if (typeof Sortable !== "undefined") {
+    if (listEl._sortable) listEl._sortable.destroy();
+    listEl._sortable = Sortable.create(listEl, {
+      handle: ".drag-handle",
+      animation: 150,
+      ghostClass: "sortable-ghost",
+      onEnd: async function () {
+        const cards = listEl.querySelectorAll(".exercise-card-prof");
+        const updates = {};
+        cards.forEach((card, idx) => {
+          const id = card.dataset.id;
+          if (id)
+            updates[
+              `treinos/${treinoAlunoAtual}/${treinoLetraAtual}/exercicios/${id}/ordem`
+            ] = idx;
+          // Atualiza número visual
+          const numEl = card.querySelector(".exercise-number");
+          if (numEl) numEl.textContent = idx + 1;
+        });
+        try {
+          await db.ref().update(updates);
+        } catch (e) {
+          showToast("Erro ao salvar ordem", "error");
+        }
+      },
+    });
+  }
 }
 
 /**
@@ -359,7 +389,7 @@ function limparFormExercicio() {
  * @param {string} alunoId
  * @param {string} letra
  * @param {string} listContainerId
- * @param {Object} historico  { exerciciosCompletos: {} }
+ * @param {Object} historico  { exerciciosCompletos: {}, seriesCompletas: {}, cargaUsada: {} }
  */
 async function loadTreinoAluno(
   alunoId,
@@ -370,8 +400,21 @@ async function loadTreinoAluno(
   const listEl = document.getElementById(listContainerId);
   if (!listEl) return;
 
-  listEl.innerHTML =
-    '<div class="loading-inline"><div class="spinner-sm"></div><p>Carregando exercícios...</p></div>';
+  // Skeleton loading
+  listEl.innerHTML = [1, 2, 3]
+    .map(
+      () => `
+    <div class="skeleton-ex-card">
+      <div class="skeleton-line sk-title"></div>
+      <div class="skeleton-line sk-meta"></div>
+      <div class="sk-pills-row">
+        <div class="skeleton-pill"></div>
+        <div class="skeleton-pill"></div>
+        <div class="skeleton-pill"></div>
+      </div>
+    </div>`,
+    )
+    .join("");
 
   try {
     const snap = await db.ref(`treinos/${alunoId}/${letra}`).once("value");
@@ -379,19 +422,44 @@ async function loadTreinoAluno(
 
     if (!data || !data.exercicios) {
       listEl.innerHTML = `
-        <div class="empty-state">
-          <h3>Treino ${sanitize(letra)} sem exercícios</h3>
-          <p>Aguarde seu professor adicionar exercícios.</p>
+        <div class="onboarding-card">
+          <div class="onboarding-icon">🏋️</div>
+          <h3>Treino ${sanitize(letra)} aguardando!</h3>
+          <p>Seu professor ainda não adicionou exercícios aqui.</p>
+          <div class="onboarding-steps">
+            <div class="onboarding-step">
+              <span class="step-num">1</span>
+              <span>Aguarde o professor configurar o treino</span>
+            </div>
+            <div class="onboarding-step">
+              <span class="step-num">2</span>
+              <span>Marque cada série à medida que completar</span>
+            </div>
+            <div class="onboarding-step">
+              <span class="step-num">3</span>
+              <span>Finalize o treino para registrar sua evolução</span>
+            </div>
+          </div>
         </div>`;
       return;
     }
 
     const completados = historico.exerciciosCompletos || {};
+    const seriesCompletas = historico.seriesCompletas || {};
+    const cargasUsadas = historico.cargaUsada || {};
     const exercicios = Object.entries(data.exercicios)
       .map(([id, ex]) => ({ id, ...ex }))
       .sort((a, b) => (a.ordem || 0) - (b.ordem || 0));
 
-    renderExerciciosAluno(listEl, exercicios, completados, alunoId, letra);
+    renderExerciciosAluno(
+      listEl,
+      exercicios,
+      completados,
+      alunoId,
+      letra,
+      cargasUsadas,
+      seriesCompletas,
+    );
     atualizarProgressoTreino(
       Object.keys(completados).length,
       exercicios.length,
@@ -404,7 +472,7 @@ async function loadTreinoAluno(
 }
 
 /**
- * Renderiza a checklist de exercícios para o aluno
+ * Renderiza a checklist de exercícios para o aluno (com séries, carga e instruções expansíveis)
  */
 function renderExerciciosAluno(
   container,
@@ -412,27 +480,57 @@ function renderExerciciosAluno(
   completados,
   alunoId,
   letra,
+  cargasUsadas = {},
+  seriesCompletas = {},
 ) {
   container.innerHTML = exercicios
     .map((ex) => {
       const done = !!completados[ex.id];
       const exIdSafe = ex.id.replace(/[^a-zA-Z0-9_-]/g, "_");
+      const numSeries = Math.max(1, parseInt(ex.series) || 3);
+      const exSeriesComp = seriesCompletas[ex.id] || {};
+      const cargaUsada = cargasUsadas[ex.id] || "";
+      const descanso = parseInt(ex.descanso) || 0;
+
+      const seriesPillsHtml = Array.from({ length: numSeries }, (_, i) => {
+        const sdone = !!exSeriesComp[`s${i}`];
+        return `<button class="serie-pill${sdone ? " serie-done" : ""}" id="spill-${exIdSafe}-${i}"
+          onclick="event.stopPropagation(); toggleSerie('${exIdSafe}','${sanitize(alunoId)}','${sanitize(letra)}',${i},${numSeries},${descanso})">S${i + 1}</button>`;
+      }).join("");
+
+      const expandArea = ex.instrucoes
+        ? `<div class="ex-expand-area hidden" id="expand-${exIdSafe}">
+            <p class="ex-instrucoes-text">💡 <strong>Como fazer:</strong> ${sanitize(ex.instrucoes)}</p>
+          </div>`
+        : "";
+
+      const hasInstrucoes = !!ex.instrucoes;
+
       return `
-      <div class="exercise-check-card ${done ? "completed" : ""}" id="excard-${exIdSafe}"
-           onclick="toggleExercicio('${exIdSafe}', '${sanitize(alunoId)}', '${sanitize(letra)}')">
-        <div class="ex-check-icon ${done ? "done" : ""}">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"/>
+      <div class="exercise-check-card${done ? " completed" : ""}" id="excard-${exIdSafe}">
+        <div class="ex-check-main" onclick="expandirCard('${exIdSafe}')">
+          <div class="exercise-check-info">
+            <div class="exercise-check-nome">${sanitize(ex.nome)}</div>
+            <div class="exercise-check-meta">
+              ${sanitize(ex.series)} séries × ${sanitize(ex.repeticoes)}${ex.descanso ? " · " + sanitize(ex.descanso) + "s descanso" : ""}
+            </div>
+            ${ex.observacoes ? `<div class="exercise-check-obs">📌 ${sanitize(ex.observacoes)}</div>` : ""}
+          </div>
+          <svg class="ex-expand-chevron${hasInstrucoes ? "" : " invisible"}" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
           </svg>
         </div>
-        <div class="exercise-check-info">
-          <div class="exercise-check-nome">${sanitize(ex.nome)}</div>
-          <div class="exercise-check-meta">
-            ${sanitize(ex.series)} séries × ${sanitize(ex.repeticoes)}
-            ${ex.carga ? " · " + sanitize(ex.carga) : ""}
-            ${ex.descanso ? " · " + sanitize(ex.descanso) + "s descanso" : ""}
-          </div>
-          ${ex.observacoes ? `<div class="exercise-check-obs">💡 ${sanitize(ex.observacoes)}</div>` : ""}
+        ${expandArea}
+        <div class="series-pills-row" onclick="event.stopPropagation()">
+          ${seriesPillsHtml}
+        </div>
+        <div class="carga-nota-wrap" onclick="event.stopPropagation()">
+          <input class="carga-nota-input" type="text"
+            placeholder="Carga usada (ex: 20kg, barra 40kg…)"
+            value="${sanitize(cargaUsada)}"
+            onchange="salvarCargaUsada('${exIdSafe}','${sanitize(alunoId)}',this.value)">
+          <button class="btn-carga-chart" title="Histórico de cargas"
+            onclick="event.stopPropagation(); verHistoricoCargas('${exIdSafe}','${sanitize(ex.nome)}','${sanitize(alunoId)}')">📊</button>
         </div>
       </div>`;
     })
@@ -440,9 +538,120 @@ function renderExerciciosAluno(
 }
 
 /**
+ * Expande/recolhe a área de instruções de um exercício
+ */
+function expandirCard(exId) {
+  const expandArea = document.getElementById(`expand-${exId}`);
+  const card = document.getElementById(`excard-${exId}`);
+  if (!expandArea) return;
+  const isOpen = !expandArea.classList.contains("hidden");
+  expandArea.classList.toggle("hidden", isOpen);
+  card?.classList.toggle("expanded", !isOpen);
+}
+
+/**
+ * Alterna o estado de uma série individual de um exercício
+ */
+async function toggleSerie(
+  exId,
+  alunoId,
+  letra,
+  serieIdx,
+  totalSeries,
+  descanso,
+) {
+  if (navigator.vibrate) navigator.vibrate(25);
+
+  const today = getDateKey();
+  const histRef = db.ref(`historicoTreinos/${alunoId}/${today}`);
+  const snap = await histRef.once("value");
+  const historico = snap.val() || {};
+
+  const seriesCompletas = { ...(historico.seriesCompletas || {}) };
+  const exSeries = { ...(seriesCompletas[exId] || {}) };
+  const key = `s${serieIdx}`;
+  const wasDone = !!exSeries[key];
+
+  if (wasDone) {
+    delete exSeries[key];
+  } else {
+    exSeries[key] = true;
+  }
+
+  const numDone = Object.keys(exSeries).length;
+  const allDone = numDone >= totalSeries;
+
+  const completados = { ...(historico.exerciciosCompletos || {}) };
+  if (allDone) {
+    completados[exId] = true;
+  } else {
+    delete completados[exId];
+  }
+
+  // Atualiza Firebase
+  await histRef.update({
+    letra,
+    completado: false,
+    exerciciosCompletos: completados,
+  });
+  const serieRef = db.ref(
+    `historicoTreinos/${alunoId}/${today}/seriesCompletas/${exId}`,
+  );
+  if (Object.keys(exSeries).length > 0) {
+    await serieRef.set(exSeries);
+  } else {
+    await serieRef.remove();
+  }
+
+  // Atualiza UI: pílula
+  const pill = document.getElementById(`spill-${exId}-${serieIdx}`);
+  if (pill) pill.classList.toggle("serie-done", !wasDone);
+
+  // Atualiza UI: card completed
+  const card = document.getElementById(`excard-${exId}`);
+  if (card) card.classList.toggle("completed", allDone);
+
+  // Atualiza progresso
+  const total = document.querySelectorAll('[id^="excard-"]').length;
+  const concluidos = document.querySelectorAll(
+    ".exercise-check-card.completed",
+  ).length;
+  atualizarProgressoTreino(concluidos, total);
+
+  // Inicia timer de descanso ao marcar série (não ao desmarcar)
+  if (!wasDone && descanso > 0) {
+    if (typeof iniciarTimerDescanso === "function") {
+      iniciarTimerDescanso(descanso);
+    }
+  }
+}
+
+/**
+ * Salva a carga utilizada durante o treino
+ */
+async function salvarCargaUsada(exId, alunoId, valor) {
+  const today = getDateKey();
+  try {
+    if (valor && valor.trim()) {
+      await db
+        .ref(`historicoTreinos/${alunoId}/${today}/cargaUsada/${exId}`)
+        .set(valor.trim());
+    } else {
+      await db
+        .ref(`historicoTreinos/${alunoId}/${today}/cargaUsada/${exId}`)
+        .remove();
+    }
+  } catch (e) {
+    console.error("[Treinos] Erro ao salvar carga:", e);
+  }
+}
+
+/**
  * Alterna o estado de conclusão de um exercício no Firebase
  */
 async function toggleExercicio(exId, alunoId, letra) {
+  if (navigator.vibrate) navigator.vibrate(30);
+
   const today = getDateKey();
   const ref = db.ref(`historicoTreinos/${alunoId}/${today}`);
   const snap = await ref.once("value");
@@ -537,10 +746,20 @@ async function finalizarTreino(alunoId) {
       await db.ref(`alunos/${alunoId}/treinoAtual`).set(proxLetra);
     }
 
-    showToast(
-      `Treino ${letra} finalizado! 🎉 Próximo: ${proxLetra || letra}`,
-      "success",
-    );
+    // Exibe modal de celebração se disponível, senão toast
+    if (typeof mostrarCelebracao === "function") {
+      await mostrarCelebracao(
+        letra,
+        proxLetra,
+        exerciciosConcluidos,
+        totalExercicios,
+      );
+    } else {
+      showToast(
+        `Treino ${letra} finalizado! 🎉 Próximo: ${proxLetra || letra}`,
+        "success",
+      );
+    }
 
     // Exibe botão desabilitado
     const btnFinalizar = document.getElementById("finish-workout-btn");

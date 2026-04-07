@@ -275,6 +275,85 @@ async function salvarDieta() {
   }
 }
 
+/* -- Copiar um dia da dieta para outro ----------------------- */
+async function copiarDiaDieta() {
+  if (!dietaAlunoAtual) return;
+  const diasDisponiveis = DIAS_SEMANA.filter(
+    (d) => d.key !== dietaDiaSelecionado,
+  );
+  const destinos = diasDisponiveis
+    .map((d) => `<option value="${d.key}">${d.full}</option>`)
+    .join("");
+  // Modal simples via confirm + prompt não é ideal, mas evita criar HTML extra
+  // Usamos um select embutido no DOM temporariamente
+  let modal = document.getElementById("modal-copiar-dia");
+  if (!modal) {
+    modal = document.createElement("div");
+    modal.id = "modal-copiar-dia";
+    modal.className = "modal";
+    modal.innerHTML = `
+      <div class="modal-content modal-content-md">
+        <div class="modal-header">
+          <span class="modal-title">Copiar Dia da Dieta</span>
+          <button class="modal-close" onclick="document.getElementById('modal-copiar-dia').classList.remove('open')">×</button>
+        </div>
+        <p style="margin-bottom:16px;color:var(--text-secondary);">Selecione o dia de <strong>destino</strong>. O conteúdo de <strong id="copiar-origem-label"></strong> será copiado.</p>
+        <div class="form-group">
+          <label class="form-label">Copiar para:</label>
+          <select class="form-control" id="copiar-destino-select">${destinos}</select>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:16px;">
+          <button class="btn-secondary" style="flex:1" onclick="document.getElementById('modal-copiar-dia').classList.remove('open')">Cancelar</button>
+          <button class="btn-primary" style="flex:1" id="confirmar-copiar-dia">Copiar</button>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+    document
+      .getElementById("confirmar-copiar-dia")
+      .addEventListener("click", _executarCopiaDia);
+  }
+  // Atualiza destinos e label
+  document.getElementById("copiar-destino-select").innerHTML = destinos;
+  const origemFull =
+    DIAS_SEMANA.find((d) => d.key === dietaDiaSelecionado)?.full ||
+    dietaDiaSelecionado;
+  document.getElementById("copiar-origem-label").textContent = origemFull;
+  modal.classList.add("open");
+}
+
+async function _executarCopiaDia() {
+  const destino = document.getElementById("copiar-destino-select")?.value;
+  if (!destino || !dietaAlunoAtual) return;
+  document.getElementById("modal-copiar-dia").classList.remove("open");
+  showLoading("Copiando dia...");
+  try {
+    const snap = await db
+      .ref(`dietas/${dietaAlunoAtual}/dias/${dietaDiaSelecionado}/refeicoes`)
+      .once("value");
+    const refeicoes = snap.val();
+    if (!refeicoes) {
+      showToast("Nenhuma refeição para copiar", "warning");
+      hideLoading();
+      return;
+    }
+    await db
+      .ref(`dietas/${dietaAlunoAtual}/dias/${destino}/refeicoes`)
+      .set(refeicoes);
+    const destinoFull =
+      DIAS_SEMANA.find((d) => d.key === destino)?.full || destino;
+    showToast("Copiado para " + destinoFull + "!", "success");
+    // Marca destino com has-data
+    const btnDest = document.querySelector(
+      `.diet-dia-btn[data-dia="${destino}"]`,
+    );
+    if (btnDest) btnDest.classList.add("has-data");
+  } catch (e) {
+    showToast("Erro ao copiar dia", "error");
+  } finally {
+    hideLoading();
+  }
+}
+
 /* -- Aluno: Visualizador de Dieta --------------------------- */
 
 async function loadDietaAluno(alunoId, containerId) {

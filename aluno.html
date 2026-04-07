@@ -54,19 +54,33 @@
           <div class="welcome-banner">
             <h2 id="welcome-name">Olá, Aluno! 💪</h2>
             <p id="welcome-subtitle">Pronto para mais um treino incrível?</p>
-            <span class="treino-badge" id="welcome-treino-badge">
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path
-                  d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"
-                />
-              </svg>
-              Treino do dia: <span id="treino-dia-letra">-</span>
-            </span>
+            <div
+              style="
+                display: flex;
+                gap: 8px;
+                flex-wrap: wrap;
+                justify-content: center;
+                margin-top: 4px;
+              "
+            >
+              <span class="treino-badge" id="welcome-treino-badge">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"
+                  />
+                </svg>
+                Treino do dia: <span id="treino-dia-letra">-</span>
+              </span>
+              <span class="streak-badge hidden" id="streak-badge">
+                🔥 <span id="streak-count">0</span> dias seguidos
+              </span>
+            </div>
+            <p class="frase-motivacional" id="frase-motivacional"></p>
           </div>
 
           <!-- Quick cards -->
@@ -169,6 +183,26 @@
             <div class="empty-state">
               <div class="spinner"></div>
             </div>
+          </div>
+
+          <!-- Progresso da semana -->
+          <div class="section-header mt-28">
+            <h2>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"
+                />
+              </svg>
+              Semana de Treinos
+            </h2>
+          </div>
+          <div class="card" id="semana-treinos-card">
+            <div class="empty-state"><div class="spinner"></div></div>
           </div>
         </section>
 
@@ -308,8 +342,17 @@
           <!-- Card de dados pessoais -->
           <div class="card mb-16">
             <div class="profile-header-sm">
-              <div class="avatar avatar-lg avatar-gradient" id="perfil-avatar">
-                A
+              <div style="position: relative; display: inline-block">
+                <div
+                  class="avatar avatar-lg avatar-gradient"
+                  id="perfil-avatar"
+                >
+                  A
+                </div>
+                <span
+                  id="perfil-sexo-badge"
+                  class="sexo-avatar-badge hidden"
+                ></span>
               </div>
               <div>
                 <h2 class="profile-name-sm" id="perfil-nome">-</h2>
@@ -329,6 +372,16 @@
                 <span class="text-purple fw-700" id="perfil-treino-atual"
                   >-</span
                 >
+                >
+              </div>
+              <div
+                class="profile-info-row"
+                id="perfil-objetivo-row"
+                style="display: none"
+              >
+                <span class="text-muted">Objetivo</span>
+                <span class="text-primary-c fw-600" id="perfil-objetivo"
+                  >-</span
                 >
               </div>
               <div class="profile-info-row">
@@ -360,7 +413,6 @@
                 Atualizar
               </button>
             </div>
-
             <div id="imc-display-perfil">
               <div class="empty-state p-24">
                 <div class="empty-state-icon">
@@ -379,6 +431,23 @@
                 <h3>IMC não calculado</h3>
                 <p>Clique em "Atualizar" para calcular seu IMC</p>
               </div>
+            </div>
+            <!-- Histórico IMC -->
+            <div
+              id="imc-historico-wrap"
+              class="hidden"
+              style="padding: 0 4px 8px"
+            >
+              <p
+                style="
+                  font-size: 0.78rem;
+                  color: var(--text-muted);
+                  margin-bottom: 8px;
+                "
+              >
+                Evolução do IMC
+              </p>
+              <canvas id="imc-chart" height="120" style="width: 100%"></canvas>
             </div>
           </div>
 
@@ -438,6 +507,51 @@
       </nav>
     </div>
     <!-- /aluno-layout -->
+
+    <!-- ============================================================
+     MODAL - CELEBRAÇÃO DE TREINO
+     ============================================================ -->
+    <div class="modal" id="modal-celebracao">
+      <div
+        class="modal-content modal-content-md"
+        style="text-align: center; padding: 32px 24px"
+      >
+        <div id="celebracao-emoji" style="font-size: 4rem; margin-bottom: 8px">
+          🎉
+        </div>
+        <h2 id="celebracao-title" style="margin-bottom: 8px">
+          Treino Concluído!
+        </h2>
+        <p
+          id="celebracao-msg"
+          style="color: var(--text-muted); margin-bottom: 20px"
+        ></p>
+        <div
+          id="celebracao-streak"
+          class="hidden"
+          style="
+            background: linear-gradient(135deg, #ff6b35, #f7c59f22);
+            border-radius: 12px;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+          "
+        >
+          <span style="font-size: 1.5rem">🔥</span>
+          <strong
+            id="celebracao-streak-num"
+            style="font-size: 1.4rem; color: #ff6b35"
+          >
+            0
+          </strong>
+          <span style="color: var(--text-secondary); font-size: 0.9rem"
+            >dias consecutivos!</span
+          >
+        </div>
+        <button class="btn-primary btn-block" onclick="fecharCelebracao()">
+          Continuar 💪
+        </button>
+      </div>
+    </div>
 
     <!-- ============================================================
      MODAL - IMC
@@ -537,11 +651,57 @@
       </div>
     </div>
 
+    <!-- Timer de descanso entre séries -->
+    <div class="timer-overlay hidden" id="timer-descanso-overlay">
+      <div class="timer-card">
+        <p class="timer-label">💤 Descanse! Próxima série em...</p>
+        <div class="timer-display" id="timer-display">60</div>
+        <div class="timer-bar-wrap">
+          <div class="timer-bar" id="timer-bar"></div>
+        </div>
+        <button
+          class="btn-secondary btn-sm timer-skip-btn"
+          onclick="pularTimer()"
+        >
+          ⏭ Pular descanso
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal Histórico de Cargas -->
+    <div
+      class="modal-overlay hidden"
+      id="modal-cargas-overlay"
+      onclick="fecharModalCargas()"
+    >
+      <div
+        class="modal-box"
+        onclick="event.stopPropagation()"
+        style="max-width: 420px"
+      >
+        <div class="modal-header">
+          <h3 id="modal-cargas-title">Histórico de Carga</h3>
+          <button class="btn-icon" onclick="fecharModalCargas()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+              />
+            </svg>
+          </button>
+        </div>
+        <div id="modal-cargas-body" style="padding: 16px; min-height: 120px">
+          <div class="empty-state"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
     <script src="js/firebase-config.js"></script>
     <script src="js/utils.js"></script>

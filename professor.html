@@ -232,6 +232,20 @@
                 </div>
               </div>
             </div>
+
+            <!-- Alerta alunos inativos -->
+            <div
+              class="card hidden"
+              id="dashboard-inativos"
+              style="margin-top: 16px"
+            ></div>
+
+            <!-- Relatório semanal -->
+            <div
+              class="card hidden"
+              id="dashboard-relatorio"
+              style="margin-top: 16px"
+            ></div>
           </section>
 
           <!-- -------- SEÇÃO: ALUNOS -------- -->
@@ -728,9 +742,18 @@
                       </svg>
                       Dieta Personalizada
                     </h3>
-                    <button class="btn-primary btn-sm" id="save-diet-btn">
-                      Salvar dia
-                    </button>
+                    <div style="display: flex; gap: 6px">
+                      <button
+                        class="btn-secondary btn-sm"
+                        onclick="copiarDiaDieta()"
+                        title="Copiar este dia para outro dia da semana"
+                      >
+                        📋 Copiar dia
+                      </button>
+                      <button class="btn-primary btn-sm" id="save-diet-btn">
+                        Salvar dia
+                      </button>
+                    </div>
                   </div>
 
                   <div class="form-row mb-16">
@@ -1100,6 +1123,8 @@
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <!-- Fuse.js (fuzzy search) -->
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+    <!-- SortableJS (drag-and-drop exercícios) -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 
     <script src="js/firebase-config.js"></script>
     <script src="js/utils.js"></script>

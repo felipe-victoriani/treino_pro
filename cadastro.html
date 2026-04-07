@@ -143,6 +143,68 @@
           <span class="form-error hidden" id="professor-error"></span>
         </div>
 
+        <!-- Sexo -->
+        <div class="form-group">
+          <label class="form-label"
+            >Sexo <span class="form-hint-inline">(opcional)</span></label
+          >
+          <div class="sexo-selector" id="sexo-selector">
+            <button type="button" class="sexo-btn" data-value="masculino">
+              ♂ Masculino
+            </button>
+            <button type="button" class="sexo-btn" data-value="feminino">
+              ♀ Feminino
+            </button>
+          </div>
+          <input type="hidden" id="sexo" value="" />
+        </div>
+
+        <!-- Objetivo -->
+        <div class="form-group">
+          <label class="form-label"
+            >Qual é seu objetivo?
+            <span class="form-hint-inline">(opcional)</span></label
+          >
+          <div class="objetivo-chips" id="objetivo-chips">
+            <button
+              type="button"
+              class="objetivo-chip"
+              data-value="Perder barriga antes do verão"
+            >
+              📉 Perder barriga antes do verão
+            </button>
+            <button
+              type="button"
+              class="objetivo-chip"
+              data-value="Ganhar músculo (e respeito)"
+            >
+              💪 Ganhar músculo (e respeito)
+            </button>
+            <button
+              type="button"
+              class="objetivo-chip"
+              data-value="Me sentir bem no espelho"
+            >
+              ✨ Me sentir bem no espelho
+            </button>
+            <button
+              type="button"
+              class="objetivo-chip"
+              data-value="Ter energia pra aguentar o dia"
+            >
+              ⚡ Ter energia pra aguentar o dia
+            </button>
+            <button
+              type="button"
+              class="objetivo-chip"
+              data-value="Caber de novo na roupa favorita"
+            >
+              👕 Caber de novo na roupa favorita
+            </button>
+          </div>
+          <input type="hidden" id="objetivo" value="" />
+        </div>
+
         <!-- Dados opcionais -->
         <div class="mb-8">
           <p class="section-label">Dados físicos (opcional)</p>
