@@ -30,6 +30,9 @@ firebase.initializeApp(firebaseConfig);
 /* --- Instâncias globais --- */
 const auth = firebase.auth();
 const db = firebase.database();
+const storage =
+  typeof firebase.storage === "function" ? firebase.storage() : null;
+window.storage = storage;
 
 /* --- Confirmar conexão no console (dev) --- */
 db.ref(".info/connected").on("value", (snap) => {
@@ -124,3 +127,22 @@ auth
 }
 
    ============================================================ */
+
+/* ============================================================
+   REGRAS SUGERIDAS PARA O FIREBASE STORAGE
+   Console Firebase > Storage > Regras:
+
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Vídeos de exercícios:
+    //   - Qualquer usuário logado pode LER (aluno assiste)
+    //   - Somente o PROFESSOR dono do caminho pode GRAVAR e DELETAR
+    match /exerciciosVideos/{professorId}/{alunoId}/{letra}/{fileName} {
+      allow read:   if request.auth != null;
+      allow write:  if request.auth != null && request.auth.uid == professorId;
+      allow delete: if request.auth != null && request.auth.uid == professorId;
+    }
+  }
+}
+============================================================ */

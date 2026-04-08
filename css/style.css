@@ -4216,3 +4216,128 @@ textarea.form-control {
   font-weight: 700;
   border: 2px solid var(--bg-card);
 }
+
+/* ============================================================
+   VÍDEOS POR EXERCÍCIO
+   ============================================================ */
+
+/* Botão de vídeo no card do professor */
+.btn-video-ex {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+}
+.btn-video-ex:hover {
+  border-color: var(--purple-600);
+  color: var(--purple-400);
+  background: rgba(107, 53, 195, 0.1);
+}
+.btn-video-ex.has-video {
+  border-color: rgba(107, 53, 195, 0.5);
+  color: var(--purple-400);
+  background: rgba(107, 53, 195, 0.12);
+}
+.btn-video-ex.has-video:hover {
+  background: rgba(107, 53, 195, 0.22);
+}
+
+/* Botão "Ver vídeo" no card do aluno */
+.btn-ver-video {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 9px 16px;
+  margin-top: 10px;
+  border: 1px solid rgba(107, 53, 195, 0.4);
+  border-radius: var(--radius-md);
+  background: rgba(107, 53, 195, 0.1);
+  color: var(--purple-400);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+.btn-ver-video:hover {
+  background: rgba(107, 53, 195, 0.22);
+  border-color: var(--purple-500);
+}
+.btn-ver-video svg {
+  flex-shrink: 0;
+}
+
+/* Área de drop/click para upload de vídeo */
+.video-upload-area {
+  border: 2px dashed var(--border-purple);
+  border-radius: var(--radius-md);
+  padding: 24px 16px;
+  text-align: center;
+  cursor: pointer;
+  background: var(--bg-input);
+  transition: var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 110px;
+}
+.video-upload-area:hover {
+  border-color: var(--purple-500);
+  background: rgba(107, 53, 195, 0.08);
+}
+
+/* Player modal */
+.video-player-modal {
+  background: #000;
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+  overflow: hidden;
+}
+.video-player-modal video,
+.video-player-modal img {
+  width: 100%;
+  max-height: 340px;
+  object-fit: contain;
+  display: block;
+}
+
+/* Modal de upload — progress bar */
+.upload-progress-bar-wrap {
+  height: 6px;
+  background: var(--bg-input);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  margin-top: 6px;
+}
+.upload-progress-bar-fill {
+  height: 100%;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-pill);
+  width: 0%;
+  transition: width 0.2s ease;
+}
+
+/* Badge "tem vídeo" no card do aluno */
+.video-badge-aluno {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--purple-400);
+  background: rgba(107, 53, 195, 0.14);
+  border-radius: var(--radius-pill);
+  padding: 2px 8px;
+  margin-left: 6px;
+  vertical-align: middle;
+}

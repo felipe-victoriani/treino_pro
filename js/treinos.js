@@ -102,6 +102,7 @@ function renderTreinoEditor(letra, data) {
           ${ex.observacoes ? `<span class="exercise-obs">${sanitize(ex.observacoes)}</span>` : ""}
         </div>
         <div class="exercise-actions">
+          <button class="btn-icon${ex.videoUrl ? " btn-video-on" : ""}" onclick="abrirUploadVideo('${sanitize(ex.id)}')" title="${ex.videoUrl ? "Alterar vídeo do exercício" : "Adicionar vídeo ao exercício"}" style="font-size:1rem">${ex.videoUrl ? "🎬" : "📹"}</button>
           <button class="btn-icon" onclick="duplicarExercicio('${sanitize(ex.id)}')" title="Duplicar">📋</button>
           <button class="btn-icon" onclick="editarExercicio('${sanitize(ex.id)}')" title="Editar">✏️</button>
           <button class="btn-icon btn-danger-icon" onclick="removerExercicio('${sanitize(ex.id)}')" title="Remover">🗑️</button>
@@ -532,6 +533,14 @@ function renderExerciciosAluno(
           <button class="btn-carga-chart" title="Histórico de cargas"
             onclick="event.stopPropagation(); verHistoricoCargas('${exIdSafe}','${sanitize(ex.nome)}','${sanitize(alunoId)}')">📊</button>
         </div>
+        ${
+          ex.videoUrl
+            ? `<button class="btn-ver-video" data-video-url="${ex.videoUrl.replace(/"/g, "&quot;")}" data-video-nome="${sanitize(ex.nome)}" onclick="event.stopPropagation(); verVideoExercicio(this.dataset.videoUrl, this.dataset.videoNome)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Ver vídeo do exercício
+        </button>`
+            : ""
+        }
       </div>`;
     })
     .join("");
@@ -871,4 +880,412 @@ function formatDate(dataStr) {
     "Dez",
   ];
   return `${d} ${meses[parseInt(m, 10) - 1]} ${y}`;
+}
+
+/* ============================================================
+   VÍDEOS POR EXERCÍCIO
+   ============================================================ */
+
+let _videoUploadExId = null;
+let _videoUploadFile = null;
+
+/**
+ * Abre o modal de upload para um exercício específico
+ */
+function abrirUploadVideo(exId) {
+  if (!treinoAlunoAtual || !treinoLetraAtual) return;
+  _videoUploadExId = exId;
+  _videoUploadFile = null;
+
+  const modal = document.getElementById("modal-video-upload");
+  if (!modal) return;
+
+  // Reseta UI
+  document
+    .getElementById("video-upload-placeholder")
+    ?.classList.remove("hidden");
+  document.getElementById("video-preview-wrap")?.classList.add("hidden");
+  document.getElementById("video-upload-progress")?.classList.add("hidden");
+  document.getElementById("video-atual-wrap")?.classList.add("hidden");
+  document.getElementById("btn-remover-video")?.classList.add("hidden");
+  const saveBtn = document.getElementById("btn-salvar-video");
+  if (saveBtn) saveBtn.disabled = true;
+  const fileInput = document.getElementById("video-file-input");
+  if (fileInput) fileInput.value = "";
+
+  // Busca nome e vídeo existente
+  db.ref(`treinos/${treinoAlunoAtual}/${treinoLetraAtual}/exercicios/${exId}`)
+    .once("value")
+    .then((snap) => {
+      const ex = snap.val() || {};
+      const nomeEl = document.getElementById("video-modal-ex-nome");
+      if (nomeEl) nomeEl.textContent = ex.nome || "";
+
+      if (ex.videoUrl) {
+        document
+          .getElementById("btn-remover-video")
+          ?.classList.remove("hidden");
+        const atualWrap = document.getElementById("video-atual-wrap");
+        if (atualWrap) {
+          atualWrap.classList.remove("hidden");
+          _mostrarMidiaEl("video-atual-el", "gif-atual-el", ex.videoUrl);
+        }
+      }
+    });
+
+  modal.classList.remove("hidden");
+}
+
+/**
+ * Detecta se URL é GIF e alterna entre <video> e <img>
+ */
+function _mostrarMidiaEl(videoId, gifId, url) {
+  const isGif = _isGifUrl(url);
+  const vEl = document.getElementById(videoId);
+  const gEl = document.getElementById(gifId);
+  if (isGif) {
+    if (vEl) vEl.style.display = "none";
+    if (gEl) {
+      gEl.src = url;
+      gEl.style.display = "";
+    }
+  } else {
+    if (gEl) gEl.style.display = "none";
+    if (vEl) {
+      vEl.src = url;
+      vEl.style.display = "";
+    }
+  }
+}
+
+function _isGifUrl(url) {
+  try {
+    const lower = url.toLowerCase();
+    return (
+      lower.includes(".gif") ||
+      lower.includes("image%2Fgif") ||
+      lower.includes("image/gif")
+    );
+  } catch (_) {
+    return false;
+  }
+}
+
+/**
+ * Fecha o modal de upload
+ */
+function fecharUploadVideoModal() {
+  document.getElementById("modal-video-upload")?.classList.add("hidden");
+  // Pausa vídeo de preview se estiver tocando
+  const vPrev = document.getElementById("video-preview-el");
+  if (vPrev) {
+    vPrev.pause();
+    vPrev.src = "";
+  }
+  _videoUploadExId = null;
+  _videoUploadFile = null;
+}
+
+/**
+ * Valida duração do vídeo (máx 10s) via metadata API
+ */
+function _validarDuracaoVideo(file) {
+  return new Promise((resolve) => {
+    const video = document.createElement("video");
+    video.preload = "metadata";
+    const blobUrl = URL.createObjectURL(file);
+    video.onloadedmetadata = () => {
+      URL.revokeObjectURL(blobUrl);
+      resolve(video.duration <= 10);
+    };
+    video.onerror = () => {
+      URL.revokeObjectURL(blobUrl);
+      resolve(true); // permissivo se não conseguir validar
+    };
+    video.src = blobUrl;
+  });
+}
+
+/**
+ * Realiza o upload do vídeo/GIF para o Firebase Storage e salva URL no DB
+ */
+async function confirmarUploadVideo() {
+  if (
+    !_videoUploadFile ||
+    !_videoUploadExId ||
+    !treinoAlunoAtual ||
+    !treinoLetraAtual
+  )
+    return;
+
+  const storage = window.storage;
+  if (!storage) {
+    showToast(
+      "Firebase Storage não disponível. Ative-o no console Firebase.",
+      "error",
+    );
+    return;
+  }
+
+  const saveBtn = document.getElementById("btn-salvar-video");
+  const progressWrap = document.getElementById("video-upload-progress");
+  const progressBar = document.getElementById("video-upload-bar");
+  const progressPct = document.getElementById("video-upload-pct");
+
+  if (saveBtn) saveBtn.disabled = true;
+  progressWrap?.classList.remove("hidden");
+
+  const professorId = auth.currentUser?.uid || "";
+  if (!professorId) {
+    showToast("Sessão expirada. Faça login novamente.", "error");
+    return;
+  }
+
+  const extMap = {
+    "video/mp4": ".mp4",
+    "video/webm": ".webm",
+    "video/quicktime": ".mov",
+    "image/gif": ".gif",
+  };
+  const ext = extMap[_videoUploadFile.type] || ".mp4";
+  const storagePath = `exerciciosVideos/${professorId}/${treinoAlunoAtual}/${treinoLetraAtual}/${_videoUploadExId}${ext}`;
+
+  const storageRef = storage.ref(storagePath);
+  const uploadTask = storageRef.put(_videoUploadFile, {
+    contentType: _videoUploadFile.type,
+    customMetadata: {
+      professorId,
+      exId: _videoUploadExId,
+    },
+  });
+
+  uploadTask.on(
+    "state_changed",
+    (snapshot) => {
+      const pct = Math.round(
+        (snapshot.bytesTransferred / snapshot.totalBytes) * 100,
+      );
+      if (progressBar) progressBar.style.width = pct + "%";
+      if (progressPct) progressPct.textContent = pct + "%";
+    },
+    (err) => {
+      console.error("[Video] Erro no upload:", err);
+      showToast(
+        "Erro no upload: " + (err.code || err.message || "desconhecido"),
+        "error",
+      );
+      if (saveBtn) saveBtn.disabled = false;
+      progressWrap?.classList.add("hidden");
+    },
+    async () => {
+      try {
+        const downloadUrl = await uploadTask.snapshot.ref.getDownloadURL();
+        await db
+          .ref(
+            `treinos/${treinoAlunoAtual}/${treinoLetraAtual}/exercicios/${_videoUploadExId}`,
+          )
+          .update({ videoUrl: downloadUrl });
+        showToast("Vídeo salvo! 🎬 O aluno já pode visualizar.", "success");
+        fecharUploadVideoModal();
+        loadTreinoProfessor(treinoAlunoAtual, treinoLetraAtual);
+      } catch (e) {
+        console.error("[Video] Erro ao salvar URL:", e);
+        showToast("Erro ao finalizar: " + (e.message || ""), "error");
+        if (saveBtn) saveBtn.disabled = false;
+      }
+    },
+  );
+}
+
+/**
+ * Remove o vídeo do Storage e do Realtime Database
+ */
+async function removerVideoExercicio() {
+  if (!_videoUploadExId || !treinoAlunoAtual || !treinoLetraAtual) return;
+
+  showLoading("Removendo vídeo...");
+  try {
+    await db
+      .ref(
+        `treinos/${treinoAlunoAtual}/${treinoLetraAtual}/exercicios/${_videoUploadExId}/videoUrl`,
+      )
+      .remove();
+
+    // Tenta remover do Storage para cada extensão possível
+    if (window.storage) {
+      const professorId = auth.currentUser?.uid || "";
+      for (const ext of [".mp4", ".webm", ".mov", ".gif"]) {
+        try {
+          await window.storage
+            .ref(
+              `exerciciosVideos/${professorId}/${treinoAlunoAtual}/${treinoLetraAtual}/${_videoUploadExId}${ext}`,
+            )
+            .delete();
+          break;
+        } catch (_) {
+          /* extensão não encontrada, tenta próxima */
+        }
+      }
+    }
+
+    showToast("Vídeo removido com sucesso", "success");
+    fecharUploadVideoModal();
+    loadTreinoProfessor(treinoAlunoAtual, treinoLetraAtual);
+  } catch (e) {
+    console.error("[Video] Erro ao remover:", e);
+    showToast("Erro ao remover vídeo", "error");
+  } finally {
+    hideLoading();
+  }
+}
+
+/**
+ * Abre o modal de player para o aluno visualizar o vídeo/GIF
+ */
+function verVideoExercicio(url, nome) {
+  const modal = document.getElementById("modal-video-player");
+  if (!modal) return;
+
+  const titleEl = document.getElementById("video-player-title");
+  if (titleEl) titleEl.textContent = nome || "Exercício";
+
+  const videoEl = document.getElementById("video-player-el");
+  const gifEl = document.getElementById("gif-player-el");
+
+  if (_isGifUrl(url)) {
+    if (videoEl) {
+      videoEl.pause();
+      videoEl.style.display = "none";
+    }
+    if (gifEl) {
+      gifEl.src = url;
+      gifEl.style.display = "";
+    }
+  } else {
+    if (gifEl) {
+      gifEl.src = "";
+      gifEl.style.display = "none";
+    }
+    if (videoEl) {
+      videoEl.src = url;
+      videoEl.style.display = "";
+    }
+  }
+
+  modal.classList.remove("hidden");
+}
+
+/**
+ * Fecha o player de vídeo do aluno
+ */
+function fecharVideoPlayer() {
+  const modal = document.getElementById("modal-video-player");
+  if (modal) modal.classList.add("hidden");
+  const videoEl = document.getElementById("video-player-el");
+  if (videoEl) {
+    videoEl.pause();
+    videoEl.src = "";
+    videoEl.style.display = "none";
+  }
+  const gifEl = document.getElementById("gif-player-el");
+  if (gifEl) {
+    gifEl.src = "";
+    gifEl.style.display = "none";
+  }
+}
+
+/**
+ * Inicializa listeners dos controles do modal de upload (chamado pelo professor.js)
+ */
+function initVideoUploadListeners() {
+  const fileInput = document.getElementById("video-file-input");
+  if (!fileInput) return;
+
+  fileInput.addEventListener("change", async function () {
+    const file = this.files[0];
+    if (!file) return;
+
+    // Tamanho máximo: 50 MB
+    if (file.size > 50 * 1024 * 1024) {
+      showToast("Arquivo muito grande. Máximo permitido: 50 MB", "error");
+      this.value = "";
+      return;
+    }
+
+    const isGif = file.type === "image/gif";
+    const isVideo = file.type.startsWith("video/");
+
+    if (!isGif && !isVideo) {
+      showToast("Formato inválido. Use MP4, WebM, MOV ou GIF", "error");
+      this.value = "";
+      return;
+    }
+
+    // Valida duração somente para vídeos
+    if (isVideo) {
+      const duracaoOk = await _validarDuracaoVideo(file);
+      if (!duracaoOk) {
+        showToast("O vídeo deve ter no máximo 10 segundos ⏱️", "error");
+        this.value = "";
+        return;
+      }
+    }
+
+    _videoUploadFile = file;
+
+    // Exibe preview
+    const blobUrl = URL.createObjectURL(file);
+    document
+      .getElementById("video-upload-placeholder")
+      ?.classList.add("hidden");
+    document.getElementById("video-preview-wrap")?.classList.remove("hidden");
+
+    const vPrev = document.getElementById("video-preview-el");
+    const gPrev = document.getElementById("gif-preview-el");
+
+    if (isGif) {
+      if (vPrev) vPrev.style.display = "none";
+      if (gPrev) {
+        gPrev.src = blobUrl;
+        gPrev.style.display = "";
+      }
+    } else {
+      if (gPrev) gPrev.style.display = "none";
+      if (vPrev) {
+        vPrev.src = blobUrl;
+        vPrev.style.display = "";
+      }
+    }
+
+    const sizeMB = (file.size / 1024 / 1024).toFixed(1);
+    const fileInfo = document.getElementById("video-file-info");
+    if (fileInfo) fileInfo.textContent = `${file.name} · ${sizeMB} MB`;
+
+    const saveBtn = document.getElementById("btn-salvar-video");
+    if (saveBtn) saveBtn.disabled = false;
+  });
+
+  document
+    .getElementById("btn-close-video-modal")
+    ?.addEventListener("click", fecharUploadVideoModal);
+  document
+    .getElementById("btn-cancelar-video")
+    ?.addEventListener("click", fecharUploadVideoModal);
+  document
+    .getElementById("modal-video-upload")
+    ?.addEventListener("click", (e) => {
+      if (e.target === e.currentTarget) fecharUploadVideoModal();
+    });
+
+  document
+    .getElementById("btn-salvar-video")
+    ?.addEventListener("click", confirmarUploadVideo);
+
+  document
+    .getElementById("btn-remover-video")
+    ?.addEventListener("click", () => {
+      if (confirm("Tem certeza que deseja remover o vídeo deste exercício?")) {
+        removerVideoExercicio();
+      }
+    });
 }

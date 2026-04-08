@@ -35,6 +35,8 @@ document.addEventListener("userReady", async function (e) {
     welcomeEl.textContent = "Ola, " + sanitize(profState.nome) + "! 👋";
   setupNavigation();
   setupLogout();
+  if (typeof initVideoUploadListeners === "function")
+    initVideoUploadListeners();
   professorNavigate("dashboard");
 });
 /* -- Navegacao ------------------------------------------------- */
