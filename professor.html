@@ -688,6 +688,183 @@
                           rows="2"
                         ></textarea>
                       </div>
+
+                      <!-- Vídeo do exercício -->
+                      <div class="ex-params-divider">
+                        <span>🎬 Vídeo demonstrativo</span>
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">Legenda do vídeo</label>
+                        <input
+                          class="form-control"
+                          type="text"
+                          id="ex-video-legenda"
+                          placeholder="Ex: Atenção ao joelho, pegada pronada..."
+                        />
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label"
+                          >Arquivo de vídeo ou GIF
+                          <span
+                            class="text-muted"
+                            style="font-weight: 400; font-size: 0.78rem"
+                            >(máx. 15s · MP4, WebM, MOV, GIF · até 50 MB)</span
+                          ></label
+                        >
+                        <div
+                          class="video-upload-inline"
+                          id="ex-video-upload-area"
+                          onclick="
+                            document.getElementById('ex-video-file').click()
+                          "
+                        >
+                          <input
+                            type="file"
+                            id="ex-video-file"
+                            accept="video/mp4,video/webm,video/quicktime,image/gif"
+                            style="display: none"
+                          />
+                          <div id="ex-video-placeholder">
+                            <svg
+                              width="22"
+                              height="22"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                              style="
+                                color: var(--purple-400);
+                                margin-bottom: 6px;
+                              "
+                            >
+                              <path
+                                d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"
+                              />
+                            </svg>
+                            <span
+                              class="text-secondary"
+                              style="font-size: 0.83rem"
+                              >Clique para selecionar</span
+                            >
+                          </div>
+                          <div
+                            id="ex-video-preview-wrap"
+                            class="hidden"
+                            style="width: 100%; text-align: left"
+                          >
+                            <video
+                              id="ex-video-preview-el"
+                              style="
+                                width: 100%;
+                                max-height: 160px;
+                                border-radius: 8px;
+                                display: none;
+                              "
+                              controls
+                              muted
+                              playsinline
+                            ></video>
+                            <img
+                              id="ex-gif-preview-el"
+                              style="
+                                width: 100%;
+                                max-height: 160px;
+                                border-radius: 8px;
+                                object-fit: contain;
+                                display: none;
+                              "
+                              alt="Preview"
+                            />
+                            <p
+                              class="text-muted"
+                              style="font-size: 0.73rem; margin-top: 6px"
+                              id="ex-video-file-info"
+                            ></p>
+                          </div>
+                        </div>
+                        <!-- Barra de progresso do upload -->
+                        <div
+                          id="ex-video-progress"
+                          class="hidden"
+                          style="margin-top: 8px"
+                        >
+                          <div
+                            style="
+                              display: flex;
+                              justify-content: space-between;
+                              margin-bottom: 3px;
+                            "
+                          >
+                            <span class="text-muted" style="font-size: 0.78rem"
+                              >Enviando vídeo...</span
+                            >
+                            <span
+                              class="text-muted"
+                              style="font-size: 0.78rem"
+                              id="ex-video-pct"
+                              >0%</span
+                            >
+                          </div>
+                          <div class="upload-progress-bar-wrap">
+                            <div
+                              class="upload-progress-bar-fill"
+                              id="ex-video-bar"
+                            ></div>
+                          </div>
+                        </div>
+                        <!-- Vídeo atual (ao editar) -->
+                        <div
+                          id="ex-video-atual-wrap"
+                          class="hidden"
+                          style="margin-top: 10px"
+                        >
+                          <div
+                            style="
+                              display: flex;
+                              align-items: center;
+                              justify-content: space-between;
+                              margin-bottom: 6px;
+                            "
+                          >
+                            <span class="text-muted" style="font-size: 0.78rem"
+                              >Vídeo atual salvo:</span
+                            >
+                            <button
+                              type="button"
+                              class="btn-ghost btn-sm"
+                              id="ex-btn-remover-video"
+                              style="
+                                font-size: 0.75rem;
+                                padding: 4px 10px;
+                                color: var(--red-400);
+                              "
+                            >
+                              🗑️ Remover
+                            </button>
+                          </div>
+                          <video
+                            id="ex-video-atual-el"
+                            style="
+                              width: 100%;
+                              max-height: 140px;
+                              border-radius: 8px;
+                              display: none;
+                            "
+                            controls
+                            muted
+                            playsinline
+                          ></video>
+                          <img
+                            id="ex-gif-atual-el"
+                            style="
+                              width: 100%;
+                              max-height: 140px;
+                              border-radius: 8px;
+                              object-fit: contain;
+                              display: none;
+                            "
+                            alt="Vídeo atual"
+                          />
+                        </div>
+                      </div>
                     </div>
 
                     <div class="form-actions">
@@ -1172,7 +1349,7 @@
                 Clique para selecionar arquivo
               </p>
               <p class="text-muted" style="font-size: 0.75rem">
-                Vídeo máx. 10s (MP4, WebM, MOV) ou GIF — até 50 MB
+                Vídeo máx. 15s (MP4, WebM, MOV) ou GIF — até 50 MB
               </p>
             </div>
             <div id="video-preview-wrap" class="hidden" style="width: 100%">

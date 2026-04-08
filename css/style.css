@@ -1787,6 +1787,56 @@ textarea.form-control {
   gap: 8px;
 }
 
+/* ── Card do professor no editor de treino ─────────────────── */
+.exercise-card-prof {
+  background: var(--bg-card-2);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  margin-bottom: 10px;
+  overflow: hidden;
+  transition: var(--transition-fast);
+}
+.exercise-card-prof:hover {
+  border-color: var(--border-purple);
+}
+.exercise-card-prof-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px 10px;
+}
+.exercise-actions-top {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.exercise-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: var(--gradient-primary);
+  border-radius: 50%;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+.exercise-meta-text {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.exercise-card-prof-footer {
+  border-top: 1px solid var(--border-subtle);
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 /* Checklist de exercícios (aluno) — layout novo com séries, carga e expand */
 /* Regras detalhadas ficam na seção FASE 4 mais abaixo */
 /* ── Exercise check cards (aluno) ─────────────────────────── */
@@ -4278,7 +4328,7 @@ textarea.form-control {
   flex-shrink: 0;
 }
 
-/* Área de drop/click para upload de vídeo */
+/* Área de drop/click para upload de vídeo (modal) */
 .video-upload-area {
   border: 2px dashed var(--border-purple);
   border-radius: var(--radius-md);
@@ -4297,7 +4347,185 @@ textarea.form-control {
   background: rgba(107, 53, 195, 0.08);
 }
 
-/* Player modal */
+/* Área de upload inline no formulário */
+.video-upload-inline {
+  border: 2px dashed var(--border-purple);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  background: var(--bg-input);
+  transition: var(--transition-fast);
+  min-height: 70px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.video-upload-inline:hover {
+  border-color: var(--purple-500);
+  background: rgba(107, 53, 195, 0.07);
+}
+.video-upload-inline.has-file {
+  cursor: default;
+  border-style: solid;
+  border-color: var(--purple-500);
+}
+
+/* Player modal - z-index acima do timer de descanso (2000) */
+#modal-video-player {
+  z-index: 3000;
+  /* Em mobile: alinha ao fundo como bottom-sheet */
+  align-items: flex-end;
+  padding: 0;
+}
+
+/* Folha deslizante (bottom-sheet no mobile, card centralizado no desktop) */
+.video-player-sheet {
+  width: 100%;
+  max-width: 560px;
+  background: var(--bg-card);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  overflow: hidden;
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.6);
+  animation: slideUpSheet 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+  /* Garante que não ultrapasse a tela */
+  max-height: 92dvh;
+  max-height: 92vh; /* fallback */
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes slideUpSheet {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Header */
+.video-player-header {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px 10px;
+  gap: 10px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border-subtle);
+  position: relative;
+}
+
+/* Alça de arrasto (visual) */
+.video-player-handle {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 36px;
+  height: 4px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.video-player-title {
+  flex: 1;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-top: 8px; /* espaço para a alça */
+}
+
+.video-player-close {
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: var(--text-secondary);
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+  margin-top: 6px;
+}
+.video-player-close:hover {
+  background: rgba(255, 23, 68, 0.18);
+  color: var(--red-400);
+}
+
+/* Área de vídeo — 16:9 responsivo */
+.video-player-media {
+  background: #000;
+  width: 100%;
+  /* Aspect ratio 16:9 garante consistência entre tamanhos de tela */
+  aspect-ratio: 16 / 9;
+  /* Fallback para browsers sem suporte a aspect-ratio */
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.video-player-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.video-player-gif {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Rodapé */
+.video-player-footer {
+  padding: 10px 16px 14px;
+  flex-shrink: 0;
+  /* Espaço extra no iPhone (safe area) */
+  padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+}
+
+.video-player-hint {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Desktop: centraliza o card e arredonda todos os cantos */
+@media (min-width: 600px) {
+  #modal-video-player {
+    align-items: center;
+    padding: 16px;
+  }
+  .video-player-sheet {
+    border-radius: var(--radius-xl);
+    animation: fadeIn 0.2s ease;
+    max-height: 88vh;
+  }
+}
+
+/* Telas muito pequenas (ex: 320px): reduz padding */
+@media (max-width: 360px) {
+  .video-player-header {
+    padding: 10px 12px 10px;
+  }
+  .video-player-footer {
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* Player modal legado (mantido por compatibilidade) */
 .video-player-modal {
   background: #000;
   border-radius: 0 0 var(--radius-xl) var(--radius-xl);
