@@ -1,3 +1,57 @@
+// === IA: Gerar treino personalizado com OpenAI GPT-4 ===
+const { OpenAI } = require("openai");
+
+// Defina sua chave de API OpenAI no ambiente do Firebase (NUNCA commite a chave)
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+/**
+ * Função HTTP: /gerarTreinoIA
+ * Body esperado: { objetivo: string, nivel: string, restricoes: string }
+ * Retorna: { treino: string }
+ */
+exports.gerarTreinoIA = functions.https.onRequest(async (req, res) => {
+  // Permitir CORS simples
+  res.set("Access-Control-Allow-Origin", "*");
+  if (req.method === "OPTIONS") {
+    res.set("Access-Control-Allow-Methods", "POST");
+    res.set("Access-Control-Allow-Headers", "Content-Type");
+    res.status(204).send("");
+    return;
+  }
+
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Método não permitido" });
+  }
+
+  const { objetivo, nivel, restricoes } = req.body || {};
+  if (!objetivo || !nivel) {
+    return res
+      .status(400)
+      .json({ error: "Informe objetivo e nível do aluno." });
+  }
+
+  try {
+    const prompt = `Monte um treino de academia para o objetivo: ${objetivo}. Nível: ${nivel}. Restrições: ${restricoes || "nenhuma"}. Responda apenas com o treino, em formato de lista, com exercícios, séries e repetições.`;
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4",
+      messages: [
+        {
+          role: "system",
+          content:
+            "Você é um personal trainer especialista em treinos de academia.",
+        },
+        { role: "user", content: prompt },
+      ],
+      max_tokens: 600,
+      temperature: 0.7,
+    });
+    const treino = completion.choices[0]?.message?.content || "";
+    res.json({ treino });
+  } catch (err) {
+    console.error("[OpenAI] Erro ao gerar treino:", err.message);
+    res.status(500).json({ error: "Erro ao gerar treino com IA." });
+  }
+});
 /* ============================================================
    TREINO PRO - Cloud Functions
    Dispara notificação FCM quando uma nova mensagem é criada.

@@ -33,6 +33,31 @@
 
       <!-- Formulário de Cadastro -->
       <form id="cadastro-form" novalidate>
+        <div
+          class="form-group"
+          style="
+            background: var(--bg-card-2);
+            border-radius: 12px;
+            padding: 14px 16px 10px 16px;
+            margin-bottom: 18px;
+            border: 1.5px solid var(--border-card);
+          "
+        >
+          <strong
+            style="
+              color: var(--blue-400);
+              font-size: 1.05rem;
+              display: block;
+              margin-bottom: 4px;
+            "
+            >Treino Inteligente por IA 🤖</strong
+          >
+          <span style="color: var(--text-secondary); font-size: 0.93rem"
+            >Seus treinos serão criados automaticamente por Inteligência
+            Artificial, de acordo com o objetivo informado no cadastro. Você
+            pode personalizar depois!</span
+          >
+        </div>
         <!-- Nome -->
         <div class="form-group">
           <label class="form-label" for="nome">Nome completo</label>
@@ -203,6 +228,52 @@
             </button>
           </div>
           <input type="hidden" id="objetivo" value="" />
+          <!-- Nível e Restrições para IA -->
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="nivel">Nível de treino</label>
+              <select class="form-select" id="nivel">
+                <option value="Iniciante">Iniciante</option>
+                <option value="Intermediário">Intermediário</option>
+                <option value="Avançado">Avançado</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="restricoes"
+                >Restrições de saúde</label
+              >
+              <input
+                class="form-control"
+                type="text"
+                id="restricoes"
+                placeholder="Ex: lesão, limitação, etc."
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <button
+              type="button"
+              class="btn-primary btn-block"
+              id="btn-gerar-treino-ia"
+              style="margin-top: 0.5rem"
+            >
+              Gerar treino automático com IA
+            </button>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="resultado-treino"
+              >Sugestão de treino</label
+            >
+            <textarea
+              class="form-control"
+              id="resultado-treino"
+              rows="6"
+              readonly
+              placeholder="O treino sugerido aparecerá aqui..."
+            ></textarea>
+          </div>
         </div>
 
         <!-- Dados opcionais -->

@@ -3,6 +3,45 @@
    ============================================================ */
 
 document.addEventListener("DOMContentLoaded", async () => {
+  // Integração IA: Gerar treino automático
+  const btnGerarTreino = document.getElementById("btn-gerar-treino-ia");
+  const resultadoTreino = document.getElementById("resultado-treino");
+  btnGerarTreino?.addEventListener("click", async () => {
+    const objetivo = document.getElementById("objetivo")?.value || "";
+    const nivel = document.getElementById("nivel")?.value || "Iniciante";
+    const restricoes = document.getElementById("restricoes")?.value || "";
+    if (!objetivo) {
+      resultadoTreino.value = "Informe seu objetivo para gerar o treino.";
+      resultadoTreino.classList.add("text-red");
+      return;
+    }
+    resultadoTreino.value = "Gerando treino personalizado... Aguarde...";
+    resultadoTreino.classList.remove("text-red");
+    btnGerarTreino.disabled = true;
+    try {
+      // Troque pela sua região/projeto se necessário
+      const url =
+        "https://us-central1-SEU_PROJETO.cloudfunctions.net/gerarTreinoIA";
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ objetivo, nivel, restricoes }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        resultadoTreino.value = err.error || "Erro ao gerar treino.";
+        resultadoTreino.classList.add("text-red");
+        btnGerarTreino.disabled = false;
+        return;
+      }
+      const data = await res.json();
+      resultadoTreino.value = data.treino || "Não foi possível gerar o treino.";
+    } catch (e) {
+      resultadoTreino.value = "Erro ao conectar com a IA.";
+      resultadoTreino.classList.add("text-red");
+    }
+    btnGerarTreino.disabled = false;
+  });
   /* --- Elementos --- */
   const form = document.getElementById("cadastro-form");
   const nomeInput = document.getElementById("nome");
