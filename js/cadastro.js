@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       // Usa o projectId do firebase-config.js para montar a URL da função
       const projectId =
         window._firebaseConfig?.projectId || "app-treino-academia";
-      const url = `https://us-central1-${projectId}.cloudfunctions.net/gerarTreinoIA`;
+      const url = "https://gerartreinoia-nsk2pknymq-uc.a.run.app";
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         // Gerar 5 treinos distintos para A-E
         const projectId =
           window._firebaseConfig?.projectId || "app-treino-academia";
-        const url = `https://us-central1-${projectId}.cloudfunctions.net/gerarTreinoIA`;
+        const url = "https://gerartreinoia-nsk2pknymq-uc.a.run.app";
         const treinos = {};
         for (const letra of ["A", "B", "C", "D", "E"]) {
           const promptExtra = `Monte um treino de academia para o objetivo: ${objetivo}. Nível: ${nivel}. Restrições: ${restricoes || "nenhuma"}. Este é o treino ${letra} da semana, diferente dos outros, como um personal trainer faria.`;
