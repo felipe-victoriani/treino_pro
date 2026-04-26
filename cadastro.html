@@ -33,31 +33,6 @@
 
       <!-- Formulário de Cadastro -->
       <form id="cadastro-form" novalidate>
-        <div
-          class="form-group"
-          style="
-            background: var(--bg-card-2);
-            border-radius: 12px;
-            padding: 14px 16px 10px 16px;
-            margin-bottom: 18px;
-            border: 1.5px solid var(--border-card);
-          "
-        >
-          <strong
-            style="
-              color: var(--blue-400);
-              font-size: 1.05rem;
-              display: block;
-              margin-bottom: 4px;
-            "
-            >Treino Inteligente por IA 🤖</strong
-          >
-          <span style="color: var(--text-secondary); font-size: 0.93rem"
-            >Seus treinos serão criados automaticamente por Inteligência
-            Artificial, de acordo com o objetivo informado no cadastro. Você
-            pode personalizar depois!</span
-          >
-        </div>
         <!-- Nome -->
         <div class="form-group">
           <label class="form-label" for="nome">Nome completo</label>
@@ -158,12 +133,31 @@
 
         <!-- Selecionar Professor -->
         <div class="form-group" id="professor-group">
-          <label class="form-label" for="professor">Professor</label>
+          <div style="display: flex; align-items: center; gap: 10px">
+            <label class="form-label" for="professor" style="margin-bottom: 0"
+              >Professor</label
+            >
+            <input
+              type="checkbox"
+              id="treino-ia-check"
+              style="margin-left: 12px; accent-color: var(--blue-400)"
+            />
+            <label
+              for="treino-ia-check"
+              style="
+                margin-bottom: 0;
+                color: var(--blue-400);
+                font-weight: 500;
+                cursor: pointer;
+              "
+              >Treino Inteligente 🤖</label
+            >
+          </div>
           <select class="form-select" id="professor">
             <option value="">Carregando professores...</option>
           </select>
           <span class="form-hint"
-            >Selecione o professor responsável pelo seu treino</span
+            >Selecione o professor ou marque "Treino Inteligente"</span
           >
           <span class="form-error hidden" id="professor-error"></span>
         </div>
@@ -249,17 +243,6 @@
                 placeholder="Ex: lesão, limitação, etc."
               />
             </div>
-          </div>
-
-          <div class="form-group">
-            <button
-              type="button"
-              class="btn-primary btn-block"
-              id="btn-gerar-treino-ia"
-              style="margin-top: 0.5rem"
-            >
-              Gerar treino automático com IA
-            </button>
           </div>
 
           <div class="form-group"></div>

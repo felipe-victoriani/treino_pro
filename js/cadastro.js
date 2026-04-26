@@ -3,40 +3,15 @@
    ============================================================ */
 
 document.addEventListener("DOMContentLoaded", async () => {
-  // Integração IA: Gerar treino automático
-  const btnGerarTreino = document.getElementById("btn-gerar-treino-ia");
-  btnGerarTreino?.addEventListener("click", async () => {
-    const objetivo = document.getElementById("objetivo")?.value || "";
-    const nivel = document.getElementById("nivel")?.value || "Iniciante";
-    const restricoes = document.getElementById("restricoes")?.value || "";
-    if (!objetivo) {
-      showToast("Informe seu objetivo para gerar o treino.", "error");
-      return;
+  // Checkbox de treino IA
+  const treinoIACheck = document.getElementById("treino-ia-check");
+  treinoIACheck?.addEventListener("change", () => {
+    if (treinoIACheck.checked) {
+      profSelect.disabled = true;
+      profSelect.value = "";
+    } else {
+      profSelect.disabled = false;
     }
-    btnGerarTreino.disabled = true;
-    showToast("Gerando treino personalizado... Aguarde...", "info");
-    try {
-      // Usa o projectId do firebase-config.js para montar a URL da função
-      const projectId =
-        window._firebaseConfig?.projectId || "app-treino-academia";
-      const url =
-        "https://us-central1-app-treino-academia.cloudfunctions.net/gerarTreinoIA";
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ objetivo, nivel, restricoes }),
-      });
-      if (!res.ok) {
-        showToast("Erro ao gerar treino.", "error");
-        btnGerarTreino.disabled = false;
-        return;
-      }
-      showToast("Treino gerado com sucesso! Confira em seu perfil.", "success");
-      setTimeout(() => window.location.replace("aluno.html"), 1200);
-    } catch (e) {
-      showToast("Erro ao conectar com a IA.", "error");
-    }
-    btnGerarTreino.disabled = false;
   });
   /* --- Elementos --- */
   const form = document.getElementById("cadastro-form");
@@ -96,7 +71,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const email = emailInput.value.trim().toLowerCase();
     const senha = senhaInput.value;
     const confirm = confirmInput.value;
-    const profId = profSelect.value;
+    const profId = treinoIACheck.checked ? "IA" : profSelect.value;
     const sexo = document.getElementById("sexo")?.value || "";
     const objetivo = document.getElementById("objetivo")?.value || "";
     const peso = pesoInput.value ? parseFloat(pesoInput.value) : null;
@@ -121,8 +96,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       showFieldError("confirm-error", "As senhas não coincidem");
       hasError = true;
     }
-    if (!profId) {
-      showFieldError("professor-error", "Selecione um professor");
+    if (!treinoIACheck.checked && !profId) {
+      showFieldError(
+        "professor-error",
+        "Selecione um professor ou marque Treino Inteligente",
+      );
       hasError = true;
     }
     if (hasError) return;
