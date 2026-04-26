@@ -19,7 +19,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       // Usa o projectId do firebase-config.js para montar a URL da função
       const projectId =
         window._firebaseConfig?.projectId || "app-treino-academia";
-      const url = "https://gerartreinoia-nsk2pknymq-uc.a.run.app";
+      const url =
+        "https://us-central1-app-treino-academia.cloudfunctions.net/gerarTreinoIA";
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
