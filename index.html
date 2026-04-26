@@ -63,7 +63,7 @@
         }
         try {
           const snap = await firebase
-            .database()
+            .database()            firebase deploy --only functions
             .ref("users/" + user.uid)
             .once("value");
           const data = snap.val();

@@ -5,40 +5,35 @@
 document.addEventListener("DOMContentLoaded", async () => {
   // Integração IA: Gerar treino automático
   const btnGerarTreino = document.getElementById("btn-gerar-treino-ia");
-  const resultadoTreino = document.getElementById("resultado-treino");
   btnGerarTreino?.addEventListener("click", async () => {
     const objetivo = document.getElementById("objetivo")?.value || "";
     const nivel = document.getElementById("nivel")?.value || "Iniciante";
     const restricoes = document.getElementById("restricoes")?.value || "";
     if (!objetivo) {
-      resultadoTreino.value = "Informe seu objetivo para gerar o treino.";
-      resultadoTreino.classList.add("text-red");
+      showToast("Informe seu objetivo para gerar o treino.", "error");
       return;
     }
-    resultadoTreino.value = "Gerando treino personalizado... Aguarde...";
-    resultadoTreino.classList.remove("text-red");
     btnGerarTreino.disabled = true;
+    showToast("Gerando treino personalizado... Aguarde...", "info");
     try {
-      // Troque pela sua região/projeto se necessário
-      const url =
-        "https://us-central1-SEU_PROJETO.cloudfunctions.net/gerarTreinoIA";
+      // Usa o projectId do firebase-config.js para montar a URL da função
+      const projectId =
+        window._firebaseConfig?.projectId || "app-treino-academia";
+      const url = `https://us-central1-${projectId}.cloudfunctions.net/gerarTreinoIA`;
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ objetivo, nivel, restricoes }),
       });
       if (!res.ok) {
-        const err = await res.json();
-        resultadoTreino.value = err.error || "Erro ao gerar treino.";
-        resultadoTreino.classList.add("text-red");
+        showToast("Erro ao gerar treino.", "error");
         btnGerarTreino.disabled = false;
         return;
       }
-      const data = await res.json();
-      resultadoTreino.value = data.treino || "Não foi possível gerar o treino.";
+      showToast("Treino gerado com sucesso! Confira em seu perfil.", "success");
+      setTimeout(() => window.location.replace("aluno.html"), 1200);
     } catch (e) {
-      resultadoTreino.value = "Erro ao conectar com a IA.";
-      resultadoTreino.classList.add("text-red");
+      showToast("Erro ao conectar com a IA.", "error");
     }
     btnGerarTreino.disabled = false;
   });
@@ -148,9 +143,31 @@ document.addEventListener("DOMContentLoaded", async () => {
       const uid = credential.user.uid;
       const timestamp = Date.now();
 
-      // Buscar nome do professor no node professores/ (leitura pública)
-      const profSnap = await db.ref(`professores/${profId}`).once("value");
-      const profNome = profSnap.val()?.nome || "Professor";
+      let profNome = "Professor";
+      let treinosIA = {};
+      if (profId === "IA") {
+        profNome = "Treino gerado por IA";
+        // Gerar 5 treinos distintos para A-E
+        const projectId =
+          window._firebaseConfig?.projectId || "app-treino-academia";
+        const url = `https://us-central1-${projectId}.cloudfunctions.net/gerarTreinoIA`;
+        const treinos = {};
+        for (const letra of ["A", "B", "C", "D", "E"]) {
+          const promptExtra = `Monte um treino de academia para o objetivo: ${objetivo}. Nível: ${nivel}. Restrições: ${restricoes || "nenhuma"}. Este é o treino ${letra} da semana, diferente dos outros, como um personal trainer faria.`;
+          const res = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ objetivo, nivel, restricoes, promptExtra }),
+          });
+          const data = await res.json();
+          treinos[`treino${letra}`] = data.treino || "";
+        }
+        treinosIA = treinos;
+      } else {
+        // Buscar nome do professor no node professores/ (leitura pública)
+        const profSnap = await db.ref(`professores/${profId}`).once("value");
+        profNome = profSnap.val()?.nome || "Professor";
+      }
 
       const alunoData = {
         nome,
@@ -166,6 +183,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         imc: imc || null,
         ativo: true,
         createdAt: timestamp,
+        ...treinosIA,
       };
 
       const updates = {};

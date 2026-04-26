@@ -440,12 +440,42 @@ async function mostrarTreino(letra) {
         : "Treino " + letra;
   }
   // Carrega exercicios
-  await loadTreinoAluno(
-    alunoState.uid,
-    letra,
-    "aluno-exercise-list",
-    historico,
-  );
+  // Tenta carregar exercícios do treino
+  const exListEl = document.getElementById("aluno-exercise-list");
+  let temExercicios = false;
+  if (exListEl) {
+    // Limpa
+    exListEl.innerHTML =
+      '<div class="empty-state"><div class="spinner"></div></div>';
+    // Busca exercícios do treino
+    const tSnap = await db
+      .ref("treinos/" + alunoState.uid + "/" + letra)
+      .once("value");
+    const treinoData = tSnap.val();
+    const exs = treinoData && treinoData.exercicios;
+    if (exs && Object.keys(exs).length > 0) {
+      temExercicios = true;
+      // Renderiza normalmente (reaproveita função existente)
+      await loadTreinoAluno(
+        alunoState.uid,
+        letra,
+        "aluno-exercise-list",
+        historico,
+      );
+    } else {
+      // Se não houver exercícios cadastrados, tenta mostrar treino IA
+      const snapAluno = await db.ref("alunos/" + alunoState.uid).once("value");
+      const dadosAluno = snapAluno.val() || {};
+      const campo = "treino" + letra;
+      const treinoIA = dadosAluno[campo];
+      if (treinoIA) {
+        exListEl.innerHTML = `<div class='card' style='white-space:pre-line;font-size:1.05rem;padding:18px 12px 12px 12px;'>${sanitize(treinoIA)}</div>`;
+      } else {
+        exListEl.innerHTML =
+          '<div class="empty-state"><p style="color:var(--text-muted);padding:12px 0;">Seu professor ainda não cadastrou exercícios e não há sugestão de IA para este treino.</p></div>';
+      }
+    }
+  }
   // Botao finalizar
   const btnFinalizar = document.getElementById("finish-workout-btn");
   if (btnFinalizar) {
