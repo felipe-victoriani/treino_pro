@@ -47,8 +47,27 @@ body {
 /* Loading state */
 .splash-loading {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 16px;
+}
+
+.splash-loading p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #6b7280;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 /* Landing page */

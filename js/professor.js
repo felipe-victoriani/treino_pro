@@ -117,39 +117,65 @@ async function loadDashboard() {
         .join("");
     }
 
+    // ⚡ OTIMIZAÇÃO: Limita a 10 alunos para calcular stats (performance)
     var snap = await db
       .ref("alunos")
       .orderByChild("professorId")
       .equalTo(profState.uid)
+      .limitToFirst(10)
       .once("value");
     var alunosData = snap.val() || {};
     var alunoIds = Object.keys(alunosData);
+
+    // Busca contagem total de alunos separadamente (mais rápido)
+    var totalSnap = await db
+      .ref("alunos")
+      .orderByChild("professorId")
+      .equalTo(profState.uid)
+      .once("value");
+    var totalAlunos = totalSnap.val() ? Object.keys(totalSnap.val()).length : 0;
+
     var statAlunos = document.getElementById("stat-alunos");
-    if (statAlunos) statAlunos.textContent = alunoIds.length;
-    var totalTreinos = 0;
+    if (statAlunos) statAlunos.textContent = totalAlunos;
+
+    // ⚡ OTIMIZAÇÃO: Calcula stats apenas dos 10 primeiros alunos
     var totalMsgNaoLidas = 0;
     var recentes = [];
+
+    // Busca mensagens não lidas em paralelo (muito mais rápido)
+    var naoLidasPromises = alunoIds.map((uid) =>
+      contarNaoLidas(uid, profState.uid),
+    );
+    var naoLidasResults = await Promise.all(naoLidasPromises);
+
     for (var i = 0; i < Math.min(alunoIds.length, 5); i++) {
       var uid = alunoIds[i];
       var aluno = alunosData[uid];
-      var treinos = (await db.ref("treinos/" + uid).once("value")).val();
-      if (aluno) recentes.push(Object.assign({ uid: uid }, aluno));
-      if (treinos) {
-        Object.values(treinos).forEach(function (t) {
-          if (t.exercicios) totalTreinos += Object.keys(t.exercicios).length;
-        });
+      if (aluno) {
+        var naoLidas = naoLidasResults[i] || 0;
+        totalMsgNaoLidas += naoLidas;
+        recentes.push(Object.assign({ uid: uid, naoLidas: naoLidas }, aluno));
       }
-      var naoLidas = await contarNaoLidas(uid, profState.uid);
-      totalMsgNaoLidas += naoLidas;
-      if (aluno) recentes[recentes.length - 1].naoLidas = naoLidas;
     }
+
+    // ⚡ Stat de treinos agora mostra apenas "Ver detalhes" para evitar query pesada
     var statTreinos = document.getElementById("stat-treinos");
-    if (statTreinos) statTreinos.textContent = totalTreinos;
+    if (statTreinos) statTreinos.textContent = "Ver detalhes";
+
     var statMsgs = document.getElementById("stat-msgs");
     if (statMsgs) statMsgs.textContent = totalMsgNaoLidas;
+
     renderAlunosRecentes(recentes);
-    await renderAlunosInativos(alunosData);
-    await renderRelatorioSemanal(alunosData);
+
+    // ⚡ Carrega widgets adicionais de forma lazy (não bloqueia)
+    setTimeout(() => {
+      renderAlunosInativos(alunosData).catch((e) =>
+        console.warn("[Dashboard] Erro ao carregar inativos:", e),
+      );
+      renderRelatorioSemanal(alunosData).catch((e) =>
+        console.warn("[Dashboard] Erro ao carregar relatório:", e),
+      );
+    }, 100);
   } catch (e) {
     console.error("[Professor] Erro ao carregar dashboard:", e);
   }
@@ -161,13 +187,29 @@ async function renderAlunosInativos(alunosData) {
   const LIMITE_DIAS = 5;
   const hoje = new Date();
   const inativos = [];
-  for (const [uid, aluno] of Object.entries(alunosData)) {
-    const snap = await db
+
+  // ⚡ OTIMIZAÇÃO: Limita verificação aos 10 alunos já carregados
+  const alunosArray = Object.entries(alunosData).slice(0, 10);
+
+  // ⚡ Busca históricos em paralelo
+  const historicoPromises = alunosArray.map(([uid]) =>
+    db
       .ref("historicoTreinos/" + uid)
       .orderByKey()
       .limitToLast(1)
-      .once("value");
-    const hist = snap.val();
+      .once("value")
+      .then((snap) => ({ uid, snap }))
+      .catch(() => ({ uid, snap: null })),
+  );
+
+  const historicos = await Promise.all(historicoPromises);
+
+  for (let i = 0; i < historicos.length; i++) {
+    const { uid, snap } = historicos[i];
+    const aluno = alunosData[uid];
+    if (!aluno) continue;
+
+    const hist = snap?.val();
     let ultimoTreino = null;
     if (hist) {
       const chave = Object.keys(hist)[0]; // "YYYY-MM-DD"
@@ -238,17 +280,35 @@ async function renderRelatorioSemanal(alunosData) {
   let totalSemana = 0;
   const porAluno = {};
 
-  for (const [uid, aluno] of Object.entries(alunosData)) {
-    let count = 0;
+  // ⚡ OTIMIZAÇÃO: Limita a 10 alunos e busca em paralelo
+  const alunosArray = Object.entries(alunosData).slice(0, 10);
+
+  // Busca todos os históricos em paralelo (7 dias × 10 alunos = 70 queries paralelas)
+  const historicoPromises = [];
+  for (const [uid, aluno] of alunosArray) {
     for (const dia of semanaKeys) {
-      const snap = await db.ref(`historicoTreinos/${uid}/${dia}`).once("value");
-      const hist = snap.val();
-      if (hist && hist.completado) {
-        totalSemana++;
-        count++;
-      }
+      historicoPromises.push(
+        db
+          .ref(`historicoTreinos/${uid}/${dia}`)
+          .once("value")
+          .then((snap) => ({ uid, aluno, dia, snap }))
+          .catch(() => ({ uid, aluno, dia, snap: null })),
+      );
     }
-    if (count > 0) porAluno[uid] = { nome: aluno.nome, count };
+  }
+
+  const resultados = await Promise.all(historicoPromises);
+
+  // Processa resultados
+  for (const { uid, aluno, snap } of resultados) {
+    const hist = snap?.val();
+    if (hist && hist.completado) {
+      totalSemana++;
+      if (!porAluno[uid]) {
+        porAluno[uid] = { nome: aluno.nome, count: 0 };
+      }
+      porAluno[uid].count++;
+    }
   }
 
   const topAlunos = Object.values(porAluno)
@@ -361,6 +421,14 @@ function selecionarAlunoDosDash(uid) {
   }, 150);
 }
 /* -- Lista de Alunos ------------------------------------------ */
+// ⚡ Estado da paginação
+var alunosPaginacao = {
+  carregados: [],
+  limite: 30,
+  offset: 0,
+  temMais: true,
+};
+
 async function loadAlunos() {
   mostrarListaAlunos();
   var listEl = document.getElementById("alunos-grid");
@@ -368,6 +436,7 @@ async function loadAlunos() {
   listEl.innerHTML =
     '<div class="empty-state" style="grid-column:1/-1"><div class="spinner"></div></div>';
   try {
+    // ⚡ OTIMIZAÇÃO: Carrega todos de uma vez mas processa em lotes
     var snap = await db
       .ref("alunos")
       .orderByChild("professorId")
@@ -382,16 +451,26 @@ async function loadAlunos() {
         '<div class="empty-state" style="grid-column:1/-1"><h3>Nenhum aluno cadastrado</h3><p>Seus alunos aparecerao quando se registrarem e selecionarem voce como professor.</p></div>';
       return;
     }
-    // Busca naoLidas em paralelo
-    var naoLidasMap = {};
-    await Promise.all(
-      alunosBase.map(async function (a) {
-        naoLidasMap[a.uid] = await contarNaoLidas(a.uid, profState.uid);
-      }),
+
+    // ⚡ Busca mensagens não lidas apenas dos primeiros 30 alunos
+    var alunosParaCarregar = alunosBase.slice(0, alunosPaginacao.limite);
+    var naoLidasPromises = alunosParaCarregar.map((a) =>
+      contarNaoLidas(a.uid, profState.uid)
+        .then((count) => ({ uid: a.uid, count }))
+        .catch(() => ({ uid: a.uid, count: 0 })),
     );
+    var naoLidasResults = await Promise.all(naoLidasPromises);
+    var naoLidasMap = {};
+    naoLidasResults.forEach((r) => {
+      naoLidasMap[r.uid] = r.count;
+    });
+
     var alunos = alunosBase.map(function (a) {
       return Object.assign({ naoLidas: naoLidasMap[a.uid] || 0 }, a);
     });
+
+    // Guarda referência para paginação futura
+    alunosPaginacao.carregados = alunos;
     // Busca
     var searchEl = document.getElementById("search-alunos");
     function renderList(filtro) {

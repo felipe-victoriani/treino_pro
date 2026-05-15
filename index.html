@@ -14,6 +14,12 @@
     <!-- Estado de carregamento (visível enquanto verifica autenticação) -->
     <div id="splash-loading" class="splash-loading">
       <div class="spinner"></div>
+      <p
+        id="loading-text"
+        style="color: #6b7280; font-size: 0.9rem; margin-top: 12px"
+      >
+        Carregando...
+      </p>
     </div>
 
     <!-- Landing page (visível apenas para não autenticados) -->
@@ -55,31 +61,98 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <script src="js/firebase-config.js"></script>
     <script>
-      auth.onAuthStateChanged(async (user) => {
-        if (!user) {
-          document.getElementById("splash-loading").classList.add("hidden");
-          document.getElementById("landing").classList.remove("hidden");
-          return;
+      // Timeout de segurança para evitar carregamento infinito
+      let authCheckComplete = false;
+
+      // Atualiza mensagem de carregamento
+      function updateLoadingMessage(message) {
+        const loadingText = document.getElementById("loading-text");
+        if (loadingText) loadingText.textContent = message;
+      }
+
+      // Timeout progressivo
+      setTimeout(() => {
+        if (!authCheckComplete) {
+          updateLoadingMessage("Conectando ao servidor...");
         }
-        try {
-          const snap = await firebase
-            .database()            firebase deploy --only functions
-            .ref("users/" + user.uid)
-            .once("value");
-          const data = snap.val();
-          if (data?.tipo === "professor") {
-            window.location.replace("professor.html");
-          } else if (data?.tipo === "aluno") {
-            window.location.replace("aluno.html");
-          } else {
+      }, 2000);
+
+      setTimeout(() => {
+        if (!authCheckComplete) {
+          console.warn("[Index] Timeout na verificação de autenticação");
+          updateLoadingMessage("Problema de conexão. Redirecionando...");
+
+          setTimeout(() => {
             document.getElementById("splash-loading").classList.add("hidden");
             document.getElementById("landing").classList.remove("hidden");
-          }
-        } catch (e) {
+          }, 1000);
+        }
+      }, 6000); // 6 segundos total
+
+      // Verifica se Firebase foi carregado
+      if (typeof firebase === "undefined" || typeof auth === "undefined") {
+        console.error("[Index] Firebase não carregado");
+        authCheckComplete = true;
+        updateLoadingMessage("Erro ao carregar. Tente novamente.");
+
+        setTimeout(() => {
           document.getElementById("splash-loading").classList.add("hidden");
           document.getElementById("landing").classList.remove("hidden");
-        }
-      });
+        }, 1500);
+      } else {
+        updateLoadingMessage("Verificando acesso...");
+
+        auth.onAuthStateChanged(async (user) => {
+          authCheckComplete = true;
+
+          if (!user) {
+            document.getElementById("splash-loading").classList.add("hidden");
+            document.getElementById("landing").classList.remove("hidden");
+            return;
+          }
+
+          try {
+            updateLoadingMessage("Carregando seus dados...");
+
+            const snap = await Promise.race([
+              firebase
+                .database()
+                .ref("users/" + user.uid)
+                .once("value"),
+              new Promise((_, reject) =>
+                setTimeout(() => reject(new Error("Timeout")), 4000),
+              ),
+            ]);
+
+            const data = snap.val();
+            if (data?.tipo === "professor") {
+              updateLoadingMessage("Bem-vindo! Redirecionando...");
+              setTimeout(() => window.location.replace("professor.html"), 500);
+            } else if (data?.tipo === "aluno") {
+              updateLoadingMessage("Bem-vindo! Redirecionando...");
+              setTimeout(() => window.location.replace("aluno.html"), 500);
+            } else {
+              document.getElementById("splash-loading").classList.add("hidden");
+              document.getElementById("landing").classList.remove("hidden");
+            }
+          } catch (e) {
+            console.error("[Index] Erro ao buscar dados do usuário:", e);
+            updateLoadingMessage("Erro de conexão. Faça login novamente.");
+
+            // Faz logout em caso de erro
+            try {
+              await auth.signOut();
+            } catch (logoutErr) {
+              console.error("[Index] Erro ao fazer logout:", logoutErr);
+            }
+
+            setTimeout(() => {
+              document.getElementById("splash-loading").classList.add("hidden");
+              document.getElementById("landing").classList.remove("hidden");
+            }, 1500);
+          }
+        });
+      }
     </script>
     <footer
       style="

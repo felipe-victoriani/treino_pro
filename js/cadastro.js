@@ -3,16 +3,6 @@
    ============================================================ */
 
 document.addEventListener("DOMContentLoaded", async () => {
-  // Checkbox de treino IA
-  const treinoIACheck = document.getElementById("treino-ia-check");
-  treinoIACheck?.addEventListener("change", () => {
-    if (treinoIACheck.checked) {
-      profSelect.disabled = true;
-      profSelect.value = "";
-    } else {
-      profSelect.disabled = false;
-    }
-  });
   /* --- Elementos --- */
   const form = document.getElementById("cadastro-form");
   const nomeInput = document.getElementById("nome");
@@ -71,7 +61,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const email = emailInput.value.trim().toLowerCase();
     const senha = senhaInput.value;
     const confirm = confirmInput.value;
-    const profId = treinoIACheck.checked ? "IA" : profSelect.value;
+    const profId = profSelect.value;
     const sexo = document.getElementById("sexo")?.value || "";
     const objetivo = document.getElementById("objetivo")?.value || "";
     const peso = pesoInput.value ? parseFloat(pesoInput.value) : null;
@@ -96,11 +86,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       showFieldError("confirm-error", "As senhas não coincidem");
       hasError = true;
     }
-    if (!treinoIACheck.checked && !profId) {
-      showFieldError(
-        "professor-error",
-        "Selecione um professor ou marque Treino Inteligente",
-      );
+    if (!profId) {
+      showFieldError("professor-error", "Selecione um professor");
       hasError = true;
     }
     if (hasError) return;
@@ -123,30 +110,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       const timestamp = Date.now();
 
       let profNome = "Professor";
-      let treinosIA = {};
-      if (profId === "IA") {
-        profNome = "Treino gerado por IA";
-        // Gerar 5 treinos distintos para A-E
-        const projectId =
-          window._firebaseConfig?.projectId || "app-treino-academia";
-        const url = "https://gerartreinoia-nsk2pknymq-uc.a.run.app";
-        const treinos = {};
-        for (const letra of ["A", "B", "C", "D", "E"]) {
-          const promptExtra = `Monte um treino de academia para o objetivo: ${objetivo}. Nível: ${nivel}. Restrições: ${restricoes || "nenhuma"}. Este é o treino ${letra} da semana, diferente dos outros, como um personal trainer faria.`;
-          const res = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ objetivo, nivel, restricoes, promptExtra }),
-          });
-          const data = await res.json();
-          treinos[`treino${letra}`] = data.treino || "";
-        }
-        treinosIA = treinos;
-      } else {
-        // Buscar nome do professor no node professores/ (leitura pública)
-        const profSnap = await db.ref(`professores/${profId}`).once("value");
-        profNome = profSnap.val()?.nome || "Professor";
-      }
+      // Buscar nome do professor no node professores/ (leitura pública)
+      const profSnap = await db.ref(`professores/${profId}`).once("value");
+      profNome = profSnap.val()?.nome || "Professor";
 
       const alunoData = {
         nome,
@@ -162,7 +128,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         imc: imc || null,
         ativo: true,
         createdAt: timestamp,
-        ...treinosIA,
       };
 
       const updates = {};

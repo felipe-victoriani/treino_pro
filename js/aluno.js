@@ -394,53 +394,6 @@ async function loadTreinoSection() {
   setupTreinoTabs();
   await mostrarTreino(alunoState.treinoAtual);
   await loadHistoricoTreinos(alunoState.uid, "aluno-historico-list", 7);
-  // Adiciona listener ao botão de IA
-  const btnGerarTreino = document.getElementById("btn-gerar-treino-ia");
-  if (btnGerarTreino) {
-    btnGerarTreino.onclick = async () => {
-      // Coleta dados do aluno para sugestão
-      const objetivo = prompt(
-        "Qual seu objetivo principal? (ex: hipertrofia, emagrecimento, condicionamento)",
-        alunoState.objetivo || "",
-      );
-      if (!objetivo) {
-        showToast("Informe seu objetivo para gerar o treino.", "error");
-        return;
-      }
-      const nivel = prompt(
-        "Qual seu nível? (Iniciante, Intermediário, Avançado)",
-        "Iniciante",
-      );
-      if (!nivel) return;
-      const restricoes = prompt(
-        "Possui alguma restrição física ou de saúde? (opcional)",
-        "",
-      );
-      btnGerarTreino.disabled = true;
-      showToast("Gerando treino personalizado... Aguarde...", "info");
-      try {
-        const url =
-          "https://us-central1-app-treino-academia.cloudfunctions.net/gerarTreinoIA";
-        const res = await fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ objetivo, nivel, restricoes }),
-        });
-        if (!res.ok) {
-          showToast("Erro ao gerar treino.", "error");
-          btnGerarTreino.disabled = false;
-          return;
-        }
-        showToast(
-          "Treino gerado com sucesso! Atualize a página para ver.",
-          "success",
-        );
-      } catch (e) {
-        showToast("Erro ao conectar com a IA.", "error");
-      }
-      btnGerarTreino.disabled = false;
-    };
-  }
 }
 function setupTreinoTabs() {
   document.querySelectorAll(".workout-tab-btn").forEach((btn) => {
@@ -502,15 +455,6 @@ async function mostrarTreino(letra) {
     const exs = treinoData && treinoData.exercicios;
     if (exs && Object.keys(exs).length > 0) {
       temExercicios = true;
-      // Exibe botão IA só se for aluno de IA
-      const btnGerarTreino = document.getElementById("btn-gerar-treino-ia");
-      if (btnGerarTreino) {
-        if (alunoState.professorId === "IA") {
-          btnGerarTreino.style.display = "block";
-        } else {
-          btnGerarTreino.style.display = "none";
-        }
-      }
       // Renderiza normalmente (reaproveita função existente)
       await loadTreinoAluno(
         alunoState.uid,

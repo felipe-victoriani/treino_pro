@@ -38,7 +38,7 @@ _swMessaging.onBackgroundMessage((payload) => {
   });
 });
 
-const CACHE_NAME = "treino-pro-v1.1.0";
+const CACHE_NAME = "treino-pro-v1.2.0";
 const STATIC_ASSETS = [
   "/",
   "/index.html",
@@ -68,6 +68,7 @@ const STATIC_ASSETS = [
 
 /* --- Install: pré-cacheia arquivos estáticos --- */
 self.addEventListener("install", (event) => {
+  console.log("[SW] Instalando Service Worker v1.2.0...");
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       // Cacheia cada arquivo individualmente para não bloquear o install
@@ -81,12 +82,13 @@ self.addEventListener("install", (event) => {
       );
     }),
   );
+  // Força ativação imediata
   self.skipWaiting();
 });
 
 /* --- Activate: limpa caches antigos --- */
 self.addEventListener("activate", (event) => {
-  console.log("[SW] Ativando Service Worker...");
+  console.log("[SW] Ativando Service Worker v1.2.0...");
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
@@ -99,6 +101,7 @@ self.addEventListener("activate", (event) => {
       );
     }),
   );
+  // Garante que o novo SW assuma o controle imediatamente
   self.clients.claim();
 });
 
