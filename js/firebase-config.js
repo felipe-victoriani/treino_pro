@@ -32,7 +32,10 @@ const auth = firebase.auth();
 const db = firebase.database();
 const storage =
   typeof firebase.storage === "function" ? firebase.storage() : null;
+const functions =
+  typeof firebase.functions === "function" ? firebase.functions() : null;
 window.storage = storage;
+window.functions = functions;
 
 /* --- Confirmar conexão no console (dev) --- */
 db.ref(".info/connected").on("value", (snap) => {

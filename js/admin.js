@@ -189,15 +189,29 @@ function confirmarRemocao(profId, nome) {
 }
 
 async function removerProfessor(profId, nome) {
-  showLoading("Removendo professor...");
+  showLoading("Removendo professor e limpando dados...");
   try {
-    await db.ref(`users/${profId}`).remove();
-    await db.ref(`professores/${profId}`).remove();
-    showToast(`Professor "${nome}" removido.`, "success");
-    carregarProfessores();
+    // Chama Cloud Function para exclusão completa (dados + conta de autenticação)
+    const functions = firebase.functions();
+    const deletarProfessorFn = functions.httpsCallable("deletarProfessor");
+
+    const result = await deletarProfessorFn({ professorId: profId });
+
+    if (result.data.success) {
+      showToast(
+        `Professor "${nome}" excluído completamente. Email liberado para reutilização.`,
+        "success",
+      );
+      carregarProfessores();
+    } else {
+      throw new Error(result.data.message || "Erro desconhecido");
+    }
   } catch (err) {
-    showToast("Erro ao remover professor.", "error");
-    console.error("[Admin]", err);
+    console.error("[Admin] Erro ao remover professor:", err);
+    showToast(
+      "Erro ao remover professor: " + (err.message || "Tente novamente"),
+      "error",
+    );
   } finally {
     hideLoading();
   }
@@ -382,15 +396,30 @@ function confirmarRemocaoAluno(alunoId, nome) {
 }
 
 async function removerAluno(alunoId, nome) {
-  showLoading("Removendo aluno...");
+  showLoading("Removendo aluno e limpando dados...");
   try {
-    await db.ref(`alunos/${alunoId}`).remove();
-    await db.ref(`users/${alunoId}`).remove();
-    showToast(`Aluno "${nome}" removido.`, "success");
-    carregarAlunos();
+    // Chama Cloud Function para exclusão completa (dados + treinos + dietas + mensagens + conta)
+    const functions = firebase.functions();
+    const deletarAlunoFn = functions.httpsCallable("deletarAluno");
+
+    const result = await deletarAlunoFn({ alunoId: alunoId });
+
+    if (result.data.success) {
+      showToast(
+        `Aluno "${nome}" excluído completamente. Todos os dados (treinos, dietas, mensagens) foram removidos. Email liberado para reutilização.`,
+        "success",
+        4000,
+      );
+      carregarAlunos();
+    } else {
+      throw new Error(result.data.message || "Erro desconhecido");
+    }
   } catch (err) {
-    showToast("Erro ao remover aluno.", "error");
-    console.error("[Admin]", err);
+    console.error("[Admin] Erro ao remover aluno:", err);
+    showToast(
+      "Erro ao remover aluno: " + (err.message || "Tente novamente"),
+      "error",
+    );
   } finally {
     hideLoading();
   }
