@@ -398,11 +398,15 @@ function confirmarRemocaoAluno(alunoId, nome) {
 async function removerAluno(alunoId, nome) {
   showLoading("Removendo aluno e limpando dados...");
   try {
+    console.log("[Admin] Chamando deletarAluno para ID:", alunoId);
+
     // Chama Cloud Function para exclusão completa (dados + treinos + dietas + mensagens + conta)
     const functions = firebase.functions();
     const deletarAlunoFn = functions.httpsCallable("deletarAluno");
 
     const result = await deletarAlunoFn({ alunoId: alunoId });
+
+    console.log("[Admin] Resultado da Cloud Function:", result);
 
     if (result.data.success) {
       showToast(
@@ -416,6 +420,11 @@ async function removerAluno(alunoId, nome) {
     }
   } catch (err) {
     console.error("[Admin] Erro ao remover aluno:", err);
+    console.error("[Admin] Detalhes do erro:", {
+      code: err.code,
+      message: err.message,
+      details: err.details,
+    });
     showToast(
       "Erro ao remover aluno: " + (err.message || "Tente novamente"),
       "error",
