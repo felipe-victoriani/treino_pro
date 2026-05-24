@@ -22,34 +22,33 @@ document.addEventListener("DOMContentLoaded", async () => {
     senhaInput.type = senhaInput.type === "password" ? "text" : "password";
   });
 
-  /* --- Sexo selector --- */
-  document.querySelectorAll(".sexo-btn").forEach((btn) => {
+  /* --- Modo selector (independente / professor) --- */
+  document.querySelectorAll("#modo-selector .sexo-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       document
-        .querySelectorAll(".sexo-btn")
+        .querySelectorAll("#modo-selector .sexo-btn")
         .forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
-      document.getElementById("sexo").value = btn.dataset.value;
-    });
-  });
-
-  /* --- Objetivo chips --- */
-  document.querySelectorAll(".objetivo-chip").forEach((chip) => {
-    chip.addEventListener("click", () => {
-      const jaAtivo = chip.classList.contains("active");
+      const modo = btn.dataset.value;
+      document.getElementById("modo-treino").value = modo;
       document
-        .querySelectorAll(".objetivo-chip")
-        .forEach((c) => c.classList.remove("active"));
-      if (!jaAtivo) {
-        chip.classList.add("active");
-        document.getElementById("objetivo").value = chip.dataset.value;
-      } else {
-        document.getElementById("objetivo").value = "";
-      }
+        .getElementById("professor-group")
+        .classList.toggle("hidden", modo !== "professor");
     });
   });
 
-  /* --- Carregar lista de professores --- */
+  /* --- Nível cards --- */
+  document.querySelectorAll("#nivel-cards .nivel-card").forEach((card) => {
+    card.addEventListener("click", () => {
+      document
+        .querySelectorAll("#nivel-cards .nivel-card")
+        .forEach((c) => c.classList.remove("active"));
+      card.classList.add("active");
+      document.getElementById("nivel").value = card.dataset.value;
+    });
+  });
+
+  /* --- Sexo selector --- */
   await loadProfessores();
 
   /* --- Submit --- */
@@ -61,9 +60,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     const email = emailInput.value.trim().toLowerCase();
     const senha = senhaInput.value;
     const confirm = confirmInput.value;
-    const profId = profSelect.value;
+    const modo =
+      document.getElementById("modo-treino")?.value || "independente";
+    const profId = modo === "professor" ? profSelect.value : "";
+    const nivel = document.getElementById("nivel")?.value || "INICIANTE";
     const sexo = document.getElementById("sexo")?.value || "";
-    const objetivo = document.getElementById("objetivo")?.value || "";
     const peso = pesoInput.value ? parseFloat(pesoInput.value) : null;
     const altura = alturaInput.value ? parseFloat(alturaInput.value) : null;
 
@@ -86,7 +87,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       showFieldError("confirm-error", "As senhas não coincidem");
       hasError = true;
     }
-    if (!profId) {
+    if (modo === "professor" && !profId) {
       showFieldError("professor-error", "Selecione um professor");
       hasError = true;
     }
@@ -109,20 +110,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       const uid = credential.user.uid;
       const timestamp = Date.now();
 
-      let profNome = "Professor";
-      // Buscar nome do professor no node professores/ (leitura pública)
-      const profSnap = await db.ref(`professores/${profId}`).once("value");
-      profNome = profSnap.val()?.nome || "Professor";
-
       const alunoData = {
         nome,
         email,
         tipo: "aluno",
-        professorId: profId,
-        professorNome: profNome,
+        nivel: nivel,
         treinoAtual: "A",
         sexo: sexo || null,
-        objetivo: objetivo || null,
         peso: peso || null,
         altura: altura || null,
         imc: imc || null,
@@ -130,15 +124,28 @@ document.addEventListener("DOMContentLoaded", async () => {
         createdAt: timestamp,
       };
 
+      if (profId) {
+        const profSnap = await db.ref(`professores/${profId}`).once("value");
+        alunoData.professorId = profId;
+        alunoData.professorNome = profSnap.val()?.nome || "Professor";
+      }
+
       const updates = {};
       updates[`users/${uid}`] = alunoData;
       updates[`alunos/${uid}`] = alunoData;
 
       await db.ref().update(updates);
-      showToast("Conta criada com sucesso! Faça o login.", "success", 3000);
 
-      await auth.signOut();
-      setTimeout(() => window.location.replace("login.html"), 2000);
+      if (modo === "independente") {
+        // Já está logado — vai montar o treino com IA
+        showToast("Conta criada! Vamos montar seu treino 🤖", "success", 2000);
+        setTimeout(() => window.location.replace("montar-treino.html"), 1500);
+      } else {
+        // Com professor — faz login normalmente
+        showToast("Conta criada com sucesso! Faça o login.", "success", 3000);
+        await auth.signOut();
+        setTimeout(() => window.location.replace("login.html"), 2000);
+      }
     } catch (error) {
       setLoading(false);
       handleRegisterError(error);

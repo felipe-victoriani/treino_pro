@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml" />
+    <link rel="icon" href="assets/icons/icon-72.png" type="image/png" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>Escolha seu Programa — Treino Pro</title>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#2563eb" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+    <style>
+      /* ── Seletor de programas ─────────────────────── */
+      .selector-layout {
+        min-height: 100vh;
+        background: var(--bg-app);
+        display: flex;
+        flex-direction: column;
+      }
+
+      .selector-header {
+        background: var(--bg-dark);
+        border-bottom: 1px solid var(--border-card);
+        padding: 20px 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .selector-header .logo-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-md);
+        background: var(--gradient-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .selector-header h1 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--text-white);
+        margin: 0;
+      }
+
+      .selector-header p {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin: 0;
+      }
+
+      .selector-content {
+        padding: 24px 20px 40px;
+        max-width: 600px;
+        margin: 0 auto;
+        width: 100%;
+        flex: 1;
+      }
+
+      /* ── Filtros ─────────────────────────────────── */
+      .filtros-container {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 24px;
+      }
+
+      .filtro-btn {
+        padding: 8px 16px;
+        border-radius: var(--radius-pill);
+        border: 1px solid var(--border-blue);
+        background: transparent;
+        color: var(--text-muted);
+        font-size: 0.82rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+      }
+
+      .filtro-btn.active,
+      .filtro-btn:hover {
+        background: var(--blue-700);
+        border-color: var(--blue-600);
+        color: var(--text-white);
+      }
+
+      /* ── Cards de programa ───────────────────────── */
+      .programas-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .programa-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-card);
+        border-radius: var(--radius-xl);
+        padding: 20px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .programa-card:hover {
+        border-color: var(--blue-600);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-blue);
+      }
+
+      .programa-card.selecionado {
+        border-color: var(--blue-500);
+        background: rgba(37, 99, 235, 0.08);
+      }
+
+      .programa-card-badge {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        background: var(--gradient-primary);
+        color: white;
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: var(--radius-pill);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .programa-card-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        margin-bottom: 12px;
+      }
+
+      .programa-card-icone {
+        font-size: 2rem;
+        line-height: 1;
+        flex-shrink: 0;
+      }
+
+      .programa-card-titulo {
+        flex: 1;
+      }
+
+      .programa-card-titulo h3 {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--text-white);
+        margin: 0 0 4px;
+      }
+
+      .programa-card-titulo p {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        margin: 0;
+        line-height: 1.5;
+      }
+
+      .programa-card-meta {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+      }
+
+      .meta-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: var(--radius-pill);
+        font-size: 0.75rem;
+        font-weight: 600;
+        background: var(--bg-card-2);
+        color: var(--text-secondary);
+        border: 1px solid var(--border-subtle);
+      }
+
+      .meta-tag.objetivo-hipertrofia {
+        color: #60a5fa;
+        border-color: rgba(96, 165, 250, 0.25);
+      }
+      .meta-tag.objetivo-emagrecimento {
+        color: #34d399;
+        border-color: rgba(52, 211, 153, 0.25);
+      }
+      .meta-tag.objetivo-condicionamento {
+        color: #f59e0b;
+        border-color: rgba(245, 158, 11, 0.25);
+      }
+
+      .programa-card-treinos {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+
+      .treino-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 12px;
+        background: var(--bg-card-2);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-sm);
+        font-size: 0.75rem;
+        color: var(--text-primary);
+      }
+
+      .treino-pill-letra {
+        font-weight: 800;
+        color: var(--blue-400);
+        font-size: 0.82rem;
+      }
+
+      /* ── Botão de confirmar ──────────────────────── */
+      .confirmar-container {
+        position: sticky;
+        bottom: 0;
+        background: linear-gradient(to top, var(--bg-app) 60%, transparent);
+        padding: 20px 20px 30px;
+        margin: 0 -20px;
+      }
+
+      .btn-confirmar {
+        width: 100%;
+        padding: 16px 24px;
+        background: var(--gradient-primary);
+        color: white;
+        border: none;
+        border-radius: var(--radius-xl);
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: var(--shadow-blue);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .btn-confirmar:disabled {
+        background: var(--bg-card-2);
+        color: var(--text-muted);
+        box-shadow: none;
+        cursor: not-allowed;
+      }
+
+      .btn-confirmar:not(:disabled):hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 32px rgba(37, 99, 235, 0.45);
+      }
+
+      /* ── Estado vazio ────────────────────────────── */
+      .empty-filter {
+        text-align: center;
+        padding: 48px 24px;
+        color: var(--text-muted);
+      }
+
+      .empty-filter h3 {
+        font-size: 1.1rem;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+      }
+
+      /* ── Detalhes do programa (modal) ────────────── */
+      .programa-detalhe-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.75);
+        z-index: 1000;
+        align-items: flex-end;
+        justify-content: center;
+      }
+
+      .programa-detalhe-overlay.open {
+        display: flex;
+      }
+
+      .programa-detalhe-sheet {
+        background: var(--bg-dark);
+        border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+        width: 100%;
+        max-width: 600px;
+        max-height: 85vh;
+        overflow-y: auto;
+        padding: 24px 20px 40px;
+      }
+
+      .detalhe-handle {
+        width: 40px;
+        height: 4px;
+        background: var(--border-subtle);
+        border-radius: 2px;
+        margin: 0 auto 20px;
+      }
+
+      .detalhe-treino {
+        margin-bottom: 20px;
+      }
+
+      .detalhe-treino-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+        padding: 12px 16px;
+        background: var(--bg-card);
+        border-radius: var(--radius-md);
+        border-left: 3px solid var(--blue-500);
+      }
+
+      .detalhe-treino-header h4 {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--text-white);
+        margin: 0;
+      }
+
+      .detalhe-exercicio-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--border-subtle);
+        font-size: 0.82rem;
+      }
+
+      .detalhe-exercicio-item:last-child {
+        border-bottom: none;
+      }
+
+      .detalhe-ex-nome {
+        color: var(--text-primary);
+        font-weight: 500;
+        flex: 1;
+      }
+
+      .detalhe-ex-info {
+        color: var(--text-muted);
+        white-space: nowrap;
+        font-size: 0.78rem;
+      }
+
+      /* ── Loading ─────────────────────────────────── */
+      .loading-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 24px;
+        gap: 16px;
+        color: var(--text-muted);
+      }
+
+      .spinner-ring {
+        width: 40px;
+        height: 40px;
+        border: 3px solid var(--border-card);
+        border-top-color: var(--blue-500);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="selector-layout">
+      <!-- HEADER -->
+      <header class="selector-header">
+        <div class="logo-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+            <path
+              d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"
+            />
+          </svg>
+        </div>
+        <div>
+          <h1>Treino Pro</h1>
+          <p>Escolha seu programa de treino</p>
+        </div>
+      </header>
+
+      <div class="selector-content">
+        <!-- TÍTULO -->
+        <div style="margin-bottom: 24px">
+          <h2
+            style="
+              font-size: 1.4rem;
+              font-weight: 800;
+              color: var(--text-white);
+              margin: 0 0 6px;
+            "
+          >
+            Qual é o seu objetivo? 🎯
+          </h2>
+          <p style="font-size: 0.875rem; color: var(--text-muted); margin: 0">
+            Selecione o programa ideal para você. Pode trocar quando quiser.
+          </p>
+        </div>
+
+        <!-- FILTROS -->
+        <div class="filtros-container" id="filtros-container">
+          <button class="filtro-btn active" data-filtro="todos">Todos</button>
+          <button class="filtro-btn" data-filtro="iniciante">Iniciante</button>
+          <button class="filtro-btn" data-filtro="hipertrofia">
+            Hipertrofia
+          </button>
+          <button class="filtro-btn" data-filtro="emagrecimento">
+            Emagrecimento
+          </button>
+          <button class="filtro-btn" data-filtro="feminino">Feminino</button>
+          <button class="filtro-btn" data-filtro="3x">3x / semana</button>
+          <button class="filtro-btn" data-filtro="4x">4x / semana</button>
+        </div>
+
+        <!-- GRID DE PROGRAMAS -->
+        <div class="programas-grid" id="programas-grid">
+          <div class="loading-state">
+            <div class="spinner-ring"></div>
+            <span>Carregando programas...</span>
+          </div>
+        </div>
+
+        <!-- BOTÃO CONFIRMAR (sticky) -->
+        <div class="confirmar-container">
+          <button class="btn-confirmar" id="btn-confirmar" disabled>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"
+              />
+            </svg>
+            Selecione um programa para continuar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL DETALHES DO PROGRAMA -->
+    <div
+      class="programa-detalhe-overlay"
+      id="detalhe-overlay"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div class="programa-detalhe-sheet" id="detalhe-sheet">
+        <div class="detalhe-handle"></div>
+        <div id="detalhe-content"><!-- preenchido via JS --></div>
+      </div>
+    </div>
+
+    <!-- Toast global -->
+    <div
+      id="toast-container"
+      style="
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      "
+    ></div>
+
+    <!-- Firebase (compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+    <script src="js/config/firebase.js"></script>
+    <script src="js/core/utils.js"></script>
+    <script src="js/services/programas.service.js"></script>
+    <script src="js/pages/selecionar-programa.js"></script>
+  </body>
+</html>

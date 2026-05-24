@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>Monte seu Treino — Treino Pro</title>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#2563eb" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+    <style>
+      body {
+        background: var(--bg-app, #0a0a14);
+      }
+
+      /* ── Page ───────────────────────────────────────────── */
+      .mt-page {
+        min-height: 100vh;
+        padding: 28px 16px 48px;
+        max-width: 480px;
+        margin: 0 auto;
+      }
+
+      /* ── Header ─────────────────────────────────────────── */
+      .mt-header {
+        text-align: center;
+        margin-bottom: 28px;
+      }
+      .mt-header .ia-icon {
+        font-size: 3.2rem;
+      }
+      .mt-header h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary, #fff);
+        margin: 8px 0 6px;
+      }
+      .mt-header p {
+        font-size: 0.88rem;
+        color: var(--text-muted, #888);
+        margin: 0;
+      }
+
+      /* ── Nível badge ────────────────────────────────────── */
+      .nivel-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(37, 99, 235, 0.12);
+        border: 1px solid rgba(37, 99, 235, 0.35);
+        border-radius: 20px;
+        padding: 6px 16px;
+        font-size: 0.85rem;
+        color: #60a5fa;
+        margin-bottom: 28px;
+      }
+
+      /* ── Section ────────────────────────────────────────── */
+      .mt-section {
+        margin-bottom: 24px;
+      }
+      .mt-label {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text-primary, #fff);
+        margin-bottom: 12px;
+      }
+
+      /* ── Option cards ───────────────────────────────────── */
+      .opt-grid {
+        display: grid;
+        gap: 10px;
+      }
+      .opt-grid-2 {
+        grid-template-columns: 1fr 1fr;
+      }
+      .opt-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+        padding: 14px 8px;
+        border: 2px solid var(--border-color, #2a2a3e);
+        border-radius: 14px;
+        background: var(--bg-card, #131326);
+        cursor: pointer;
+        transition: all 0.18s;
+        color: var(--text-primary, #fff);
+        font-family: inherit;
+        font-size: 0.82rem;
+        font-weight: 500;
+        width: 100%;
+        text-align: center;
+      }
+      .opt-card .opt-icon {
+        font-size: 1.5rem;
+      }
+      .opt-card.active {
+        border-color: #2563eb;
+        background: rgba(37, 99, 235, 0.12);
+        color: #60a5fa;
+      }
+
+      /* ── Dias selector ──────────────────────────────────── */
+      .dias-wrap {
+        text-align: center;
+      }
+      .dias-selector {
+        display: inline-flex;
+        align-items: center;
+        gap: 24px;
+        margin-top: 8px;
+      }
+      .dias-btn {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        border: 2px solid var(--border-color, #2a2a3e);
+        background: var(--bg-card, #131326);
+        color: var(--text-primary, #fff);
+        font-size: 1.6rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: border-color 0.15s;
+      }
+      .dias-btn:hover {
+        border-color: #2563eb;
+      }
+      .dias-value {
+        font-size: 2.4rem;
+        font-weight: 800;
+        color: #60a5fa;
+        min-width: 52px;
+      }
+      .dias-sub {
+        font-size: 0.78rem;
+        color: var(--text-muted, #888);
+        margin-top: 4px;
+      }
+
+      /* ── Generate button ────────────────────────────────── */
+      .btn-gerar {
+        width: 100%;
+        padding: 17px;
+        border-radius: 14px;
+        border: none;
+        background: linear-gradient(135deg, #2563eb, #38bdf8);
+        color: #fff;
+        font-size: 1.05rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 12px;
+        transition: opacity 0.2s;
+      }
+      .btn-gerar:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      /* ── Loading state ──────────────────────────────────── */
+      #loading-state {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        text-align: center;
+        gap: 24px;
+        padding: 24px;
+      }
+      #loading-state.active {
+        display: flex;
+      }
+      .ia-spinner {
+        width: 76px;
+        height: 76px;
+        border: 5px solid rgba(37, 99, 235, 0.2);
+        border-top-color: #2563eb;
+        border-radius: 50%;
+        animation: spin 0.75s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .loading-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--text-primary, #fff);
+        margin-bottom: 12px;
+      }
+      .loading-step {
+        font-size: 0.88rem;
+        color: var(--text-muted, #888);
+        padding: 4px 0;
+        transition: color 0.3s;
+      }
+      .loading-step.current {
+        color: #60a5fa;
+        font-weight: 600;
+      }
+
+      /* ── Result state ───────────────────────────────────── */
+      #result-state {
+        display: none;
+      }
+      #result-state.active {
+        display: block;
+      }
+      .plan-header {
+        text-align: center;
+        margin-bottom: 24px;
+      }
+      .plan-header .check-icon {
+        font-size: 3rem;
+      }
+      .plan-header h2 {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--text-primary, #fff);
+        margin: 8px 0 6px;
+      }
+      .plan-header p {
+        font-size: 0.85rem;
+        color: var(--text-muted, #888);
+        margin: 0;
+      }
+      .plan-summary-card {
+        background: linear-gradient(
+          135deg,
+          rgba(37, 99, 235, 0.15),
+          rgba(56, 189, 248, 0.08)
+        );
+        border: 1px solid rgba(37, 99, 235, 0.3);
+        border-radius: 14px;
+        padding: 16px;
+        margin-bottom: 20px;
+      }
+      .plan-summary-card h3 {
+        color: #60a5fa;
+        font-size: 0.95rem;
+        margin: 0 0 12px;
+      }
+      .plan-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .plan-tag {
+        background: rgba(255, 255, 255, 0.07);
+        border-radius: 20px;
+        padding: 4px 12px;
+        font-size: 0.78rem;
+        color: var(--text-secondary, #ccc);
+      }
+      .treino-card {
+        border: 1px solid var(--border-color, #2a2a3e);
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 10px;
+        background: var(--bg-card, #131326);
+      }
+      .treino-card-header {
+        padding: 13px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+      }
+      .treino-card-header strong {
+        color: var(--text-primary, #fff);
+        font-size: 0.9rem;
+      }
+      .treino-badge {
+        background: rgba(37, 99, 235, 0.2);
+        color: #60a5fa;
+        border-radius: 20px;
+        padding: 2px 10px;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+      .treino-card-body {
+        padding: 0 16px 12px;
+        display: none;
+      }
+      .treino-card-body.open {
+        display: block;
+      }
+      .ex-row {
+        padding: 7px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        font-size: 0.82rem;
+      }
+      .ex-row:last-child {
+        border: none;
+      }
+      .ex-row strong {
+        color: var(--text-primary, #fff);
+        display: block;
+        margin-bottom: 2px;
+      }
+      .ex-row span {
+        color: var(--text-muted, #888);
+      }
+      .btn-comecar {
+        width: 100%;
+        padding: 17px;
+        border-radius: 14px;
+        border: none;
+        background: linear-gradient(135deg, #16a34a, #22c55e);
+        color: #fff;
+        font-size: 1.05rem;
+        font-weight: 700;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: opacity 0.2s;
+      }
+      .btn-comecar:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ══ Estado: Formulário ══════════════════════════════════ -->
+    <div id="form-state" class="mt-page">
+      <div class="mt-header">
+        <div class="ia-icon">🤖</div>
+        <h1>Seu Treino Personalizado</h1>
+        <p>Responda 3 perguntas e a IA monta seu plano</p>
+      </div>
+
+      <div style="text-align: center">
+        <div class="nivel-badge" id="nivel-badge">⏳ Carregando...</div>
+      </div>
+
+      <!-- Objetivo -->
+      <div class="mt-section">
+        <span class="mt-label">🎯 Qual é o seu objetivo?</span>
+        <div class="opt-grid opt-grid-2">
+          <button
+            class="opt-card active"
+            data-group="objetivo"
+            data-value="Hipertrofia"
+          >
+            <span class="opt-icon">💪</span>Ganhar músculo
+          </button>
+          <button
+            class="opt-card"
+            data-group="objetivo"
+            data-value="Emagrecimento"
+          >
+            <span class="opt-icon">🔥</span>Emagrecer
+          </button>
+          <button class="opt-card" data-group="objetivo" data-value="Força">
+            <span class="opt-icon">🏋️</span>Ganhar força
+          </button>
+          <button
+            class="opt-card"
+            data-group="objetivo"
+            data-value="Resistência"
+          >
+            <span class="opt-icon">⚡</span>Resistência
+          </button>
+        </div>
+        <input type="hidden" id="objetivo-val" value="Hipertrofia" />
+      </div>
+
+      <!-- Dias por semana -->
+      <div class="mt-section">
+        <span class="mt-label">📅 Quantos dias por semana?</span>
+        <div class="dias-wrap">
+          <div class="dias-selector">
+            <button class="dias-btn" id="dias-minus" type="button">−</button>
+            <div>
+              <div class="dias-value" id="dias-display">3</div>
+              <div class="dias-sub">dias/semana</div>
+            </div>
+            <button class="dias-btn" id="dias-plus" type="button">+</button>
+          </div>
+        </div>
+        <input type="hidden" id="dias-val" value="3" />
+      </div>
+
+      <!-- Equipamentos -->
+      <div class="mt-section">
+        <span class="mt-label">🏟️ Que equipamentos você tem?</span>
+        <div class="opt-grid">
+          <button
+            class="opt-card active"
+            data-group="equip"
+            data-value="Academia completa"
+            style="flex-direction: row; justify-content: center; gap: 10px"
+          >
+            <span class="opt-icon">🏋️</span>Academia completa
+          </button>
+          <button
+            class="opt-card"
+            data-group="equip"
+            data-value="Halteres"
+            style="flex-direction: row; justify-content: center; gap: 10px"
+          >
+            <span class="opt-icon">🪀</span>Apenas halteres
+          </button>
+          <button
+            class="opt-card"
+            data-group="equip"
+            data-value="Sem equipamento"
+            style="flex-direction: row; justify-content: center; gap: 10px"
+          >
+            <span class="opt-icon">🤸</span>Sem equipamento (calistenia)
+          </button>
+        </div>
+        <input type="hidden" id="equip-val" value="Academia completa" />
+      </div>
+
+      <button class="btn-gerar" id="btn-gerar" type="button">
+        ✨ Gerar Meu Treino com IA
+      </button>
+    </div>
+
+    <!-- ══ Estado: Loading ════════════════════════════════════ -->
+    <div id="loading-state">
+      <div class="ia-spinner"></div>
+      <div>
+        <p class="loading-title">Seu personal trainer IA está trabalhando...</p>
+        <div id="loading-steps">
+          <p class="loading-step current" id="step-0">
+            🤖 Analisando seu perfil...
+          </p>
+          <p class="loading-step" id="step-1">
+            📊 Calculando volume e frequência...
+          </p>
+          <p class="loading-step" id="step-2">
+            🏋️ Selecionando os exercícios ideais...
+          </p>
+          <p class="loading-step" id="step-3">
+            ✅ Montando a divisão de treinos...
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ Estado: Resultado ══════════════════════════════════ -->
+    <div id="result-state" class="mt-page" style="padding-top: 20px">
+      <div class="plan-header">
+        <div class="check-icon">✅</div>
+        <h2>Treino Pronto!</h2>
+        <p>Personalizado com base no seu perfil</p>
+      </div>
+      <div class="plan-summary-card" id="plan-summary"></div>
+      <div id="treinos-preview"></div>
+      <button class="btn-comecar" id="btn-comecar" type="button">
+        🚀 Começar a Treinar!
+      </button>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="js/config/firebase.js"></script>
+    <script src="js/core/utils.js"></script>
+    <script src="js/services/plano-generator.js"></script>
+    <script src="js/pages/montar-treino.js"></script>
+  </body>
+</html>

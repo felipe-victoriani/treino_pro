@@ -1,0 +1,30 @@
+# ── Dependências ──────────────────────────────────────────
+node_modules/
+functions/node_modules/
+
+# ── Firebase config (contém API keys — não commitar em repos públicos) ──
+js/config/firebase.js
+
+# ── Variáveis de ambiente ──────────────────────────────────
+.env
+.env.local
+.env.production
+functions/.env
+functions/.env.local
+
+# ── Chaves de conta de serviço (NUNCA commitar) ────────────
+*.json.key
+service-account*.json
+*-credentials.json
+
+# ── Build / cache ──────────────────────────────────────────
+.firebase/
+.cache/
+dist/
+build/
+
+# ── IDEs e SO ─────────────────────────────────────────────
+.vscode/settings.json
+.DS_Store
+Thumbs.db
+*.log

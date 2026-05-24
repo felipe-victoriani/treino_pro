@@ -15,6 +15,52 @@
     <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/responsive.css" />
+    <style>
+      .nivel-cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-top: 8px;
+      }
+      .nivel-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        padding: 14px 8px;
+        border: 2px solid var(--border-color, #2a2a3e);
+        border-radius: 14px;
+        background: var(--bg-card, #1a1a2e);
+        cursor: pointer;
+        transition: all 0.2s;
+        color: var(--text-primary, #fff);
+        font-family: inherit;
+        width: 100%;
+      }
+      .nivel-card .nivel-icon {
+        font-size: 1.8rem;
+      }
+      .nivel-card strong {
+        font-size: 0.82rem;
+        font-weight: 600;
+        display: block;
+      }
+      .nivel-card small {
+        font-size: 0.7rem;
+        color: var(--text-muted, #888);
+        display: block;
+      }
+      .nivel-card.active {
+        border-color: #2563eb;
+        background: rgba(37, 99, 235, 0.12);
+      }
+      .nivel-card.active strong {
+        color: #60a5fa;
+      }
+      .nivel-card.active small {
+        color: #60a5fa;
+      }
+    </style>
   </head>
   <body class="login-page login-page-scroll">
     <div class="login-card login-card-wide">
@@ -131,8 +177,32 @@
           <span class="form-error hidden" id="confirm-error"></span>
         </div>
 
-        <!-- Selecionar Professor -->
-        <div class="form-group" id="professor-group">
+        <!-- Modo de uso -->
+        <div class="form-group">
+          <label class="form-label">Como você quer treinar?</label>
+          <div class="sexo-selector" id="modo-selector">
+            <button
+              type="button"
+              class="sexo-btn active"
+              data-value="independente"
+              id="modo-independente"
+            >
+              🏋️ Por conta própria
+            </button>
+            <button
+              type="button"
+              class="sexo-btn"
+              data-value="professor"
+              id="modo-professor"
+            >
+              👤 Com professor
+            </button>
+          </div>
+          <input type="hidden" id="modo-treino" value="independente" />
+        </div>
+
+        <!-- Selecionar Professor (oculto por padrão) -->
+        <div class="form-group hidden" id="professor-group">
           <label class="form-label" for="professor">Professor</label>
           <select class="form-select" id="professor">
             <option value="">Carregando professores...</option>
@@ -157,50 +227,31 @@
           <input type="hidden" id="sexo" value="" />
         </div>
 
-        <!-- Objetivo -->
+        <!-- Nível de experiência -->
         <div class="form-group">
-          <label class="form-label"
-            >Qual é seu objetivo?
-            <span class="form-hint-inline">(opcional)</span></label
-          >
-          <div class="objetivo-chips" id="objetivo-chips">
+          <label class="form-label">Qual é seu nível de experiência?</label>
+          <div class="nivel-cards" id="nivel-cards">
             <button
               type="button"
-              class="objetivo-chip"
-              data-value="Perder barriga antes do verão"
+              class="nivel-card active"
+              data-value="INICIANTE"
             >
-              📉 Perder barriga antes do verão
+              <span class="nivel-icon">🌱</span>
+              <strong>Iniciante</strong>
+              <small>0 – 6 meses</small>
             </button>
-            <button
-              type="button"
-              class="objetivo-chip"
-              data-value="Ganhar músculo (e respeito)"
-            >
-              💪 Ganhar músculo (e respeito)
+            <button type="button" class="nivel-card" data-value="INTERMEDIARIO">
+              <span class="nivel-icon">💪</span>
+              <strong>Intermediário</strong>
+              <small>6m – 2 anos</small>
             </button>
-            <button
-              type="button"
-              class="objetivo-chip"
-              data-value="Me sentir bem no espelho"
-            >
-              ✨ Me sentir bem no espelho
-            </button>
-            <button
-              type="button"
-              class="objetivo-chip"
-              data-value="Ter energia pra aguentar o dia"
-            >
-              ⚡ Ter energia pra aguentar o dia
-            </button>
-            <button
-              type="button"
-              class="objetivo-chip"
-              data-value="Caber de novo na roupa favorita"
-            >
-              👕 Caber de novo na roupa favorita
+            <button type="button" class="nivel-card" data-value="AVANCADO">
+              <span class="nivel-icon">🔥</span>
+              <strong>Experiente</strong>
+              <small>2+ anos</small>
             </button>
           </div>
-          <input type="hidden" id="objetivo" value="" />
+          <input type="hidden" id="nivel" value="INICIANTE" />
         </div>
 
         <!-- Dados opcionais -->
@@ -256,9 +307,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-    <script src="js/firebase-config.js"></script>
-    <script src="js/utils.js"></script>
-    <script src="js/pwa.js"></script>
-    <script src="js/cadastro.js"></script>
+    <script src="js/config/firebase.js"></script>
+    <script src="js/core/utils.js"></script>
+    <script src="js/core/pwa.js"></script>
+    <script src="js/pages/cadastro.js"></script>
   </body>
 </html>

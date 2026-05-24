@@ -32,13 +32,18 @@ function getCurrentPage() {
  * Redireciona o usuário baseado no seu tipo
  * @param {string} tipo - 'professor' | 'aluno'
  */
-function redirectByRole(tipo) {
+function redirectByRole(tipo, userData) {
   if (tipo === "admin") {
     window.location.replace("admin.html");
   } else if (tipo === "professor") {
     window.location.replace("professor.html");
   } else if (tipo === "aluno") {
-    window.location.replace("aluno.html");
+    // Aluno sem programa ativo vai montar treino com IA
+    if (userData && !userData.programaAtivo && !userData.professorId) {
+      window.location.replace("montar-treino.html");
+    } else {
+      window.location.replace("aluno.html");
+    }
   } else {
     // Tipo desconhecido: desloga e vai ao login
     auth.signOut().then(() => window.location.replace("login.html"));
@@ -121,7 +126,7 @@ async function handleAuthState(user) {
     return;
   }
   if (page === "login.html" || page === "index.html" || page === "") {
-    redirectByRole(userData.tipo);
+    redirectByRole(userData.tipo, userData);
     return;
   }
 

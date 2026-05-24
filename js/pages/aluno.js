@@ -74,6 +74,8 @@ let alunoState = {
   uid: null,
   nome: "",
   professorId: null,
+  programaAtivo: null, // id do programa ativo (ia-custom, pré-definido, etc.)
+  treinoGerado: null, // plano gerado pela IA
   treinoAtual: "A",
   sexo: null,
   objetivo: null,
@@ -88,9 +90,18 @@ document.addEventListener("userReady", async (e) => {
     window.location.replace("login.html");
     return;
   }
+
+  // Aluno sem professor nem programa → vai montar treino com IA
+  if (!userData.professorId && !userData.programaAtivo) {
+    window.location.replace("montar-treino.html");
+    return;
+  }
+
   alunoState.uid = user.uid;
   alunoState.nome = userData.nome || "Aluno";
-  alunoState.professorId = userData.professorId;
+  alunoState.professorId = userData.professorId || null;
+  alunoState.programaAtivo = userData.programaAtivo || null;
+  alunoState.treinoGerado = userData.treinoGerado || null;
   alunoState.sexo = userData.sexo || null;
   alunoState.objetivo = userData.objetivo || null;
   alunoState.peso = userData.peso;
@@ -178,57 +189,99 @@ async function loadInicio() {
         parseFloat(data.imc).toFixed(1) + " - " + cls.classe;
     }
 
-    // Preview dos exercicios
+    // Preview dos exercicios na tela de início
     const previewEl = document.getElementById("inicio-treino-preview");
     if (previewEl) {
-      const tSnap = await db
-        .ref("treinos/" + alunoState.uid + "/" + alunoState.treinoAtual)
-        .once("value");
-      const treinoData = tSnap.val();
-      const exs = treinoData && treinoData.exercicios;
-      if (exs) {
-        const lista = Object.values(exs)
-          .sort((a, b) => (a.ordem || 0) - (b.ordem || 0))
-          .slice(0, 3);
-        const foco = treinoData.foco
-          ? '<p style="color:var(--purple-400);margin-bottom:8px;">🎯 ' +
-            sanitize(treinoData.foco) +
-            "</p>"
-          : "";
-        previewEl.innerHTML =
-          foco +
-          lista
-            .map(function (ex) {
-              return (
-                '<div style="padding:6px 0;border-bottom:1px solid var(--border-color);font-size:0.9rem;">💪 <strong>' +
-                sanitize(ex.nome) +
-                "</strong> — " +
-                sanitize(ex.series) +
-                "x" +
-                sanitize(ex.repeticoes) +
-                "</div>"
-              );
-            })
-            .join("");
-        if (Object.keys(exs).length > 3) {
-          previewEl.innerHTML +=
-            '<p style="color:var(--text-muted);margin-top:8px;font-size:0.82rem;">+' +
-            (Object.keys(exs).length - 3) +
-            " exercicios a mais</p>";
+      if (alunoState.programaAtivo === "ia-custom" && alunoState.treinoGerado) {
+        // Preview do plano gerado por IA
+        const treinoIA =
+          alunoState.treinoGerado.treinos?.[alunoState.treinoAtual];
+        if (treinoIA && treinoIA.exercicios) {
+          const lista = treinoIA.exercicios.slice(0, 3);
+          const foco = `<p style="color:var(--blue-400);margin-bottom:8px;font-size:0.85rem;">🤖 ${sanitize(treinoIA.nome)}</p>`;
+          previewEl.innerHTML =
+            foco +
+            lista
+              .map(
+                (ex) =>
+                  `<div style="padding:6px 0;border-bottom:1px solid var(--border-subtle);font-size:0.88rem;">💪 <strong>${sanitize(ex.nome)}</strong> — ${ex.series}x ${sanitize(ex.repeticoes)}</div>`,
+              )
+              .join("");
+          if (treinoIA.exercicios.length > 3) {
+            previewEl.innerHTML += `<p style="color:var(--text-muted);margin-top:8px;font-size:0.82rem;">+${treinoIA.exercicios.length - 3} exercícios</p>`;
+          }
+        }
+      } else if (alunoState.programaAtivo && !alunoState.professorId) {
+        // Preview do programa pré-definido
+        const treinoPre = getTreinoDoPrograma(
+          alunoState.programaAtivo,
+          alunoState.treinoAtual,
+        );
+        if (treinoPre && treinoPre.exercicios) {
+          const lista = treinoPre.exercicios.slice(0, 3);
+          const foco = treinoPre.foco
+            ? `<p style="color:var(--blue-400);margin-bottom:8px;font-size:0.85rem;">🎯 ${sanitize(treinoPre.foco)}</p>`
+            : "";
+          previewEl.innerHTML =
+            foco +
+            lista
+              .map(
+                (ex) =>
+                  `<div style="padding:6px 0;border-bottom:1px solid var(--border-subtle);font-size:0.88rem;">💪 <strong>${sanitize(ex.nome)}</strong> — ${ex.series}x ${sanitize(ex.reps)}</div>`,
+              )
+              .join("");
+          if (treinoPre.exercicios.length > 3) {
+            previewEl.innerHTML += `<p style="color:var(--text-muted);margin-top:8px;font-size:0.82rem;">+${treinoPre.exercicios.length - 3} exercícios</p>`;
+          }
         }
       } else {
-        previewEl.innerHTML =
-          '<p style="color:var(--text-muted);padding:12px 0;">Seu professor ainda nao cadastrou exercicios.</p>';
+        // Preview do treino do professor (fluxo original)
+        const tSnap = await db
+          .ref("treinos/" + alunoState.uid + "/" + alunoState.treinoAtual)
+          .once("value");
+        const treinoData = tSnap.val();
+        const exs = treinoData && treinoData.exercicios;
+        if (exs) {
+          const lista = Object.values(exs)
+            .sort((a, b) => (a.ordem || 0) - (b.ordem || 0))
+            .slice(0, 3);
+          const foco = treinoData.foco
+            ? `<p style="color:var(--blue-400);margin-bottom:8px;">🎯 ${sanitize(treinoData.foco)}</p>`
+            : "";
+          previewEl.innerHTML =
+            foco +
+            lista
+              .map(
+                (ex) =>
+                  `<div style="padding:6px 0;border-bottom:1px solid var(--border-subtle);font-size:0.9rem;">💪 <strong>${sanitize(ex.nome)}</strong> — ${sanitize(ex.series)}x${sanitize(ex.repeticoes)}</div>`,
+              )
+              .join("");
+          if (Object.keys(exs).length > 3) {
+            previewEl.innerHTML += `<p style="color:var(--text-muted);margin-top:8px;font-size:0.82rem;">+${Object.keys(exs).length - 3} exercícios a mais</p>`;
+          }
+        } else {
+          previewEl.innerHTML =
+            '<p style="color:var(--text-muted);padding:12px 0;">Seu professor ainda não cadastrou exercícios.</p>';
+        }
       }
     }
 
-    // Nome do professor no header
-    if (alunoState.professorId) {
+    // Nome do professor OU nome do programa no header
+    const profInfoEl = document.getElementById("header-professor-info");
+    if (alunoState.programaAtivo === "ia-custom" && alunoState.treinoGerado) {
+      if (profInfoEl) {
+        profInfoEl.textContent = `🤖 Treino IA · ${sanitize(alunoState.treinoGerado.objetivo || "Personalizado")}`;
+      }
+    } else if (alunoState.programaAtivo && !alunoState.professorId) {
+      const prog = getProgramaById(alunoState.programaAtivo);
+      if (profInfoEl && prog) {
+        profInfoEl.textContent = "📋 " + prog.nome;
+      }
+    } else if (alunoState.professorId) {
       const profSnap = await db
         .ref("professores/" + alunoState.professorId)
         .once("value");
       const profData = profSnap.val();
-      const profInfoEl = document.getElementById("header-professor-info");
       if (profInfoEl && profData) {
         profInfoEl.textContent =
           "Professor: " + sanitize(profData.nome || "Professor");
@@ -391,9 +444,48 @@ async function loadTreinoSection() {
     .ref("alunos/" + alunoState.uid + "/treinoAtual")
     .once("value");
   alunoState.treinoAtual = snap.val() || "A";
+
+  // Ajusta abas conforme tipo de plano
+  if (alunoState.programaAtivo === "ia-custom" && alunoState.treinoGerado) {
+    const letras = Object.keys(alunoState.treinoGerado.treinos || {}).sort();
+    ajustarAbasTreinoIA(letras);
+  } else if (alunoState.programaAtivo && !alunoState.professorId) {
+    const letras = getTreinosDoPrograma(alunoState.programaAtivo);
+    ajustarAbasTreino(letras);
+  }
+
   setupTreinoTabs();
   await mostrarTreino(alunoState.treinoAtual);
   await loadHistoricoTreinos(alunoState.uid, "aluno-historico-list", 7);
+}
+
+/**
+ * Ajusta as abas da seção de treino para refletir as letras do programa
+ */
+function ajustarAbasTreino(letras) {
+  const tabsContainer = document.querySelector(".workout-tabs");
+  if (!tabsContainer) return;
+  tabsContainer.innerHTML = letras
+    .map((letra, i) => {
+      const prog = getProgramaById(alunoState.programaAtivo);
+      const treino = prog?.treinos[letra];
+      return `<button class="workout-tab-btn${i === 0 ? " active" : ""}" data-letra="${letra}">
+        ${treino ? treino.icone + " " : ""}Treino ${letra}
+      </button>`;
+    })
+    .join("");
+}
+function ajustarAbasTreinoIA(letras) {
+  const tabsContainer = document.querySelector(".workout-tabs");
+  if (!tabsContainer) return;
+  tabsContainer.innerHTML = letras
+    .map(
+      (letra, i) =>
+        `<button class="workout-tab-btn${i === 0 ? " active" : ""}" data-letra="${letra}">
+          🤖 Treino ${letra}
+        </button>`,
+    )
+    .join("");
 }
 function setupTreinoTabs() {
   document.querySelectorAll(".workout-tab-btn").forEach((btn) => {
@@ -429,50 +521,98 @@ async function mostrarTreino(letra) {
   const completado = historico.completado;
   // Subtitulo / foco
   const focoInfoEl = document.getElementById("treino-foco-info");
-  if (focoInfoEl) {
-    const focoSnap = await db
-      .ref("treinos/" + alunoState.uid + "/" + letra + "/foco")
-      .once("value");
-    focoInfoEl.textContent = focoSnap.val()
-      ? "🎯 Foco: " + sanitize(focoSnap.val())
-      : letra === alunoState.treinoAtual
-        ? "Seu treino de hoje"
+
+  // ── Aluno com plano gerado por IA ─────────────────────────
+  if (alunoState.programaAtivo === "ia-custom" && alunoState.treinoGerado) {
+    const treinoIA = alunoState.treinoGerado.treinos?.[letra];
+    if (focoInfoEl) {
+      focoInfoEl.textContent = treinoIA
+        ? "🤖 " + sanitize(treinoIA.nome)
         : "Treino " + letra;
-  }
-  // Carrega exercicios
-  // Tenta carregar exercícios do treino
-  const exListEl = document.getElementById("aluno-exercise-list");
-  let temExercicios = false;
-  if (exListEl) {
-    // Limpa
-    exListEl.innerHTML =
-      '<div class="empty-state"><div class="spinner"></div></div>';
-    // Busca exercícios do treino
-    const tSnap = await db
-      .ref("treinos/" + alunoState.uid + "/" + letra)
-      .once("value");
-    const treinoData = tSnap.val();
-    const exs = treinoData && treinoData.exercicios;
-    if (exs && Object.keys(exs).length > 0) {
-      temExercicios = true;
-      // Renderiza normalmente (reaproveita função existente)
-      await loadTreinoAluno(
-        alunoState.uid,
-        letra,
-        "aluno-exercise-list",
-        historico,
-      );
-    } else {
-      // Se não houver exercícios cadastrados, tenta mostrar treino IA
-      const snapAluno = await db.ref("alunos/" + alunoState.uid).once("value");
-      const dadosAluno = snapAluno.val() || {};
-      const campo = "treino" + letra;
-      const treinoIA = dadosAluno[campo];
-      if (treinoIA) {
-        exListEl.innerHTML = `<div class='card' style='white-space:pre-line;font-size:1.05rem;padding:18px 12px 12px 12px;'>${sanitize(treinoIA)}</div>`;
+    }
+    const exListEl = document.getElementById("aluno-exercise-list");
+    if (exListEl) {
+      if (treinoIA && treinoIA.exercicios && treinoIA.exercicios.length) {
+        const exercicios = treinoIA.exercicios.map((ex) => ({
+          nome: ex.nome,
+          series: ex.series,
+          reps: ex.repeticoes,
+          descanso: ex.descanso,
+          dica: ex.observacao,
+        }));
+        exListEl.innerHTML = renderExerciciosPreDefinidos(
+          exercicios,
+          historico,
+        );
+        initExercicioCheckboxes();
       } else {
         exListEl.innerHTML =
-          '<div class="empty-state"><p style="color:var(--text-muted);padding:12px 0;">Seu professor ainda não cadastrou exercícios e não há sugestão de IA para este treino.</p></div>';
+          '<div class="empty-state"><p style="color:var(--text-muted);padding:12px 0;">Este treino não está disponível.</p></div>';
+      }
+    }
+  } else if (alunoState.programaAtivo && !alunoState.professorId) {
+    // ── Aluno com programa pré-definido (sem professor) ────────
+    const treinoPre = getTreinoDoPrograma(alunoState.programaAtivo, letra);
+    if (focoInfoEl) {
+      focoInfoEl.textContent = treinoPre
+        ? "🎯 " + treinoPre.foco
+        : "Treino " + letra;
+    }
+    const exListEl = document.getElementById("aluno-exercise-list");
+    if (exListEl) {
+      if (treinoPre && treinoPre.exercicios && treinoPre.exercicios.length) {
+        // Renderiza exercícios do programa pré-definido
+        exListEl.innerHTML = renderExerciciosPreDefinidos(
+          treinoPre.exercicios,
+          historico,
+        );
+        initExercicioCheckboxes();
+      } else {
+        exListEl.innerHTML =
+          '<div class="empty-state"><p style="color:var(--text-muted);padding:12px 0;">Este treino não está disponível no seu programa.</p></div>';
+      }
+    }
+  } else {
+    // ── Aluno com professor (fluxo original) ──────────────────
+    if (focoInfoEl) {
+      const focoSnap = await db
+        .ref("treinos/" + alunoState.uid + "/" + letra + "/foco")
+        .once("value");
+      focoInfoEl.textContent = focoSnap.val()
+        ? "🎯 Foco: " + sanitize(focoSnap.val())
+        : letra === alunoState.treinoAtual
+          ? "Seu treino de hoje"
+          : "Treino " + letra;
+    }
+    const exListEl = document.getElementById("aluno-exercise-list");
+    if (exListEl) {
+      exListEl.innerHTML =
+        '<div class="empty-state"><div class="spinner"></div></div>';
+      const tSnap = await db
+        .ref("treinos/" + alunoState.uid + "/" + letra)
+        .once("value");
+      const treinoData = tSnap.val();
+      const exs = treinoData && treinoData.exercicios;
+      if (exs && Object.keys(exs).length > 0) {
+        await loadTreinoAluno(
+          alunoState.uid,
+          letra,
+          "aluno-exercise-list",
+          historico,
+        );
+      } else {
+        const snapAluno = await db
+          .ref("alunos/" + alunoState.uid)
+          .once("value");
+        const dadosAluno = snapAluno.val() || {};
+        const campo = "treino" + letra;
+        const treinoIA = dadosAluno[campo];
+        if (treinoIA) {
+          exListEl.innerHTML = `<div class='card' style='white-space:pre-line;font-size:1.05rem;padding:18px 12px 12px 12px;'>${sanitize(treinoIA)}</div>`;
+        } else {
+          exListEl.innerHTML =
+            '<div class="empty-state"><p style="color:var(--text-muted);padding:12px 0;">Seu professor ainda não cadastrou exercícios.</p></div>';
+        }
       }
     }
   }
@@ -857,4 +997,153 @@ async function renderCargaHistoricoChart(exId, alunoId) {
       '<div class="empty-state"><h3>Erro ao carregar histórico</h3></div>';
     console.error(e);
   }
+}
+
+/* ── Renderização de exercícios pré-definidos ──────────────
+   Usado quando o aluno escolheu um programa independente
+   (sem professor). Gera o mesmo visual do renderExerciciosAluno
+   mas recebe dados do PROGRAMAS_PREDEFINIDOS.
+   ─────────────────────────────────────────────────────────── */
+function renderExerciciosPreDefinidos(exercicios, historico = {}) {
+  const completados = historico.exerciciosCompletos || {};
+  const seriesCompletas = historico.seriesCompletas || {};
+
+  return exercicios
+    .map((ex, idx) => {
+      const exId =
+        "pre_" + idx + "_" + ex.nome.replace(/\s+/g, "_").toLowerCase();
+      const done = !!completados[exId];
+      const numSeries = Math.max(1, parseInt(ex.series) || 3);
+      const exSeriesComp = seriesCompletas[exId] || {};
+
+      const seriesButtons = Array.from({ length: numSeries }, (_, i) => {
+        const serieKey = "s" + (i + 1);
+        const serieFeita = !!exSeriesComp[serieKey];
+        return `<button
+          class="serie-btn${serieFeita ? " done" : ""}"
+          data-exid="${exId}"
+          data-serie="${serieKey}"
+          title="Série ${i + 1}"
+          onclick="toggleSeriePre(this, '${exId}', '${serieKey}')"
+        >${serieFeita ? "✓" : i + 1}</button>`;
+      }).join("");
+
+      return `
+        <div class="ex-card${done ? " ex-done" : ""}" id="excard-${exId}">
+          <div class="ex-card-header" onclick="toggleExInstrucoes('${exId}')">
+            <div class="ex-card-info">
+              <div class="ex-card-nome">${sanitize(ex.nome)}</div>
+              <div class="ex-card-meta">
+                <span class="ex-pill">${ex.series}x ${sanitize(ex.reps)}</span>
+                <span class="ex-pill">⏱ ${sanitize(ex.descanso)}</span>
+                ${ex.grupoMuscular ? `<span class="ex-pill">${sanitize(ex.grupoMuscular)}</span>` : ""}
+              </div>
+            </div>
+            <div class="ex-card-check${done ? " done" : ""}" id="excheck-${exId}">
+              ${done ? "✓" : ""}
+            </div>
+          </div>
+          <div class="ex-instrucoes hidden" id="extinstr-${exId}">
+            ${ex.dica ? `<p class="ex-dica"><strong>💡 Dica:</strong> ${sanitize(ex.dica)}</p>` : ""}
+          </div>
+          <div class="series-container">
+            <span class="series-label">Séries:</span>
+            <div class="series-buttons">
+              ${seriesButtons}
+            </div>
+          </div>
+        </div>`;
+    })
+    .join("");
+}
+
+/**
+ * Marca/desmarca uma série de exercício pré-definido e persiste no Firebase
+ */
+async function toggleSeriePre(btn, exId, serieKey) {
+  const done = btn.classList.toggle("done");
+  btn.textContent = done ? "✓" : serieKey.replace("s", "");
+
+  const today = getDateKey();
+  const path = `historicoTreinos/${alunoState.uid}/${today}/seriesCompletas/${exId}/${serieKey}`;
+  try {
+    await db.ref(path).set(done ? true : null);
+  } catch (e) {
+    console.error("[Aluno] Erro ao salvar série:", e);
+  }
+
+  // Verifica se todas as séries do exercício foram completadas
+  const card = document.getElementById("excard-" + exId);
+  if (!card) return;
+  const totalBtns = card.querySelectorAll(".serie-btn");
+  const doneBtns = card.querySelectorAll(".serie-btn.done");
+
+  if (totalBtns.length === doneBtns.length && doneBtns.length > 0) {
+    card.classList.add("ex-done");
+    const check = document.getElementById("excheck-" + exId);
+    if (check) {
+      check.classList.add("done");
+      check.textContent = "✓";
+    }
+
+    // Persiste exercício completo
+    const pathEx = `historicoTreinos/${alunoState.uid}/${today}/exerciciosCompletos/${exId}`;
+    try {
+      await db.ref(pathEx).set(true);
+    } catch (_) {}
+    atualizarProgressoTreino();
+
+    // Timer de descanso automático
+    const descansoMatch = (
+      card.querySelector(".ex-pill")?.textContent || "60s"
+    ).match(/(\d+)/);
+    const descansoSeg = descansoMatch ? parseInt(descansoMatch[1]) : 60;
+    iniciarTimerDescanso(descansoSeg);
+  } else {
+    card.classList.remove("ex-done");
+    const check = document.getElementById("excheck-" + exId);
+    if (check) {
+      check.classList.remove("done");
+      check.textContent = "";
+    }
+    const pathEx = `historicoTreinos/${alunoState.uid}/${today}/exerciciosCompletos/${exId}`;
+    try {
+      await db.ref(pathEx).remove();
+    } catch (_) {}
+    atualizarProgressoTreino();
+  }
+}
+
+/**
+ * Expande/colapsa instruções de um exercício
+ */
+function toggleExInstrucoes(exId) {
+  const el = document.getElementById("extinstr-" + exId);
+  if (el) el.classList.toggle("hidden");
+}
+
+/**
+ * Atualiza a barra de progresso do treino
+ */
+function atualizarProgressoTreino(feitos, total) {
+  const allCards = document.querySelectorAll('[id^="excard-"]');
+  const allDone = document.querySelectorAll('[id^="excard-"].ex-done');
+  const t = total !== undefined ? total : allCards.length;
+  const f = feitos !== undefined ? feitos : allDone.length;
+
+  const progressEl = document.getElementById("treino-progress-bar");
+  const progressText = document.getElementById("treino-progress-text");
+  if (progressEl)
+    progressEl.style.width = (t > 0 ? Math.round((f / t) * 100) : 0) + "%";
+  if (progressText) progressText.textContent = f + "/" + t + " exercícios";
+
+  const btnFinalizar = document.getElementById("finish-workout-btn");
+  if (btnFinalizar) btnFinalizar.disabled = t === 0;
+}
+
+/**
+ * Inicializa checkboxes de exercícios (compatibilidade)
+ */
+function initExercicioCheckboxes() {
+  atualizarProgressoTreino();
 }
