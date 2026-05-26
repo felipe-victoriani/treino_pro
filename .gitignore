@@ -2,9 +2,6 @@
 node_modules/
 functions/node_modules/
 
-# ── Firebase config (contém API keys — não commitar em repos públicos) ──
-js/config/firebase.js
-
 # ── Variáveis de ambiente ──────────────────────────────────
 .env
 .env.local
