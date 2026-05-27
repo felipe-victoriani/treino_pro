@@ -52,6 +52,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadProfessores();
 
   /* --- Submit --- */
+  // Guarda os dados validados para usar após confirmação do modal
+  let dadosPendentes = null;
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     clearErrors();
@@ -99,6 +102,82 @@ document.addEventListener("DOMContentLoaded", async () => {
       imc = parseFloat((peso / (altura * altura)).toFixed(1));
     }
 
+    // Modo independente → exibe aviso antes de criar conta
+    if (modo === "independente") {
+      dadosPendentes = {
+        nome,
+        email,
+        senha,
+        nivel,
+        sexo,
+        peso,
+        altura,
+        imc,
+        modo,
+        profId,
+      };
+      abrirAvisoProfessor();
+      return;
+    }
+
+    await criarConta({
+      nome,
+      email,
+      senha,
+      nivel,
+      sexo,
+      peso,
+      altura,
+      imc,
+      modo,
+      profId,
+    });
+  });
+
+  /* --- Modal aviso professor --- */
+  function abrirAvisoProfessor() {
+    const overlay = document.getElementById("aviso-prof-overlay");
+    if (!overlay) {
+      criarConta(dadosPendentes);
+      return;
+    }
+    overlay.classList.add("open");
+
+    const btnOk = document.getElementById("btn-aviso-ok");
+    const btnFechar = document.getElementById("btn-aviso-fechar");
+
+    const newOk = btnOk.cloneNode(true);
+    const newFechar = btnFechar.cloneNode(true);
+    btnOk.replaceWith(newOk);
+    btnFechar.replaceWith(newFechar);
+
+    newOk.addEventListener("click", () => {
+      overlay.classList.remove("open");
+      criarConta(dadosPendentes);
+    });
+
+    newFechar.addEventListener("click", () => {
+      overlay.classList.remove("open");
+    });
+
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) overlay.classList.remove("open");
+    });
+  }
+
+  /* --- Lógica de criação de conta --- */
+  async function criarConta({
+    nome,
+    email,
+    senha,
+    nivel,
+    sexo,
+    peso,
+    altura,
+    imc,
+    modo,
+    profId,
+  }) {
     setLoading(true);
 
     try {
@@ -150,7 +229,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       setLoading(false);
       handleRegisterError(error);
     }
-  });
+  }
 
   /* ---- Funções auxiliares ---- */
 
