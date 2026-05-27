@@ -1000,9 +1000,8 @@ async function renderCargaHistoricoChart(exId, alunoId) {
 }
 
 /* ── Renderização de exercícios pré-definidos ──────────────
-   Usado quando o aluno escolheu um programa independente
-   (sem professor). Gera o mesmo visual do renderExerciciosAluno
-   mas recebe dados do PROGRAMAS_PREDEFINIDOS.
+   Usa o mesmo layout exercise-check-card do fluxo de professor
+   para UX consistente em todos os tipos de plano.
    ─────────────────────────────────────────────────────────── */
 function renderExerciciosPreDefinidos(exercicios, historico = {}) {
   const completados = historico.exerciciosCompletos || {};
@@ -1016,41 +1015,52 @@ function renderExerciciosPreDefinidos(exercicios, historico = {}) {
       const numSeries = Math.max(1, parseInt(ex.series) || 3);
       const exSeriesComp = seriesCompletas[exId] || {};
 
-      const seriesButtons = Array.from({ length: numSeries }, (_, i) => {
+      // Extrai segundos de descanso para o timer
+      const descansoSeg = (() => {
+        const raw = String(ex.descanso || "");
+        const m = raw.match(/(\d+)/);
+        return m ? parseInt(m[1]) : 60;
+      })();
+
+      const seriesPillsHtml = Array.from({ length: numSeries }, (_, i) => {
         const serieKey = "s" + (i + 1);
         const serieFeita = !!exSeriesComp[serieKey];
-        return `<button
-          class="serie-btn${serieFeita ? " done" : ""}"
-          data-exid="${exId}"
-          data-serie="${serieKey}"
-          title="Série ${i + 1}"
-          onclick="toggleSeriePre(this, '${exId}', '${serieKey}')"
-        >${serieFeita ? "✓" : i + 1}</button>`;
+        const repsLabel = ex.reps
+          ? `<span class="serie-reps">${sanitize(ex.reps)}</span>`
+          : "";
+        return `<button class="serie-pill${serieFeita ? " serie-done" : ""}" id="spill-${exId}-${i}"
+          onclick="event.stopPropagation(); toggleSeriePre(this, '${exId}', '${serieKey}', ${numSeries}, ${descansoSeg})"
+        ><span class="serie-num">S${i + 1}</span>${repsLabel}</button>`;
       }).join("");
 
+      const expandArea = ex.dica
+        ? `<div class="ex-expand-area hidden" id="expand-${exId}">
+            <p class="ex-instrucoes-text">💡 <strong>Dica:</strong> ${sanitize(ex.dica)}</p>
+          </div>`
+        : "";
+
+      const metaPartes = [
+        `${numSeries} série${numSeries > 1 ? "s" : ""} × ${sanitize(ex.reps || "")}`,
+        ex.descanso ? `${sanitize(ex.descanso)} descanso` : null,
+      ]
+        .filter(Boolean)
+        .join(" · ");
+
       return `
-        <div class="ex-card${done ? " ex-done" : ""}" id="excard-${exId}">
-          <div class="ex-card-header" onclick="toggleExInstrucoes('${exId}')">
-            <div class="ex-card-info">
-              <div class="ex-card-nome">${sanitize(ex.nome)}</div>
-              <div class="ex-card-meta">
-                <span class="ex-pill">${ex.series}x ${sanitize(ex.reps)}</span>
-                <span class="ex-pill">⏱ ${sanitize(ex.descanso)}</span>
-                ${ex.grupoMuscular ? `<span class="ex-pill">${sanitize(ex.grupoMuscular)}</span>` : ""}
-              </div>
+        <div class="exercise-check-card${done ? " completed" : ""}" id="excard-${exId}">
+          <div class="ex-check-main" onclick="expandirCard('${exId}')">
+            <div class="exercise-check-info">
+              <div class="exercise-check-nome">${sanitize(ex.nome)}</div>
+              <div class="exercise-check-meta">${metaPartes}</div>
+              ${ex.grupoMuscular ? `<div class="exercise-check-obs">💪 ${sanitize(ex.grupoMuscular)}</div>` : ""}
             </div>
-            <div class="ex-card-check${done ? " done" : ""}" id="excheck-${exId}">
-              ${done ? "✓" : ""}
-            </div>
+            <svg class="ex-expand-chevron${ex.dica ? "" : " invisible"}" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+            </svg>
           </div>
-          <div class="ex-instrucoes hidden" id="extinstr-${exId}">
-            ${ex.dica ? `<p class="ex-dica"><strong>💡 Dica:</strong> ${sanitize(ex.dica)}</p>` : ""}
-          </div>
-          <div class="series-container">
-            <span class="series-label">Séries:</span>
-            <div class="series-buttons">
-              ${seriesButtons}
-            </div>
+          ${expandArea}
+          <div class="series-pills-row" onclick="event.stopPropagation()">
+            ${seriesPillsHtml}
           </div>
         </div>`;
     })
@@ -1060,9 +1070,9 @@ function renderExerciciosPreDefinidos(exercicios, historico = {}) {
 /**
  * Marca/desmarca uma série de exercício pré-definido e persiste no Firebase
  */
-async function toggleSeriePre(btn, exId, serieKey) {
-  const done = btn.classList.toggle("done");
-  btn.textContent = done ? "✓" : serieKey.replace("s", "");
+async function toggleSeriePre(btn, exId, serieKey, numSeries, descansoSeg) {
+  if (navigator.vibrate) navigator.vibrate(25);
+  const done = btn.classList.toggle("serie-done");
 
   const today = getDateKey();
   const path = `historicoTreinos/${alunoState.uid}/${today}/seriesCompletas/${exId}/${serieKey}`;
@@ -1075,51 +1085,28 @@ async function toggleSeriePre(btn, exId, serieKey) {
   // Verifica se todas as séries do exercício foram completadas
   const card = document.getElementById("excard-" + exId);
   if (!card) return;
-  const totalBtns = card.querySelectorAll(".serie-btn");
-  const doneBtns = card.querySelectorAll(".serie-btn.done");
+  const doneBtns = card.querySelectorAll(".serie-pill.serie-done").length;
+  const total = numSeries || card.querySelectorAll(".serie-pill").length;
+  const allDone = doneBtns >= total;
 
-  if (totalBtns.length === doneBtns.length && doneBtns.length > 0) {
-    card.classList.add("ex-done");
-    const check = document.getElementById("excheck-" + exId);
-    if (check) {
-      check.classList.add("done");
-      check.textContent = "✓";
-    }
+  card.classList.toggle("completed", allDone);
 
-    // Persiste exercício completo
-    const pathEx = `historicoTreinos/${alunoState.uid}/${today}/exerciciosCompletos/${exId}`;
-    try {
+  const pathEx = `historicoTreinos/${alunoState.uid}/${today}/exerciciosCompletos/${exId}`;
+  try {
+    if (allDone) {
       await db.ref(pathEx).set(true);
-    } catch (_) {}
-    atualizarProgressoTreino();
-
-    // Timer de descanso automático
-    const descansoMatch = (
-      card.querySelector(".ex-pill")?.textContent || "60s"
-    ).match(/(\d+)/);
-    const descansoSeg = descansoMatch ? parseInt(descansoMatch[1]) : 60;
-    iniciarTimerDescanso(descansoSeg);
-  } else {
-    card.classList.remove("ex-done");
-    const check = document.getElementById("excheck-" + exId);
-    if (check) {
-      check.classList.remove("done");
-      check.textContent = "";
-    }
-    const pathEx = `historicoTreinos/${alunoState.uid}/${today}/exerciciosCompletos/${exId}`;
-    try {
+      // Animação de conclusão
+      card.classList.add("just-completed");
+      setTimeout(() => card.classList.remove("just-completed"), 450);
+      // Timer de descanso
+      const seg = descansoSeg || 60;
+      if (seg > 0) iniciarTimerDescanso(seg);
+    } else {
       await db.ref(pathEx).remove();
-    } catch (_) {}
-    atualizarProgressoTreino();
-  }
-}
+    }
+  } catch (_) {}
 
-/**
- * Expande/colapsa instruções de um exercício
- */
-function toggleExInstrucoes(exId) {
-  const el = document.getElementById("extinstr-" + exId);
-  if (el) el.classList.toggle("hidden");
+  atualizarProgressoTreino();
 }
 
 /**
@@ -1127,15 +1114,21 @@ function toggleExInstrucoes(exId) {
  */
 function atualizarProgressoTreino(feitos, total) {
   const allCards = document.querySelectorAll('[id^="excard-"]');
-  const allDone = document.querySelectorAll('[id^="excard-"].ex-done');
+  const allDone = document.querySelectorAll('[id^="excard-"].completed');
   const t = total !== undefined ? total : allCards.length;
   const f = feitos !== undefined ? feitos : allDone.length;
+  const pct = t > 0 ? Math.round((f / t) * 100) : 0;
 
-  const progressEl = document.getElementById("treino-progress-bar");
-  const progressText = document.getElementById("treino-progress-text");
-  if (progressEl)
-    progressEl.style.width = (t > 0 ? Math.round((f / t) * 100) : 0) + "%";
-  if (progressText) progressText.textContent = f + "/" + t + " exercícios";
+  const progressEl = document.getElementById("progress-fill");
+  const progressText = document.getElementById("progress-text");
+  const progressPct = document.getElementById("progress-pct");
+
+  if (progressEl) {
+    progressEl.style.width = pct + "%";
+    progressEl.classList.toggle("done", pct === 100);
+  }
+  if (progressText) progressText.textContent = `${f} / ${t}`;
+  if (progressPct) progressPct.textContent = pct + "%";
 
   const btnFinalizar = document.getElementById("finish-workout-btn");
   if (btnFinalizar) btnFinalizar.disabled = t === 0;

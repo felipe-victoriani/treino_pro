@@ -2799,15 +2799,43 @@ textarea.form-control {
 
 /* Progress bar de treino */
 .workout-progress {
-  margin-bottom: 20px;
+  position: sticky;
+  top: 60px;
+  z-index: 30;
+  background: var(--bg-app);
+  padding: 10px 0 12px;
+  margin-bottom: 12px;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.progress-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.progress-pct {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--purple-400);
+  background: rgba(107, 53, 195, 0.15);
+  border-radius: var(--radius-pill);
+  padding: 2px 8px;
+  transition: var(--transition-fast);
 }
 
 .workout-progress-bar {
-  height: 8px;
+  height: 10px;
   background: var(--bg-card-3);
   border-radius: var(--radius-pill);
   overflow: hidden;
-  margin-top: 8px;
+  margin-top: 6px;
 }
 
 .workout-progress-fill {
@@ -2815,6 +2843,10 @@ textarea.form-control {
   background: var(--gradient-primary);
   border-radius: var(--radius-pill);
   transition: width 0.5s ease;
+}
+
+.workout-progress-fill.done {
+  background: linear-gradient(90deg, #16a34a, #22c55e);
 }
 
 .workout-progress-text {
@@ -2826,23 +2858,32 @@ textarea.form-control {
 }
 
 /* Botão finalizar treino */
+.finish-workout-wrap {
+  position: sticky;
+  bottom: calc(var(--bottom-nav-height) + 8px);
+  z-index: 20;
+  padding-top: 12px;
+  background: linear-gradient(to top, var(--bg-app) 70%, transparent);
+  margin-top: 20px;
+}
+
 .finish-workout-btn {
   background: var(--gradient-primary);
   color: #fff;
   border: none;
   border-radius: var(--radius-pill);
-  padding: 16px 32px;
-  font-size: 1rem;
+  padding: 17px 32px;
+  font-size: 1.05rem;
   font-weight: 700;
   cursor: pointer;
   width: 100%;
-  margin-top: 20px;
-  box-shadow: var(--shadow-purple);
+  box-shadow: 0 4px 20px rgba(107, 53, 195, 0.45);
   transition: var(--transition-base);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
+  letter-spacing: 0.02em;
 }
 
 .finish-workout-btn:hover {
@@ -2850,10 +2891,15 @@ textarea.form-control {
   box-shadow: 0 8px 30px rgba(107, 53, 195, 0.5);
 }
 
+.finish-workout-btn:active {
+  transform: translateY(0);
+}
+
 .finish-workout-btn:disabled {
-  opacity: 0.4;
+  opacity: 0.35;
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
 }
 
 /* ============================================================
@@ -3907,33 +3953,51 @@ textarea.form-control {
 /* -- Exercise check card (layout novo) ---------------------- */
 .exercise-check-card {
   background: var(--bg-card-2);
-  border: 2px solid rgba(239, 68, 68, 0.35);
+  border: 2px solid rgba(239, 68, 68, 0.25);
   border-radius: var(--radius-lg);
   overflow: hidden;
   transition:
-    border-color 0.2s ease,
-    background 0.2s ease;
+    border-color 0.25s ease,
+    background 0.25s ease,
+    box-shadow 0.25s ease;
   user-select: none;
   -webkit-user-select: none;
+  margin-bottom: 2px;
 }
 .exercise-check-card.completed {
   border-color: #22c55e;
   background: rgba(34, 197, 94, 0.06);
+  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.15);
 }
 .exercise-check-card.completed .exercise-check-nome {
-  text-decoration: line-through;
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.6);
+}
+@keyframes cardComplete {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.025);
+    box-shadow: 0 0 22px rgba(34, 197, 94, 0.4);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.exercise-check-card.just-completed {
+  animation: cardComplete 0.4s ease;
 }
 .ex-check-main {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 16px;
+  padding: 16px 16px 14px;
   cursor: pointer;
   gap: 12px;
+  -webkit-tap-highlight-color: transparent;
 }
 .ex-check-main:active {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.04);
 }
 .exercise-check-info {
   flex: 1;
@@ -3984,36 +4048,56 @@ textarea.form-control {
 
 /* -- Pílulas de série --------------------------------------- */
 .series-pills-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
   gap: 8px;
-  flex-wrap: wrap;
-  padding: 10px 14px;
+  padding: 12px 14px 14px;
   border-top: 1px solid var(--border-card);
 }
 .serie-pill {
-  padding: 6px 14px;
-  border-radius: var(--radius-pill);
-  border: 1.5px solid var(--border-card);
+  border-radius: var(--radius-md);
+  border: 2px solid var(--border-card);
   background: var(--bg-input);
   color: var(--text-secondary);
-  font-size: 0.82rem;
-  font-weight: 700;
   cursor: pointer;
   transition:
     background 0.15s ease,
     border-color 0.15s ease,
-    color 0.15s ease;
-  min-width: 44px;
-  text-align: center;
-  line-height: 1.2;
+    color 0.15s ease,
+    transform 0.1s ease;
+  min-height: 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 8px 4px;
+  -webkit-tap-highlight-color: transparent;
+}
+.serie-num {
+  font-size: 0.92rem;
+  font-weight: 800;
+  line-height: 1;
+}
+.serie-reps {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  line-height: 1;
 }
 .serie-pill:active {
-  transform: scale(0.94);
+  transform: scale(0.92);
 }
 .serie-pill.serie-done {
-  background: rgba(34, 197, 94, 0.18);
+  background: rgba(34, 197, 94, 0.15);
   border-color: #22c55e;
   color: #22c55e;
+}
+.serie-pill.serie-done .serie-num::before {
+  content: "✓ ";
+}
+.serie-pill.serie-done .serie-reps {
+  color: rgba(34, 197, 94, 0.7);
 }
 
 /* -- Anotação de carga -------------------------------------- */

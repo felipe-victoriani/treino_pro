@@ -623,8 +623,12 @@ function renderExerciciosAluno(
 
       const seriesPillsHtml = Array.from({ length: numSeries }, (_, i) => {
         const sdone = !!exSeriesComp[`s${i}`];
+        const repsLabel = ex.repeticoes
+          ? `<span class="serie-reps">${sanitize(ex.repeticoes)}</span>`
+          : "";
         return `<button class="serie-pill${sdone ? " serie-done" : ""}" id="spill-${exIdSafe}-${i}"
-          onclick="event.stopPropagation(); toggleSerie('${exIdSafe}','${sanitize(alunoId)}','${sanitize(letra)}',${i},${numSeries},${descanso})">S${i + 1}</button>`;
+          onclick="event.stopPropagation(); toggleSerie('${exIdSafe}','${sanitize(alunoId)}','${sanitize(letra)}',${i},${numSeries},${descanso})"
+        ><span class="serie-num">S${i + 1}</span>${repsLabel}</button>`;
       }).join("");
 
       const expandArea = ex.instrucoes
@@ -746,7 +750,13 @@ async function toggleSerie(
 
   // Atualiza UI: card completed
   const card = document.getElementById(`excard-${exId}`);
-  if (card) card.classList.toggle("completed", allDone);
+  if (card) {
+    card.classList.toggle("completed", allDone);
+    if (allDone) {
+      card.classList.add("just-completed");
+      setTimeout(() => card.classList.remove("just-completed"), 450);
+    }
+  }
 
   // Atualiza progresso
   const total = document.querySelectorAll('[id^="excard-"]').length;
@@ -829,9 +839,14 @@ function atualizarProgressoTreino(concluidos, total) {
   const pct = total > 0 ? Math.round((concluidos / total) * 100) : 0;
   const barEl = document.getElementById("progress-fill");
   const textEl = document.getElementById("progress-text");
+  const pctEl = document.getElementById("progress-pct");
 
-  if (barEl) barEl.style.width = pct + "%";
+  if (barEl) {
+    barEl.style.width = pct + "%";
+    barEl.classList.toggle("done", pct === 100);
+  }
   if (textEl) textEl.textContent = `${concluidos} / ${total}`;
+  if (pctEl) pctEl.textContent = pct + "%";
 }
 
 /**

@@ -224,11 +224,14 @@
             <button class="workout-tab-btn" data-letra="E">E</button>
           </div>
 
-          <!-- Progresso do treino atual -->
+          <!-- Progresso do treino atual (sticky) -->
           <div class="workout-progress" id="workout-progress-wrap">
             <div class="progress-header">
               <span class="progress-label">Progresso de hoje</span>
-              <span class="progress-value" id="progress-text">0 / 0</span>
+              <div class="progress-header-right">
+                <span class="progress-value" id="progress-text">0 / 0</span>
+                <span class="progress-pct" id="progress-pct">0%</span>
+              </div>
             </div>
             <div class="workout-progress-bar">
               <div
@@ -246,15 +249,22 @@
             </div>
           </div>
 
-          <!-- Botão finalizar treino -->
-          <button class="finish-workout-btn" id="finish-workout-btn" disabled>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-              <path
-                d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"
-              />
-            </svg>
-            Finalizar Treino
-          </button>
+          <!-- Botão finalizar treino (sticky bottom) -->
+          <div class="finish-workout-wrap">
+            <button class="finish-workout-btn" id="finish-workout-btn" disabled>
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"
+                />
+              </svg>
+              Finalizar Treino
+            </button>
+          </div>
 
           <!-- Histórico -->
           <div class="mt-28">
