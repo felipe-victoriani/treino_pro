@@ -75,14 +75,22 @@ exports.deletarProfessor = onCall(async (request) => {
     await db.ref().update(updates);
     console.log(`[Delete] Dados do database removidos para: ${professorId}`);
 
-    // 2. Deleta a conta do Firebase Authentication
+    // 2. Deleta a conta do Firebase Authentication (libera o email)
     try {
       await admin.auth().deleteUser(professorId);
       console.log(`[Delete] Conta de autenticação deletada: ${professorId}`);
     } catch (authErr) {
-      // Se o usuário não existir no Auth, continua (pode ter sido deletado manualmente)
+      // Se o usuário já não existia no Auth, ignora (dados já removidos, email já livre)
       if (authErr.code !== "auth/user-not-found") {
-        console.warn(`[Delete] Aviso ao deletar auth: ${authErr.message}`);
+        console.error(
+          `[Delete] Falha ao deletar conta Auth do professor ${professorId}:`,
+          authErr.message,
+        );
+        throw new HttpsError(
+          "internal",
+          "Dados removidos, mas falha ao liberar o email na autenticação: " +
+            authErr.message,
+        );
       }
     }
 
@@ -130,9 +138,17 @@ exports.deletarAluno = onCall(async (request) => {
       await admin.auth().deleteUser(alunoId);
       console.log(`[Delete] Conta de autenticação deletada: ${alunoId}`);
     } catch (authErr) {
-      // Se o usuário não existir no Auth, continua (pode ter sido deletado manualmente)
+      // Se o usuário já não existia no Auth, ignora (dados já removidos, email já livre)
       if (authErr.code !== "auth/user-not-found") {
-        console.warn(`[Delete] Aviso ao deletar auth: ${authErr.message}`);
+        console.error(
+          `[Delete] Falha ao deletar conta Auth do aluno ${alunoId}:`,
+          authErr.message,
+        );
+        throw new HttpsError(
+          "internal",
+          "Dados removidos, mas falha ao liberar o email na autenticação: " +
+            authErr.message,
+        );
       }
     }
 
