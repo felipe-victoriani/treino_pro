@@ -381,6 +381,123 @@
           transform: rotate(360deg);
         }
       }
+
+      /* ── Modal aviso professor ───────────────────── */
+      .aviso-professor-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.72);
+        z-index: 2000;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        padding: 0 0 env(safe-area-inset-bottom);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+      }
+      .aviso-professor-overlay.open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .aviso-professor-sheet {
+        background: var(--bg-card-2);
+        border-radius: 24px 24px 0 0;
+        width: 100%;
+        max-width: 520px;
+        padding: 8px 24px 32px;
+        transform: translateY(40px);
+        transition: transform 0.3s cubic-bezier(0.34, 1.36, 0.64, 1);
+      }
+      .aviso-professor-overlay.open .aviso-professor-sheet {
+        transform: translateY(0);
+      }
+      .aviso-professor-handle {
+        width: 40px;
+        height: 4px;
+        border-radius: 2px;
+        background: var(--border-card);
+        margin: 12px auto 24px;
+      }
+      .aviso-professor-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: rgba(234, 179, 8, 0.15);
+        border: 2px solid rgba(234, 179, 8, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin: 0 auto 20px;
+      }
+      .aviso-professor-titulo {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: var(--text-white);
+        text-align: center;
+        margin: 0 0 12px;
+        line-height: 1.3;
+      }
+      .aviso-professor-corpo {
+        font-size: 0.88rem;
+        color: var(--text-secondary);
+        line-height: 1.65;
+        text-align: center;
+        margin: 0 0 8px;
+      }
+      .aviso-professor-destaque {
+        background: rgba(234, 179, 8, 0.08);
+        border: 1px solid rgba(234, 179, 8, 0.25);
+        border-radius: var(--radius-md);
+        padding: 12px 16px;
+        margin: 16px 0 24px;
+        font-size: 0.82rem;
+        color: rgba(234, 179, 8, 0.9);
+        line-height: 1.55;
+      }
+      .aviso-professor-destaque ul {
+        margin: 6px 0 0;
+        padding-left: 16px;
+      }
+      .aviso-professor-destaque li {
+        margin-bottom: 4px;
+      }
+      .aviso-professor-acoes {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .btn-aviso-continuar {
+        background: var(--gradient-primary);
+        color: #fff;
+        border: none;
+        border-radius: var(--radius-pill);
+        padding: 16px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        width: 100%;
+        transition: opacity 0.2s;
+      }
+      .btn-aviso-continuar:active {
+        opacity: 0.85;
+      }
+      .btn-aviso-voltar {
+        background: transparent;
+        border: 1px solid var(--border-card);
+        color: var(--text-muted);
+        border-radius: var(--radius-pill);
+        padding: 14px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        width: 100%;
+        transition: background 0.2s;
+      }
+      .btn-aviso-voltar:active {
+        background: rgba(255, 255, 255, 0.05);
+      }
     </style>
   </head>
   <body>
@@ -465,6 +582,51 @@
       <div class="programa-detalhe-sheet" id="detalhe-sheet">
         <div class="detalhe-handle"></div>
         <div id="detalhe-content"><!-- preenchido via JS --></div>
+      </div>
+    </div>
+
+    <!-- Modal: aviso sobre professor de educação física -->
+    <div
+      class="aviso-professor-overlay"
+      id="aviso-professor-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="aviso-professor-titulo"
+    >
+      <div class="aviso-professor-sheet">
+        <div class="aviso-professor-handle"></div>
+        <div class="aviso-professor-icon">🎓</div>
+        <h2 class="aviso-professor-titulo" id="aviso-professor-titulo">
+          Treino sem acompanhamento profissional
+        </h2>
+        <p class="aviso-professor-corpo">
+          Você escolheu um programa <strong>montado pelo app</strong>, sem a
+          supervisão de um professor de Educação Física.
+        </p>
+        <div class="aviso-professor-destaque">
+          <strong>⚠️ Por que o acompanhamento é importante?</strong>
+          <ul>
+            <li>Previne lesões ao corrigir a execução dos exercícios</li>
+            <li>Ajusta cargas e séries ao seu nível real</li>
+            <li>Monitora sua evolução e adapta o treino</li>
+            <li>Garante resultados mais seguros e eficazes</li>
+          </ul>
+        </div>
+        <p
+          class="aviso-professor-corpo"
+          style="margin-bottom: 0; font-size: 0.8rem; color: var(--text-muted)"
+        >
+          Se possível, consulte um profissional antes de iniciar. O app pode ser
+          um ótimo complemento — não um substituto.
+        </p>
+        <div class="aviso-professor-acoes" style="margin-top: 24px">
+          <button class="btn-aviso-continuar" id="btn-aviso-continuar">
+            Entendi, quero continuar assim mesmo
+          </button>
+          <button class="btn-aviso-voltar" id="btn-aviso-voltar">
+            ← Voltar à seleção
+          </button>
+        </div>
       </div>
     </div>
 

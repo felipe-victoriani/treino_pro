@@ -193,31 +193,75 @@ function initBotaoConfirmar(user) {
   const btn = document.getElementById("btn-confirmar");
   if (!btn) return;
 
-  btn.addEventListener("click", async () => {
+  btn.addEventListener("click", () => {
     if (!programaSelecionadoId) return;
-
-    btn.disabled = true;
-    btn.innerHTML = `<div class="spinner-ring" style="width:20px;height:20px;border-width:2px;"></div> Salvando...`;
-
-    try {
-      const agora = new Date().toISOString();
-      const updates = {};
-      // Escreve em ambos os caminhos (mesma convenção do cadastro)
-      updates[`users/${user.uid}/programaAtivo`] = programaSelecionadoId;
-      updates[`users/${user.uid}/programaSelecionadoEm`] = agora;
-      updates[`alunos/${user.uid}/programaAtivo`] = programaSelecionadoId;
-      updates[`alunos/${user.uid}/programaSelecionadoEm`] = agora;
-      await db.ref().update(updates);
-
-      // Redireciona para o dashboard
-      window.location.href = "aluno.html";
-    } catch (err) {
-      console.error("[SelecionarPrograma] Erro ao salvar:", err);
-      showToast("Erro ao salvar programa. Tente novamente.", "error");
-      btn.disabled = false;
-      selecionarPrograma(programaSelecionadoId); // Restaura botão
-    }
+    abrirAvisoProfessor(user);
   });
+}
+
+/* ── Modal de aviso sobre professor ────────────────────── */
+function abrirAvisoProfessor(user) {
+  const overlay = document.getElementById("aviso-professor-overlay");
+  if (!overlay) {
+    // Fallback: confirma diretamente se o modal não existir no DOM
+    confirmarPrograma(user);
+    return;
+  }
+  overlay.classList.add("open");
+
+  const btnContinuar = document.getElementById("btn-aviso-continuar");
+  const btnVoltar = document.getElementById("btn-aviso-voltar");
+
+  // Clones para remover listeners duplicados em chamadas repetidas
+  const newContinuar = btnContinuar.cloneNode(true);
+  const newVoltar = btnVoltar.cloneNode(true);
+  btnContinuar.replaceWith(newContinuar);
+  btnVoltar.replaceWith(newVoltar);
+
+  newContinuar.addEventListener("click", () => {
+    overlay.classList.remove("open");
+    confirmarPrograma(user);
+  });
+
+  newVoltar.addEventListener("click", () => {
+    overlay.classList.remove("open");
+  });
+
+  // Fecha ao clicar fora do sheet
+  overlay.addEventListener(
+    "click",
+    (e) => {
+      if (e.target === overlay) overlay.classList.remove("open");
+    },
+    { once: false },
+  );
+}
+
+async function confirmarPrograma(user) {
+  const btn = document.getElementById("btn-confirmar");
+  if (!btn) return;
+
+  btn.disabled = true;
+  btn.innerHTML = `<div class="spinner-ring" style="width:20px;height:20px;border-width:2px;"></div> Salvando...`;
+
+  try {
+    const agora = new Date().toISOString();
+    const updates = {};
+    // Escreve em ambos os caminhos (mesma convenção do cadastro)
+    updates[`users/${user.uid}/programaAtivo`] = programaSelecionadoId;
+    updates[`users/${user.uid}/programaSelecionadoEm`] = agora;
+    updates[`alunos/${user.uid}/programaAtivo`] = programaSelecionadoId;
+    updates[`alunos/${user.uid}/programaSelecionadoEm`] = agora;
+    await db.ref().update(updates);
+
+    // Redireciona para o dashboard
+    window.location.href = "aluno.html";
+  } catch (err) {
+    console.error("[SelecionarPrograma] Erro ao salvar:", err);
+    showToast("Erro ao salvar programa. Tente novamente.", "error");
+    btn.disabled = false;
+    selecionarPrograma(programaSelecionadoId); // Restaura botão
+  }
 }
 
 /* ── Filtros ────────────────────────────────────────────── */
