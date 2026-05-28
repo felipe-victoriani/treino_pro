@@ -498,12 +498,14 @@ async function abrirEditarAluno(aluno) {
       nome: p.nome || "Professor",
     }));
     profs.sort((a, b) => a.nome.localeCompare(b.nome));
-    sel.innerHTML = profs
-      .map(
-        (p) =>
-          `<option value="${p.id}" ${p.id === aluno.professorId ? "selected" : ""}>${sanitize(p.nome)}</option>`,
-      )
-      .join("");
+    sel.innerHTML =
+      `<option value="" ${!aluno.professorId ? "selected" : ""}>Sem professor (treino independente)</option>` +
+      profs
+        .map(
+          (p) =>
+            `<option value="${p.id}" ${p.id === aluno.professorId ? "selected" : ""}>${sanitize(p.nome)}</option>`,
+        )
+        .join("");
   } catch (_) {
     sel.innerHTML = '<option value="">Erro ao carregar professores</option>';
   }
@@ -528,35 +530,32 @@ async function salvarEditarAluno() {
     showToast("Informe o nome do aluno.", "error");
     return;
   }
-  if (!profId) {
-    showToast("Selecione um professor.", "error");
-    return;
-  }
-
   const peso = pesoVal ? parseFloat(pesoVal) : null;
   const altura = alturaVal ? parseFloat(alturaVal) : null;
   let imc = null;
   if (peso && altura && altura > 0)
     imc = parseFloat((peso / (altura * altura)).toFixed(1));
 
-  // Pegar nome do professor
-  let profNome = "";
-  try {
-    const snap = await db.ref(`professores/${profId}`).once("value");
-    profNome = snap.val()?.nome || "";
-  } catch (_) {}
+  // Pegar nome do professor (null se sem professor)
+  let profNome = null;
+  if (profId) {
+    try {
+      const snap = await db.ref(`professores/${profId}`).once("value");
+      profNome = snap.val()?.nome || null;
+    } catch (_) {}
+  }
 
   showLoading("Salvando...");
   try {
     const updates = {
       [`alunos/${id}/nome`]: nome,
-      [`alunos/${id}/professorId`]: profId,
+      [`alunos/${id}/professorId`]: profId || null,
       [`alunos/${id}/professorNome`]: profNome,
       [`alunos/${id}/peso`]: peso,
       [`alunos/${id}/altura`]: altura,
       [`alunos/${id}/imc`]: imc,
       [`users/${id}/nome`]: nome,
-      [`users/${id}/professorId`]: profId,
+      [`users/${id}/professorId`]: profId || null,
       [`users/${id}/professorNome`]: profNome,
       [`users/${id}/peso`]: peso,
       [`users/${id}/altura`]: altura,
