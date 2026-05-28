@@ -551,9 +551,10 @@ async function mostrarTreino(letra) {
           descanso: ex.descanso,
           dica: ex.observacao,
         }));
+        // Sempre renderiza com estado vazio — checkboxes reiniciam a cada abertura
         exListEl.innerHTML = renderExerciciosPreDefinidos(
           exercicios,
-          historicoLetra,
+          {},
           letra,
         );
         initExercicioCheckboxes();
@@ -582,10 +583,10 @@ async function mostrarTreino(letra) {
     const exListEl = document.getElementById("aluno-exercise-list");
     if (exListEl) {
       if (treinoPre && treinoPre.exercicios && treinoPre.exercicios.length) {
-        // Renderiza exercícios do programa pré-definido
+        // Sempre renderiza com estado vazio — checkboxes reiniciam a cada abertura
         exListEl.innerHTML = renderExerciciosPreDefinidos(
           treinoPre.exercicios,
-          historicoLetra,
+          {},
           letra,
         );
         initExercicioCheckboxes();
@@ -616,8 +617,9 @@ async function mostrarTreino(letra) {
       const treinoData = tSnap.val();
       const exs = treinoData && treinoData.exercicios;
       if (exs && Object.keys(exs).length > 0) {
+        // Passa apenas cargaUsada (para pré-preencher o input de carga);
+        // estado de checkboxes é sempre reiniciado em loadTreinoAluno
         await loadTreinoAluno(alunoState.uid, letra, "aluno-exercise-list", {
-          ...historicoLetra,
           cargaUsada: historico.cargaUsada || {},
         });
       } else {
@@ -636,21 +638,18 @@ async function mostrarTreino(letra) {
       }
     }
   }
-  // Botao finalizar
+  // Botão finalizar — sempre habilitado (exercícios sempre reiniciam zerados)
   const btnFinalizar = document.getElementById("finish-workout-btn");
   if (btnFinalizar) {
-    if (letraCompletadaHoje) {
-      btnFinalizar.innerHTML = "✅ Treino Concluido Hoje!";
-      btnFinalizar.disabled = true;
-    } else {
-      const total = document.querySelectorAll('[id^="excard-"]').length;
-      btnFinalizar.innerHTML =
-        '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg> Finalizar Treino';
-      btnFinalizar.disabled = total === 0;
-      btnFinalizar.onclick = function () {
-        finalizarTreino(alunoState.uid);
-      };
-    }
+    const total = document.querySelectorAll('[id^="excard-"]').length;
+    const jaFeito = letraCompletadaHoje
+      ? "↪️ Refazer Treino "
+      : '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg> ';
+    btnFinalizar.innerHTML = jaFeito + "Finalizar Treino";
+    btnFinalizar.disabled = total === 0;
+    btnFinalizar.onclick = function () {
+      finalizarTreino(alunoState.uid);
+    };
   }
 }
 /* -- Secao Dieta --------------------------------------------- */
@@ -1111,9 +1110,11 @@ function renderExerciciosPreDefinidos(
 }
 
 /**
- * Marca/desmarca uma série de exercício pré-definido e persiste no Firebase
+ * Marca/desmarca uma série de exercício pré-definido.
+ * Estado mantido apenas localmente (_sessaoLocal); Firebase só é
+ * escrito ao chamar finalizarTreino().
  */
-async function toggleSeriePre(
+function toggleSeriePre(
   btn,
   exId,
   serieKey,
@@ -1124,16 +1125,15 @@ async function toggleSeriePre(
   if (navigator.vibrate) navigator.vibrate(25);
   const done = btn.classList.toggle("serie-done");
 
-  const today = getDateKey();
   // Usa a letra do treino renderizado na tela (passada pelo onclick),
   // com fallback para treinoAtual caso chamado por código legado.
   const letraAtiva = letraRenderizada || alunoState.treinoAtual || "A";
-  const path = `historicoTreinos/${alunoState.uid}/${today}/letras/${letraAtiva}/seriesCompletas/${exId}/${serieKey}`;
-  try {
-    await db.ref(path).set(done ? true : null);
-  } catch (e) {
-    console.error("[Aluno] Erro ao salvar série:", e);
-  }
+
+  // Atualiza estado local da sessão (sem Firebase)
+  const sessao = _getSessaoLetra(letraAtiva);
+  if (!sessao.seriesCompletas[exId]) sessao.seriesCompletas[exId] = {};
+  if (done) sessao.seriesCompletas[exId][serieKey] = true;
+  else delete sessao.seriesCompletas[exId][serieKey];
 
   // Verifica se todas as séries do exercício foram completadas
   const card = document.getElementById("excard-" + exId);
@@ -1144,28 +1144,17 @@ async function toggleSeriePre(
 
   card.classList.toggle("completed", allDone);
 
-  const pathEx = `historicoTreinos/${alunoState.uid}/${today}/letras/${letraAtiva}/exerciciosCompletos/${exId}`;
-  try {
-    if (allDone) {
-      await db.ref(pathEx).set(true);
-      // Animação de conclusão
-      card.classList.add("just-completed");
-      setTimeout(() => card.classList.remove("just-completed"), 450);
-      // Timer de descanso
-      const seg = descansoSeg || 60;
-      if (seg > 0) iniciarTimerDescanso(seg);
-    } else {
-      await db.ref(pathEx).remove();
-    }
-  } catch (_) {}
-
-  // Salva letra no historico raiz para finalizarTreino calcular o percentual corretamente
-  try {
-    await db.ref(`historicoTreinos/${alunoState.uid}/${today}`).update({
-      letra: letraAtiva,
-      completado: false,
-    });
-  } catch (_) {}
+  if (allDone) {
+    sessao.exerciciosCompletos[exId] = true;
+    // Animação de conclusão
+    card.classList.add("just-completed");
+    setTimeout(() => card.classList.remove("just-completed"), 450);
+    // Timer de descanso
+    const seg = descansoSeg || 60;
+    if (seg > 0) iniciarTimerDescanso(seg);
+  } else {
+    delete sessao.exerciciosCompletos[exId];
+  }
 
   atualizarProgressoTreino();
 }

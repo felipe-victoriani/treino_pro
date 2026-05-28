@@ -11,6 +11,17 @@ let treinoListener = null;
 let treinoAlunoAtual = null;
 let treinoLetraAtual = "A";
 
+/* Estado local da sessão de treino — reiniciado ao abrir qualquer ficha.
+   Nunca persiste entre sessões. Só é gravado no Firebase ao clicar
+   em "Finalizar Treino". */
+let _sessaoLocal = {};
+function _getSessaoLetra(letra) {
+  if (!_sessaoLocal[letra]) {
+    _sessaoLocal[letra] = { exerciciosCompletos: {}, seriesCompletas: {} };
+  }
+  return _sessaoLocal[letra];
+}
+
 /* ── Helpers ─────────────────────────────────────────────── */
 
 function treinoLetras() {
@@ -573,8 +584,8 @@ async function loadTreinoAluno(
       return;
     }
 
-    const completados = historico.exerciciosCompletos || {};
-    const seriesCompletas = historico.seriesCompletas || {};
+    // Reinicia estado local da sessão — checkboxes sempre começam vazios
+    _sessaoLocal[letra] = { exerciciosCompletos: {}, seriesCompletas: {} };
     const cargasUsadas = historico.cargaUsada || {};
     const exercicios = Object.entries(data.exercicios)
       .map(([id, ex]) => ({ id, ...ex }))
@@ -583,16 +594,13 @@ async function loadTreinoAluno(
     renderExerciciosAluno(
       listEl,
       exercicios,
-      completados,
+      {}, // completados: sempre vazio ao abrir
       alunoId,
       letra,
       cargasUsadas,
-      seriesCompletas,
+      {}, // seriesCompletas: sempre vazio ao abrir
     );
-    atualizarProgressoTreino(
-      Object.keys(completados).length,
-      exercicios.length,
-    );
+    atualizarProgressoTreino(0, exercicios.length);
   } catch (e) {
     listEl.innerHTML =
       '<div class="empty-state"><h3>Erro ao carregar treino</h3></div>';
@@ -691,61 +699,27 @@ function expandirCard(exId) {
 }
 
 /**
- * Alterna o estado de uma série individual de um exercício
+ * Alterna o estado de uma série individual de um exercício.
+ * O estado é mantido apenas localmente (_sessaoLocal) e só é
+ * gravado no Firebase ao chamar finalizarTreino().
  */
-async function toggleSerie(
-  exId,
-  alunoId,
-  letra,
-  serieIdx,
-  totalSeries,
-  descanso,
-) {
+function toggleSerie(exId, alunoId, letra, serieIdx, totalSeries, descanso) {
   if (navigator.vibrate) navigator.vibrate(25);
 
-  const today = getDateKey();
-  const histRef = db.ref(`historicoTreinos/${alunoId}/${today}`);
-  const snap = await histRef.once("value");
-  const historico = snap.val() || {};
-
-  // Suporta estrutura nova (letras/{letra}) e legada (raiz)
-  const historicoLetra = (historico.letras && historico.letras[letra]) || {};
-  const seriesCompletas = {
-    ...(historicoLetra.seriesCompletas || historico.seriesCompletas || {}),
-  };
-  const exSeries = { ...(seriesCompletas[exId] || {}) };
+  const sessao = _getSessaoLetra(letra);
+  const exSeries = { ...(sessao.seriesCompletas[exId] || {}) };
   const key = `s${serieIdx}`;
   const wasDone = !!exSeries[key];
 
-  if (wasDone) {
-    delete exSeries[key];
-  } else {
-    exSeries[key] = true;
-  }
+  if (wasDone) delete exSeries[key];
+  else exSeries[key] = true;
+  sessao.seriesCompletas[exId] = exSeries;
 
   const numDone = Object.keys(exSeries).length;
   const allDone = numDone >= totalSeries;
 
-  // Mantém letra e completado:false na raiz (para finalizarTreino e histórico)
-  await histRef.update({ letra, completado: false });
-
-  // Grava séries no subpath isolado por letra (sem poluir dados de outras letras)
-  const serieRef = db.ref(
-    `historicoTreinos/${alunoId}/${today}/letras/${letra}/seriesCompletas/${exId}`,
-  );
-  if (Object.keys(exSeries).length > 0) {
-    await serieRef.set(exSeries);
-  } else {
-    await serieRef.remove();
-  }
-
-  // Grava exerciciosCompletos no subpath por letra
-  const exCompPath = `historicoTreinos/${alunoId}/${today}/letras/${letra}/exerciciosCompletos/${exId}`;
-  if (allDone) {
-    await db.ref(exCompPath).set(true);
-  } else {
-    await db.ref(exCompPath).remove();
-  }
+  if (allDone) sessao.exerciciosCompletos[exId] = true;
+  else delete sessao.exerciciosCompletos[exId];
 
   // Atualiza UI: pílula
   const pill = document.getElementById(`spill-${exId}-${serieIdx}`);
@@ -755,7 +729,7 @@ async function toggleSerie(
   const card = document.getElementById(`excard-${exId}`);
   if (card) {
     card.classList.toggle("completed", allDone);
-    if (allDone) {
+    if (allDone && !wasDone) {
       card.classList.add("just-completed");
       setTimeout(() => card.classList.remove("just-completed"), 450);
     }
@@ -769,10 +743,8 @@ async function toggleSerie(
   atualizarProgressoTreino(concluidos, total);
 
   // Inicia timer de descanso ao marcar série (não ao desmarcar)
-  if (!wasDone && descanso > 0) {
-    if (typeof iniciarTimerDescanso === "function") {
-      iniciarTimerDescanso(descanso);
-    }
+  if (!wasDone && descanso > 0 && typeof iniciarTimerDescanso === "function") {
+    iniciarTimerDescanso(descanso);
   }
 }
 
@@ -859,17 +831,11 @@ function atualizarProgressoTreino(concluidos, total) {
 async function finalizarTreino(alunoId) {
   const today = getDateKey();
   const hiRef = db.ref(`historicoTreinos/${alunoId}/${today}`);
-  const hiSnap = await hiRef.once("value");
-  const historico = hiSnap.val() || {};
 
-  // Suporta estrutura nova (letras/{letra}) e legada (raiz)
+  // Lê o estado LOCAL da sessão (nunca lê checkboxes do Firebase)
   const letra =
-    historico.letra ||
-    (typeof alunoState !== "undefined" ? alunoState.treinoAtual : null) ||
-    "A";
-  const historicoLetra = (historico.letras && historico.letras[letra]) || {};
-  const completados =
-    historicoLetra.exerciciosCompletos || historico.exerciciosCompletos || {};
+    (typeof alunoState !== "undefined" ? alunoState.treinoAtual : null) || "A";
+  const completados = _getSessaoLetra(letra).exerciciosCompletos;
   const exerciciosConcluidos = Object.keys(completados).length;
 
   // Conta total de exercícios no treino
