@@ -82,6 +82,8 @@ let alunoState = {
   peso: null,
   altura: null,
   imc: null,
+  programaFase: 1,
+  treinosCompletos: 0,
 };
 /* -- Inicializacao ------------------------------------------- */
 document.addEventListener("userReady", async (e) => {
@@ -107,6 +109,7 @@ document.addEventListener("userReady", async (e) => {
   alunoState.peso = userData.peso;
   alunoState.altura = userData.altura;
   alunoState.imc = userData.imc;
+  alunoState.programaFase = userData.programaFase || 1;
   setupBottomNav();
   setupLogout();
   await alunoNavigate("inicio");
@@ -291,6 +294,8 @@ async function loadInicio() {
     // Streak e gráfico da semana
     await calcularEExibirStreak();
     await renderSemanaChart();
+    // Barra de progressão de fase (apenas alunos independentes)
+    await loadProgressaoInicio();
   } catch (e) {
     console.error("[Aluno] Erro ao carregar inicio:", e);
   }
@@ -552,7 +557,16 @@ async function mostrarTreino(letra) {
     }
   } else if (alunoState.programaAtivo && !alunoState.professorId) {
     // ── Aluno com programa pré-definido (sem professor) ────────
-    const treinoPre = getTreinoDoPrograma(alunoState.programaAtivo, letra);
+    const treinoBase = getTreinoDoPrograma(alunoState.programaAtivo, letra);
+    const treinoPre =
+      treinoBase && typeof aplicarFaseAoTreino !== "undefined"
+        ? aplicarFaseAoTreino(
+            treinoBase,
+            alunoState.programaAtivo,
+            letra,
+            alunoState.programaFase,
+          )
+        : treinoBase;
     if (focoInfoEl) {
       focoInfoEl.textContent = treinoPre
         ? "🎯 " + treinoPre.foco
@@ -712,6 +726,8 @@ async function loadPerfilSection() {
     renderIMCPerfil(data.imc, data.peso, data.altura);
     // Gráfico histórico IMC
     await renderIMCChart();
+    // Conquistas (apenas alunos independentes)
+    await renderConquistasPerfil();
   } catch (e) {
     console.error("[Aluno] Erro ao carregar perfil:", e);
   }
@@ -820,6 +836,11 @@ async function mostrarCelebracao(letra, proxLetra, feitos, total) {
     streakEl.classList.add("hidden");
   }
   modal.classList.add("open");
+
+  // Para alunos independentes: verifica progressão de fase e conquistas
+  if (!alunoState.professorId && alunoState.programaAtivo) {
+    setTimeout(() => verificarProgressaoAposTreino(), 1600);
+  }
 }
 
 function fecharCelebracao() {
@@ -1139,4 +1160,256 @@ function atualizarProgressoTreino(feitos, total) {
  */
 function initExercicioCheckboxes() {
   atualizarProgressoTreino();
+}
+
+/* ================================================================
+   SISTEMA DE PROGRESSÃO DE FASES E CONQUISTAS
+   Apenas para alunos que treinam de forma independente.
+   ================================================================ */
+
+/* -- Barra de Progresso no Início -------------------------------- */
+async function loadProgressaoInicio() {
+  const secEl = document.getElementById("progressao-fase-section");
+  if (!secEl || alunoState.professorId) return;
+  if (!alunoState.programaAtivo || typeof getFaseAtual === "undefined") return;
+
+  try {
+    const hiSnap = await db
+      .ref("historicoTreinos/" + alunoState.uid)
+      .once("value");
+    const historico = hiSnap.val() || {};
+    const total = Object.values(historico).filter((d) => d.completado).length;
+    alunoState.treinosCompletos = total;
+    alunoState.programaFase = getFaseAtual(total);
+
+    const progresso = getProgressoFase(total);
+    const faseInfo = FASES_INFO[progresso.fase];
+
+    secEl.classList.remove("hidden");
+
+    const badgeEl = document.getElementById("fase-badge");
+    if (badgeEl) {
+      badgeEl.textContent = "Fase " + progresso.fase + " — " + faseInfo.nome;
+      badgeEl.style.cssText +=
+        ";background:" +
+        faseInfo.cor +
+        "22;color:" +
+        faseInfo.cor +
+        ";border-color:" +
+        faseInfo.cor +
+        "55;";
+    }
+
+    const card = document.getElementById("progressao-fase-card");
+    if (!card) return;
+
+    if (progresso.proxima) {
+      const pct = progresso.pct;
+      const proxInfo = FASES_INFO[progresso.proxima];
+      card.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <span style="font-size:1.9rem;line-height:1;">${faseInfo.icone}</span>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:700;font-size:0.93rem;">${sanitize(faseInfo.desc)}</div>
+            <div style="font-size:0.78rem;color:var(--text-muted);">${total} treino${total !== 1 ? "s" : ""} completo${total !== 1 ? "s" : ""}</div>
+          </div>
+          <div style="text-align:right;white-space:nowrap;">
+            <div style="font-size:0.72rem;color:var(--text-muted);">Próxima fase</div>
+            <div style="font-weight:700;font-size:0.9rem;color:${proxInfo.cor};">${progresso.faltam} treino${progresso.faltam !== 1 ? "s" : ""}</div>
+          </div>
+        </div>
+        <div class="progresso-fase-track">
+          <div class="progresso-fase-fill" style="width:${pct}%;background:${faseInfo.cor};"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:0.73rem;color:var(--text-muted);">
+          <span>${faseInfo.icone} Fase ${progresso.fase}</span>
+          <span>${proxInfo.icone} Fase ${progresso.proxima} em ${FASE_THRESHOLDS[progresso.proxima - 1]} treinos</span>
+        </div>`;
+    } else {
+      card.innerHTML = `
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:2.2rem;line-height:1;">⚡</span>
+          <div>
+            <div style="font-weight:700;font-size:0.95rem;">Nível Máximo Alcançado!</div>
+            <div style="font-size:0.82rem;color:var(--text-muted);">${total} treinos — você é elite! 👑</div>
+          </div>
+        </div>`;
+    }
+  } catch (e) {
+    console.error("[Aluno] Erro ao carregar progressão:", e);
+  }
+}
+
+/* -- Conquistas no Perfil ---------------------------------------- */
+async function renderConquistasPerfil() {
+  const card = document.getElementById("conquistas-card");
+  if (!card || alunoState.professorId) return;
+  if (!alunoState.programaAtivo || typeof CONQUISTAS_DEFS === "undefined")
+    return;
+
+  card.style.display = "";
+  try {
+    const [hiSnap, conquSnap] = await Promise.all([
+      db.ref("historicoTreinos/" + alunoState.uid).once("value"),
+      db.ref("conquistas/" + alunoState.uid).once("value"),
+    ]);
+    const historico = hiSnap.val() || {};
+    const total = Object.values(historico).filter((d) => d.completado).length;
+    const streak = await calcularEExibirStreak();
+    const fase = getFaseAtual(total);
+    const ganhas = getConquistasGanhas(total, streak, fase);
+
+    const totalEl = document.getElementById("conquistas-total");
+    if (totalEl)
+      totalEl.textContent = ganhas.length + "/" + CONQUISTAS_DEFS.length;
+
+    const grid = document.getElementById("conquistas-grid");
+    if (!grid) return;
+    grid.innerHTML = CONQUISTAS_DEFS.map((c) => {
+      const earned = ganhas.includes(c.id);
+      return `
+        <div class="conquista-item ${earned ? "earned" : "locked"}" title="${sanitize(c.desc)}">
+          <span class="conquista-emoji">${earned ? c.emoji : "🔒"}</span>
+          <span class="conquista-nome">${sanitize(c.nome)}</span>
+        </div>`;
+    }).join("");
+  } catch (e) {
+    console.error("[Aluno] Erro ao carregar conquistas:", e);
+  }
+}
+
+/* -- Verificar Progressão após Finalizar Treino ------------------ */
+async function verificarProgressaoAposTreino() {
+  if (!alunoState.uid || !alunoState.programaAtivo || alunoState.professorId)
+    return;
+  if (typeof getFaseAtual === "undefined") return;
+
+  try {
+    const [hiSnap, conquSnap] = await Promise.all([
+      db.ref("historicoTreinos/" + alunoState.uid).once("value"),
+      db.ref("conquistas/" + alunoState.uid).once("value"),
+    ]);
+    const historico = hiSnap.val() || {};
+    const total = Object.values(historico).filter((d) => d.completado).length;
+    const streak = await calcularEExibirStreak();
+    const novaFase = getFaseAtual(total);
+    const conquistasSalvas = Object.keys(conquSnap.val() || {});
+    const novas = getNovasConquistas(total, streak, novaFase, conquistasSalvas);
+    const faseMudou = novaFase > (alunoState.programaFase || 1);
+
+    // Atualiza state
+    alunoState.treinosCompletos = total;
+    alunoState.programaFase = novaFase;
+
+    // Avança treinoAtual para a próxima letra do programa (fix para programas pré-definidos)
+    if (
+      alunoState.programaAtivo !== "ia-custom" &&
+      typeof proximaLetraPrograma !== "undefined"
+    ) {
+      const hiHojeSnap = await db
+        .ref("historicoTreinos/" + alunoState.uid + "/" + getDateKey())
+        .once("value");
+      const letraHoje =
+        (hiHojeSnap.val() || {}).letra || alunoState.treinoAtual;
+      const proxLetra = proximaLetraPrograma(
+        alunoState.programaAtivo,
+        letraHoje,
+      );
+      if (proxLetra !== letraHoje) {
+        await db
+          .ref("alunos/" + alunoState.uid + "/treinoAtual")
+          .set(proxLetra);
+        alunoState.treinoAtual = proxLetra;
+      }
+    }
+
+    // Persiste fase e treinos no Firebase
+    const updates = {
+      ["users/" + alunoState.uid + "/programaFase"]: novaFase,
+      ["alunos/" + alunoState.uid + "/programaFase"]: novaFase,
+      ["users/" + alunoState.uid + "/treinosCompletos"]: total,
+      ["alunos/" + alunoState.uid + "/treinosCompletos"]: total,
+    };
+    novas.forEach((c) => {
+      updates["conquistas/" + alunoState.uid + "/" + c.id] = {
+        nome: c.nome,
+        data: Date.now(),
+      };
+    });
+    await db.ref().update(updates);
+
+    // Celebração de fase desbloqueada (prioridade máxima)
+    if (faseMudou) {
+      fecharCelebracao();
+      setTimeout(() => mostrarFaseDesbloqueada(novaFase), 400);
+      return;
+    }
+
+    // Toast para novas conquistas (exceto as de fase, que têm modal próprio)
+    const conquistasNaoFase = novas.filter(
+      (c) => c.id !== "fase-2" && c.id !== "fase-3",
+    );
+    conquistasNaoFase.forEach((c, i) => {
+      setTimeout(
+        () =>
+          showToast(
+            c.emoji + " Conquista desbloqueada: " + c.nome + "!",
+            "success",
+            4000,
+          ),
+        i * 1200,
+      );
+    });
+  } catch (e) {
+    console.error("[Aluno] Erro ao verificar progressão:", e);
+  }
+}
+
+/* -- Modal Fase Desbloqueada ------------------------------------- */
+function mostrarFaseDesbloqueada(fase) {
+  const modal = document.getElementById("modal-fase-desbloqueada");
+  if (!modal || typeof FASES_INFO === "undefined") return;
+  const info = FASES_INFO[fase];
+  if (!info) return;
+
+  const iconeEl = document.getElementById("fase-unlock-icone");
+  const badgeEl = document.getElementById("fase-unlock-badge");
+  const tituloEl = document.getElementById("fase-unlock-titulo");
+  const descEl = document.getElementById("fase-unlock-desc");
+  const infoEl = document.getElementById("fase-unlock-info");
+
+  if (iconeEl) iconeEl.textContent = info.icone;
+  if (badgeEl) {
+    badgeEl.textContent = "Fase " + fase + " — " + info.nome;
+    badgeEl.style.cssText +=
+      ";background:" +
+      info.cor +
+      "22;color:" +
+      info.cor +
+      ";border-color:" +
+      info.cor +
+      "55;";
+  }
+  if (tituloEl) tituloEl.textContent = "Fase " + fase + " Desbloqueada! 🎉";
+  if (descEl) descEl.textContent = info.desc + " — seu treino evoluiu!";
+
+  if (infoEl) {
+    const mod = typeof FASE_MODS !== "undefined" ? FASE_MODS[fase] : null;
+    if (mod) {
+      infoEl.innerHTML = `
+        <div class="fase-unlock-changes">
+          <div class="fase-change-item"><span class="fase-change-icon">➕</span><span>${mod.seriesBonus} série extra por exercício</span></div>
+          <div class="fase-change-item"><span class="fase-change-icon">⏱️</span><span>${mod.restReducao}s a menos de descanso entre séries</span></div>
+          <div class="fase-change-item"><span class="fase-change-icon">💪</span><span>Exercício bônus desbloqueado por dia de treino</span></div>
+        </div>`;
+    }
+  }
+  modal.classList.add("open");
+}
+
+function fecharFaseDesbloqueada() {
+  const modal = document.getElementById("modal-fase-desbloqueada");
+  if (modal) modal.classList.remove("open");
+  // Recarrega a seção de treino para mostrar os novos exercícios
+  alunoNavigate("treino");
 }
