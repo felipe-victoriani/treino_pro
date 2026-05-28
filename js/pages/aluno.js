@@ -1127,6 +1127,14 @@ async function toggleSeriePre(btn, exId, serieKey, numSeries, descansoSeg) {
     }
   } catch (_) {}
 
+  // Salva letra no historico raiz para finalizarTreino calcular o percentual corretamente
+  try {
+    await db.ref(`historicoTreinos/${alunoState.uid}/${today}`).update({
+      letra: alunoState.treinoAtual || "A",
+      completado: false,
+    });
+  } catch (_) {}
+
   atualizarProgressoTreino();
 }
 
@@ -1301,8 +1309,25 @@ async function verificarProgressaoAposTreino() {
     alunoState.treinosCompletos = total;
     alunoState.programaFase = novaFase;
 
-    // Avança treinoAtual para a próxima letra do programa (fix para programas pré-definidos)
-    if (
+    // Avança treinoAtual para a próxima letra do programa
+    if (alunoState.programaAtivo === "ia-custom" && alunoState.treinoGerado) {
+      // IA: cicla circularmente pelas letras disponíveis
+      const letrasIA = Object.keys(
+        alunoState.treinoGerado.treinos || {},
+      ).sort();
+      if (letrasIA.length > 1) {
+        const letraHojeSnap = await db
+          .ref("historicoTreinos/" + alunoState.uid + "/" + getDateKey())
+          .once("value");
+        const letraHoje =
+          (letraHojeSnap.val() || {}).letra || alunoState.treinoAtual;
+        const idxIA = letrasIA.indexOf(letraHoje);
+        const proxIA =
+          idxIA !== -1 ? letrasIA[(idxIA + 1) % letrasIA.length] : letrasIA[0];
+        alunoState.treinoAtual = proxIA;
+        await db.ref("alunos/" + alunoState.uid + "/treinoAtual").set(proxIA);
+      }
+    } else if (
       alunoState.programaAtivo !== "ia-custom" &&
       typeof proximaLetraPrograma !== "undefined"
     ) {

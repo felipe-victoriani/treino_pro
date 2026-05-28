@@ -867,9 +867,10 @@ async function finalizarTreino(alunoId) {
   const treinoSnap = await db
     .ref(`treinos/${alunoId}/${letra}/exercicios`)
     .once("value");
+  // Fallback para programas pré-definidos e treinos de IA (sem registro em `treinos/`)
   const totalExercicios = treinoSnap.exists()
     ? Object.keys(treinoSnap.val()).length
-    : 0;
+    : document.querySelectorAll('[id^="excard-"]').length;
 
   const pct =
     totalExercicios > 0
@@ -892,11 +893,29 @@ async function finalizarTreino(alunoId) {
       timestamp: Date.now(),
     });
 
-    // Avança treinoAtual para próxima letra com exercícios
-    const proxLetra = await proximaLetraComExercicios(alunoId, letra);
-    if (proxLetra) {
-      await db.ref(`alunos/${alunoId}/treinoAtual`).set(proxLetra);
+    // Avança treinoAtual para próxima letra do ciclo
+    let proxLetra = letra;
+    if (
+      typeof alunoState !== "undefined" &&
+      alunoState.uid === alunoId &&
+      alunoState.programaAtivo === "ia-custom" &&
+      alunoState.treinoGerado
+    ) {
+      // IA: cicla circularmente pelas letras do plano (A→B→A→B…)
+      const letrasIA = Object.keys(
+        alunoState.treinoGerado.treinos || {},
+      ).sort();
+      const idxIA = letrasIA.indexOf(letra);
+      proxLetra =
+        idxIA !== -1
+          ? letrasIA[(idxIA + 1) % letrasIA.length]
+          : letrasIA[0] || letra;
+    } else {
+      // Professor ou programa pré-definido: usa path do Firebase
+      proxLetra = await proximaLetraComExercicios(alunoId, letra);
     }
+    await db.ref(`alunos/${alunoId}/treinoAtual`).set(proxLetra);
+    if (typeof alunoState !== "undefined") alunoState.treinoAtual = proxLetra;
 
     // Exibe modal de celebração se disponível, senão toast
     if (typeof mostrarCelebracao === "function") {
