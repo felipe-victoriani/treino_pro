@@ -708,7 +708,11 @@ async function toggleSerie(
   const snap = await histRef.once("value");
   const historico = snap.val() || {};
 
-  const seriesCompletas = { ...(historico.seriesCompletas || {}) };
+  // Suporta estrutura nova (letras/{letra}) e legada (raiz)
+  const historicoLetra = (historico.letras && historico.letras[letra]) || {};
+  const seriesCompletas = {
+    ...(historicoLetra.seriesCompletas || historico.seriesCompletas || {}),
+  };
   const exSeries = { ...(seriesCompletas[exId] || {}) };
   const key = `s${serieIdx}`;
   const wasDone = !!exSeries[key];
@@ -722,26 +726,25 @@ async function toggleSerie(
   const numDone = Object.keys(exSeries).length;
   const allDone = numDone >= totalSeries;
 
-  const completados = { ...(historico.exerciciosCompletos || {}) };
-  if (allDone) {
-    completados[exId] = true;
-  } else {
-    delete completados[exId];
-  }
+  // Mantém letra e completado:false na raiz (para finalizarTreino e histórico)
+  await histRef.update({ letra, completado: false });
 
-  // Atualiza Firebase
-  await histRef.update({
-    letra,
-    completado: false,
-    exerciciosCompletos: completados,
-  });
+  // Grava séries no subpath isolado por letra (sem poluir dados de outras letras)
   const serieRef = db.ref(
-    `historicoTreinos/${alunoId}/${today}/seriesCompletas/${exId}`,
+    `historicoTreinos/${alunoId}/${today}/letras/${letra}/seriesCompletas/${exId}`,
   );
   if (Object.keys(exSeries).length > 0) {
     await serieRef.set(exSeries);
   } else {
     await serieRef.remove();
+  }
+
+  // Grava exerciciosCompletos no subpath por letra
+  const exCompPath = `historicoTreinos/${alunoId}/${today}/letras/${letra}/exerciciosCompletos/${exId}`;
+  if (allDone) {
+    await db.ref(exCompPath).set(true);
+  } else {
+    await db.ref(exCompPath).remove();
   }
 
   // Atualiza UI: pílula
@@ -859,7 +862,11 @@ async function finalizarTreino(alunoId) {
   const hiSnap = await hiRef.once("value");
   const historico = hiSnap.val() || {};
 
-  const completados = historico.exerciciosCompletos || {};
+  // Suporta estrutura nova (letras/{letra}) e legada (raiz)
+  const historicoLetra =
+    (historico.letras && historico.letras[historico.letra || "A"]) || {};
+  const completados =
+    historicoLetra.exerciciosCompletos || historico.exerciciosCompletos || {};
   const exerciciosConcluidos = Object.keys(completados).length;
 
   // Conta total de exercícios no treino
@@ -892,6 +899,10 @@ async function finalizarTreino(alunoId) {
       totalExercicios,
       timestamp: Date.now(),
     });
+    // Marca esta letra como concluída hoje (permite ciclos: A→B→A)
+    await db
+      .ref(`historicoTreinos/${alunoId}/${today}/letrasCompletas/${letra}`)
+      .set(true);
 
     // Avança treinoAtual para próxima letra do ciclo
     let proxLetra = letra;

@@ -522,8 +522,14 @@ async function mostrarTreino(letra) {
     .ref("historicoTreinos/" + alunoState.uid + "/" + today)
     .once("value");
   const historico = hiSnap.val() || {};
-  const isHoje = historico.letra === letra;
-  const completado = historico.completado;
+  // Extrai dados específicos da letra (nova estrutura) com fallback legado
+  const historicoLetra =
+    (historico.letras && historico.letras[letra]) ||
+    (historico.letra === letra ? historico : {});
+  // Letra concluída = novo campo letrasCompletas OU estrutura legada
+  const letraCompletadaHoje =
+    !!(historico.letrasCompletas && historico.letrasCompletas[letra]) ||
+    (historico.letra === letra && !!historico.completado);
   // Subtitulo / foco
   const focoInfoEl = document.getElementById("treino-foco-info");
 
@@ -547,7 +553,7 @@ async function mostrarTreino(letra) {
         }));
         exListEl.innerHTML = renderExerciciosPreDefinidos(
           exercicios,
-          historico,
+          historicoLetra,
         );
         initExercicioCheckboxes();
       } else {
@@ -578,7 +584,7 @@ async function mostrarTreino(letra) {
         // Renderiza exercícios do programa pré-definido
         exListEl.innerHTML = renderExerciciosPreDefinidos(
           treinoPre.exercicios,
-          historico,
+          historicoLetra,
         );
         initExercicioCheckboxes();
       } else {
@@ -608,12 +614,10 @@ async function mostrarTreino(letra) {
       const treinoData = tSnap.val();
       const exs = treinoData && treinoData.exercicios;
       if (exs && Object.keys(exs).length > 0) {
-        await loadTreinoAluno(
-          alunoState.uid,
-          letra,
-          "aluno-exercise-list",
-          historico,
-        );
+        await loadTreinoAluno(alunoState.uid, letra, "aluno-exercise-list", {
+          ...historicoLetra,
+          cargaUsada: historico.cargaUsada || {},
+        });
       } else {
         const snapAluno = await db
           .ref("alunos/" + alunoState.uid)
@@ -633,7 +637,7 @@ async function mostrarTreino(letra) {
   // Botao finalizar
   const btnFinalizar = document.getElementById("finish-workout-btn");
   if (btnFinalizar) {
-    if (completado && isHoje) {
+    if (letraCompletadaHoje) {
       btnFinalizar.innerHTML = "✅ Treino Concluido Hoje!";
       btnFinalizar.disabled = true;
     } else {
@@ -846,6 +850,18 @@ async function mostrarCelebracao(letra, proxLetra, feitos, total) {
 function fecharCelebracao() {
   const modal = document.getElementById("modal-celebracao");
   if (modal) modal.classList.remove("open");
+  // Auto-navega para o próximo treino (ciclo) ao fechar o modal de celebração
+  if (typeof alunoState !== "undefined" && alunoState.treinoAtual) {
+    const proxLetra = alunoState.treinoAtual;
+    document
+      .querySelectorAll(".workout-tab-btn")
+      .forEach((b) => b.classList.remove("active"));
+    const btn = document.querySelector(
+      `.workout-tab-btn[data-letra="${proxLetra}"]`,
+    );
+    if (btn) btn.classList.add("active");
+    if (typeof mostrarTreino === "function") mostrarTreino(proxLetra);
+  }
 }
 
 /* -- Badge de Mensagens nao lidas ---------------------------- */
@@ -1096,7 +1112,8 @@ async function toggleSeriePre(btn, exId, serieKey, numSeries, descansoSeg) {
   const done = btn.classList.toggle("serie-done");
 
   const today = getDateKey();
-  const path = `historicoTreinos/${alunoState.uid}/${today}/seriesCompletas/${exId}/${serieKey}`;
+  const letraAtiva = alunoState.treinoAtual || "A";
+  const path = `historicoTreinos/${alunoState.uid}/${today}/letras/${letraAtiva}/seriesCompletas/${exId}/${serieKey}`;
   try {
     await db.ref(path).set(done ? true : null);
   } catch (e) {
@@ -1112,7 +1129,7 @@ async function toggleSeriePre(btn, exId, serieKey, numSeries, descansoSeg) {
 
   card.classList.toggle("completed", allDone);
 
-  const pathEx = `historicoTreinos/${alunoState.uid}/${today}/exerciciosCompletos/${exId}`;
+  const pathEx = `historicoTreinos/${alunoState.uid}/${today}/letras/${letraAtiva}/exerciciosCompletos/${exId}`;
   try {
     if (allDone) {
       await db.ref(pathEx).set(true);
