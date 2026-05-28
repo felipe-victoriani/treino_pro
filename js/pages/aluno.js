@@ -554,6 +554,7 @@ async function mostrarTreino(letra) {
         exListEl.innerHTML = renderExerciciosPreDefinidos(
           exercicios,
           historicoLetra,
+          letra,
         );
         initExercicioCheckboxes();
       } else {
@@ -585,6 +586,7 @@ async function mostrarTreino(letra) {
         exListEl.innerHTML = renderExerciciosPreDefinidos(
           treinoPre.exercicios,
           historicoLetra,
+          letra,
         );
         initExercicioCheckboxes();
       } else {
@@ -1040,7 +1042,11 @@ async function renderCargaHistoricoChart(exId, alunoId) {
    Usa o mesmo layout exercise-check-card do fluxo de professor
    para UX consistente em todos os tipos de plano.
    ─────────────────────────────────────────────────────────── */
-function renderExerciciosPreDefinidos(exercicios, historico = {}) {
+function renderExerciciosPreDefinidos(
+  exercicios,
+  historico = {},
+  letraRenderizada = null,
+) {
   const completados = historico.exerciciosCompletos || {};
   const seriesCompletas = historico.seriesCompletas || {};
 
@@ -1066,7 +1072,7 @@ function renderExerciciosPreDefinidos(exercicios, historico = {}) {
           ? `<span class="serie-reps">${sanitize(ex.reps)}</span>`
           : "";
         return `<button class="serie-pill${serieFeita ? " serie-done" : ""}" id="spill-${exId}-${i}"
-          onclick="event.stopPropagation(); toggleSeriePre(this, '${exId}', '${serieKey}', ${numSeries}, ${descansoSeg})"
+          onclick="event.stopPropagation(); toggleSeriePre(this, '${exId}', '${serieKey}', ${numSeries}, ${descansoSeg}, '${letraRenderizada || ""}')"
         ><span class="serie-num">S${i + 1}</span>${repsLabel}</button>`;
       }).join("");
 
@@ -1107,12 +1113,21 @@ function renderExerciciosPreDefinidos(exercicios, historico = {}) {
 /**
  * Marca/desmarca uma série de exercício pré-definido e persiste no Firebase
  */
-async function toggleSeriePre(btn, exId, serieKey, numSeries, descansoSeg) {
+async function toggleSeriePre(
+  btn,
+  exId,
+  serieKey,
+  numSeries,
+  descansoSeg,
+  letraRenderizada,
+) {
   if (navigator.vibrate) navigator.vibrate(25);
   const done = btn.classList.toggle("serie-done");
 
   const today = getDateKey();
-  const letraAtiva = alunoState.treinoAtual || "A";
+  // Usa a letra do treino renderizado na tela (passada pelo onclick),
+  // com fallback para treinoAtual caso chamado por código legado.
+  const letraAtiva = letraRenderizada || alunoState.treinoAtual || "A";
   const path = `historicoTreinos/${alunoState.uid}/${today}/letras/${letraAtiva}/seriesCompletas/${exId}/${serieKey}`;
   try {
     await db.ref(path).set(done ? true : null);
@@ -1147,7 +1162,7 @@ async function toggleSeriePre(btn, exId, serieKey, numSeries, descansoSeg) {
   // Salva letra no historico raiz para finalizarTreino calcular o percentual corretamente
   try {
     await db.ref(`historicoTreinos/${alunoState.uid}/${today}`).update({
-      letra: alunoState.treinoAtual || "A",
+      letra: letraAtiva,
       completado: false,
     });
   } catch (_) {}
