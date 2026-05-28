@@ -863,14 +863,16 @@ async function finalizarTreino(alunoId) {
   const historico = hiSnap.val() || {};
 
   // Suporta estrutura nova (letras/{letra}) e legada (raiz)
-  const historicoLetra =
-    (historico.letras && historico.letras[historico.letra || "A"]) || {};
+  const letra =
+    historico.letra ||
+    (typeof alunoState !== "undefined" ? alunoState.treinoAtual : null) ||
+    "A";
+  const historicoLetra = (historico.letras && historico.letras[letra]) || {};
   const completados =
     historicoLetra.exerciciosCompletos || historico.exerciciosCompletos || {};
   const exerciciosConcluidos = Object.keys(completados).length;
 
   // Conta total de exercícios no treino
-  const letra = historico.letra || "A";
   const treinoSnap = await db
     .ref(`treinos/${alunoId}/${letra}/exercicios`)
     .once("value");
@@ -912,7 +914,7 @@ async function finalizarTreino(alunoId) {
       alunoState.programaAtivo === "ia-custom" &&
       alunoState.treinoGerado
     ) {
-      // IA: cicla circularmente pelas letras do plano (A→B→A→B…)
+      // IA: cicla circularmente pelas letras do plano (A→B→C→A…)
       const letrasIA = Object.keys(
         alunoState.treinoGerado.treinos || {},
       ).sort();
@@ -921,8 +923,18 @@ async function finalizarTreino(alunoId) {
         idxIA !== -1
           ? letrasIA[(idxIA + 1) % letrasIA.length]
           : letrasIA[0] || letra;
+    } else if (
+      typeof alunoState !== "undefined" &&
+      alunoState.uid === alunoId &&
+      alunoState.programaAtivo &&
+      !alunoState.professorId &&
+      typeof proximaLetraPrograma === "function"
+    ) {
+      // Programa pré-definido: exercícios estão no serviço local, não no Firebase.
+      // Cicla pelas letras do programa (A→B→C→D→A…) para qualquer quantidade de letras.
+      proxLetra = proximaLetraPrograma(alunoState.programaAtivo, letra);
     } else {
-      // Professor ou programa pré-definido: usa path do Firebase
+      // Aluno com professor: busca próxima letra com exercícios no Firebase
       proxLetra = await proximaLetraComExercicios(alunoId, letra);
     }
     await db.ref(`alunos/${alunoId}/treinoAtual`).set(proxLetra);
