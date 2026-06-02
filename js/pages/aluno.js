@@ -842,10 +842,8 @@ async function mostrarCelebracao(letra, proxLetra, feitos, total) {
   }
   modal.classList.add("open");
 
-  // Para alunos independentes: verifica progressão de fase e conquistas
-  if (!alunoState.professorId && alunoState.programaAtivo) {
-    setTimeout(() => verificarProgressaoAposTreino(), 1600);
-  }
+  // Verifica conquistas (todos os alunos) e progressão de fase (só independentes)
+  setTimeout(() => verificarProgressaoAposTreino(), 1600);
 }
 
 function fecharCelebracao() {
@@ -1269,12 +1267,15 @@ async function loadProgressaoInicio() {
   }
 }
 
-/* -- Conquistas no Perfil ---------------------------------------- */
+/* -- Conquistas no Perfil ----------------------------------------
+   Conquistas são cumulativas: uma vez desbloqueadas, ficam para sempre.
+   Por isso unimos "ganhas agora" (baseado em total/streak/fase atuais)
+   com "ganhas no passado" (lidas de conquistas/{uid}/ no Firebase).
+   ---------------------------------------------------------------- */
 async function renderConquistasPerfil() {
   const card = document.getElementById("conquistas-card");
-  if (!card || alunoState.professorId) return;
-  if (!alunoState.programaAtivo || typeof CONQUISTAS_DEFS === "undefined")
-    return;
+  if (!card) return;
+  if (typeof CONQUISTAS_DEFS === "undefined") return;
 
   card.style.display = "";
   try {
@@ -1285,8 +1286,31 @@ async function renderConquistasPerfil() {
     const historico = hiSnap.val() || {};
     const total = Object.values(historico).filter((d) => d.completado).length;
     const streak = await calcularEExibirStreak();
-    const fase = getFaseAtual(total);
-    const ganhas = getConquistasGanhas(total, streak, fase);
+    const fase = typeof getFaseAtual === "function" ? getFaseAtual(total) : 1;
+    const ganhasAgora = getConquistasGanhas(total, streak, fase);
+    const ganhasNoPassado = Object.keys(conquSnap.val() || {});
+    // União: conquista uma vez desbloqueada não se perde (mesmo se streak quebrar)
+    const ganhas = Array.from(new Set([...ganhasAgora, ...ganhasNoPassado]));
+
+    // Persiste qualquer conquista nova detectada agora que ainda não foi gravada
+    const novasParaSalvar = ganhasAgora.filter(
+      (id) => !ganhasNoPassado.includes(id),
+    );
+    if (novasParaSalvar.length) {
+      const updates = {};
+      novasParaSalvar.forEach((id) => {
+        const def = CONQUISTAS_DEFS.find((c) => c.id === id);
+        if (def) {
+          updates["conquistas/" + alunoState.uid + "/" + id] = {
+            nome: def.nome,
+            data: Date.now(),
+          };
+        }
+      });
+      db.ref()
+        .update(updates)
+        .catch(() => {});
+    }
 
     const totalEl = document.getElementById("conquistas-total");
     if (totalEl)
@@ -1309,9 +1333,14 @@ async function renderConquistasPerfil() {
 
 /* -- Verificar Progressão após Finalizar Treino ------------------ */
 async function verificarProgressaoAposTreino() {
-  if (!alunoState.uid || !alunoState.programaAtivo || alunoState.professorId)
-    return;
-  if (typeof getFaseAtual === "undefined") return;
+  if (!alunoState.uid) return;
+  if (typeof CONQUISTAS_DEFS === "undefined") return;
+
+  // Conquistas valem para TODOS os alunos. Progressão de fase só p/ independentes.
+  const temProgressaoFase =
+    !!alunoState.programaAtivo &&
+    !alunoState.professorId &&
+    typeof getFaseAtual === "function";
 
   try {
     const [hiSnap, conquSnap] = await Promise.all([
@@ -1321,17 +1350,22 @@ async function verificarProgressaoAposTreino() {
     const historico = hiSnap.val() || {};
     const total = Object.values(historico).filter((d) => d.completado).length;
     const streak = await calcularEExibirStreak();
-    const novaFase = getFaseAtual(total);
+    const novaFase = temProgressaoFase ? getFaseAtual(total) : 1;
     const conquistasSalvas = Object.keys(conquSnap.val() || {});
     const novas = getNovasConquistas(total, streak, novaFase, conquistasSalvas);
-    const faseMudou = novaFase > (alunoState.programaFase || 1);
+    const faseMudou =
+      temProgressaoFase && novaFase > (alunoState.programaFase || 1);
 
     // Atualiza state
     alunoState.treinosCompletos = total;
-    alunoState.programaFase = novaFase;
+    if (temProgressaoFase) alunoState.programaFase = novaFase;
 
-    // Avança treinoAtual para a próxima letra do programa
-    if (alunoState.programaAtivo === "ia-custom" && alunoState.treinoGerado) {
+    // Avança treinoAtual para a próxima letra do programa (só independentes)
+    if (
+      temProgressaoFase &&
+      alunoState.programaAtivo === "ia-custom" &&
+      alunoState.treinoGerado
+    ) {
       // IA: cicla circularmente pelas letras disponíveis
       const letrasIA = Object.keys(
         alunoState.treinoGerado.treinos || {},
@@ -1349,6 +1383,7 @@ async function verificarProgressaoAposTreino() {
         await db.ref("alunos/" + alunoState.uid + "/treinoAtual").set(proxIA);
       }
     } else if (
+      temProgressaoFase &&
       alunoState.programaAtivo !== "ia-custom" &&
       typeof proximaLetraPrograma !== "undefined"
     ) {
@@ -1369,13 +1404,15 @@ async function verificarProgressaoAposTreino() {
       }
     }
 
-    // Persiste fase e treinos no Firebase
+    // Persiste fase, treinos e novas conquistas no Firebase
     const updates = {
-      ["users/" + alunoState.uid + "/programaFase"]: novaFase,
-      ["alunos/" + alunoState.uid + "/programaFase"]: novaFase,
       ["users/" + alunoState.uid + "/treinosCompletos"]: total,
       ["alunos/" + alunoState.uid + "/treinosCompletos"]: total,
     };
+    if (temProgressaoFase) {
+      updates["users/" + alunoState.uid + "/programaFase"] = novaFase;
+      updates["alunos/" + alunoState.uid + "/programaFase"] = novaFase;
+    }
     novas.forEach((c) => {
       updates["conquistas/" + alunoState.uid + "/" + c.id] = {
         nome: c.nome,
