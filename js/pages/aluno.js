@@ -1272,12 +1272,37 @@ async function loadProgressaoInicio() {
    Por isso unimos "ganhas agora" (baseado em total/streak/fase atuais)
    com "ganhas no passado" (lidas de conquistas/{uid}/ no Firebase).
    ---------------------------------------------------------------- */
+function _renderGridConquistas(ganhas) {
+  const grid = document.getElementById("conquistas-grid");
+  if (!grid) return;
+  grid.innerHTML = CONQUISTAS_DEFS.map((c) => {
+    const earned = ganhas.includes(c.id);
+    return `
+      <div class="conquista-item ${earned ? "earned" : "locked"}" title="${sanitize(c.desc)}">
+        <span class="conquista-emoji">${earned ? c.emoji : "🔒"}</span>
+        <span class="conquista-nome">${sanitize(c.nome)}</span>
+      </div>`;
+  }).join("");
+}
+
 async function renderConquistasPerfil() {
   const card = document.getElementById("conquistas-card");
   if (!card) return;
-  if (typeof CONQUISTAS_DEFS === "undefined") return;
+  if (typeof CONQUISTAS_DEFS === "undefined") {
+    card.style.display = "none";
+    return;
+  }
 
   card.style.display = "";
+
+  // Render imediato com todas locked — evita ficar preso no spinner
+  // se o Firebase demorar/falhar ou se o usuário não tiver UID ainda.
+  _renderGridConquistas([]);
+  const totalEl = document.getElementById("conquistas-total");
+  if (totalEl) totalEl.textContent = "0/" + CONQUISTAS_DEFS.length;
+
+  if (!alunoState.uid) return;
+
   try {
     const [hiSnap, conquSnap] = await Promise.all([
       db.ref("historicoTreinos/" + alunoState.uid).once("value"),
@@ -1312,22 +1337,12 @@ async function renderConquistasPerfil() {
         .catch(() => {});
     }
 
-    const totalEl = document.getElementById("conquistas-total");
     if (totalEl)
       totalEl.textContent = ganhas.length + "/" + CONQUISTAS_DEFS.length;
-
-    const grid = document.getElementById("conquistas-grid");
-    if (!grid) return;
-    grid.innerHTML = CONQUISTAS_DEFS.map((c) => {
-      const earned = ganhas.includes(c.id);
-      return `
-        <div class="conquista-item ${earned ? "earned" : "locked"}" title="${sanitize(c.desc)}">
-          <span class="conquista-emoji">${earned ? c.emoji : "🔒"}</span>
-          <span class="conquista-nome">${sanitize(c.nome)}</span>
-        </div>`;
-    }).join("");
+    _renderGridConquistas(ganhas);
   } catch (e) {
     console.error("[Aluno] Erro ao carregar conquistas:", e);
+    // Mantém o grid com todas locked (já renderizado acima) — sem spinner preso.
   }
 }
 
