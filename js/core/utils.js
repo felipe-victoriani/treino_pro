@@ -105,15 +105,43 @@ function formatDateTime(timestamp) {
 }
 
 /**
- * Retorna a data atual no formato YYYY-MM-DD (para chave no Firebase)
+ * Faz parse de um número decimal aceitando vírgula OU ponto como separador
+ * (padrão pt-BR). Remove espaços e qualquer caractere que não seja dígito,
+ * vírgula, ponto ou sinal. Retorna NaN se inválido.
+ * @param {string|number} raw
+ * @returns {number}
+ */
+function parseDecimal(raw) {
+  if (raw === null || raw === undefined) return NaN;
+  if (typeof raw === "number") return raw;
+  const cleaned = String(raw)
+    .trim()
+    .replace(/\s+/g, "")
+    .replace(/[^\d.,-]/g, "")
+    .replace(",", ".");
+  if (!cleaned) return NaN;
+  return parseFloat(cleaned);
+}
+
+/**
+ * Converte uma instância de Date para YYYY-MM-DD em fuso LOCAL
+ * (não usar toISOString — esse converte p/ UTC e quebra perto da meia-noite)
+ * @param {Date} d
  * @returns {string}
  */
-function getDateKey() {
-  const d = new Date();
+function dateKeyOf(d) {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
   return `${y}-${m}-${day}`;
+}
+
+/**
+ * Retorna a data atual no formato YYYY-MM-DD (para chave no Firebase)
+ * @returns {string}
+ */
+function getDateKey() {
+  return dateKeyOf(new Date());
 }
 
 /**

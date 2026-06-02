@@ -807,22 +807,7 @@ async function toggleExercicio(exId, alunoId, letra) {
   atualizarProgressoTreino(concluidos, total);
 }
 
-/**
- * Atualiza a barra de progresso do treino
- */
-function atualizarProgressoTreino(concluidos, total) {
-  const pct = total > 0 ? Math.round((concluidos / total) * 100) : 0;
-  const barEl = document.getElementById("progress-fill");
-  const textEl = document.getElementById("progress-text");
-  const pctEl = document.getElementById("progress-pct");
-
-  if (barEl) {
-    barEl.style.width = pct + "%";
-    barEl.classList.toggle("done", pct === 100);
-  }
-  if (textEl) textEl.textContent = `${concluidos} / ${total}`;
-  if (pctEl) pctEl.textContent = pct + "%";
-}
+/* atualizarProgressoTreino é definida em js/pages/aluno.js — única fonte */
 
 /**
  * Finaliza o treino do dia e salva no Firebase

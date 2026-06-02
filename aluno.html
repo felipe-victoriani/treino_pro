@@ -679,28 +679,36 @@
           </p>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Peso (kg)</label>
+              <label class="form-label" for="imc-peso">Peso (kg)</label>
               <input
                 class="form-control"
-                type="number"
+                type="text"
+                inputmode="decimal"
+                autocomplete="off"
                 id="imc-peso"
-                placeholder="70.5"
-                min="20"
-                max="300"
-                step="0.1"
+                placeholder="Ex: 70,5"
+                aria-describedby="imc-peso-help"
               />
+              <small id="imc-peso-help" class="form-hint">
+                Use vírgula ou ponto. Ex: <strong>70,5</strong> ou
+                <strong>70.5</strong> (entre 20 e 300 kg).
+              </small>
             </div>
             <div class="form-group">
-              <label class="form-label">Altura (m)</label>
+              <label class="form-label" for="imc-altura">Altura</label>
               <input
                 class="form-control"
-                type="number"
+                type="text"
+                inputmode="decimal"
+                autocomplete="off"
                 id="imc-altura"
-                placeholder="1.75"
-                min="1.0"
-                max="2.5"
-                step="0.01"
+                placeholder="Ex: 1,75 ou 175"
+                aria-describedby="imc-altura-help"
               />
+              <small id="imc-altura-help" class="form-hint">
+                Em metros (<strong>1,75</strong>) ou centímetros
+                (<strong>175</strong>) — convertemos pra você.
+              </small>
             </div>
           </div>
           <button class="btn-primary btn-block" id="calcular-imc-btn">

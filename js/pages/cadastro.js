@@ -68,8 +68,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     const profId = modo === "professor" ? profSelect.value : "";
     const nivel = document.getElementById("nivel")?.value || "INICIANTE";
     const sexo = document.getElementById("sexo")?.value || "";
-    const peso = pesoInput.value ? parseFloat(pesoInput.value) : null;
-    const altura = alturaInput.value ? parseFloat(alturaInput.value) : null;
+    const peso = pesoInput.value ? parseDecimal(pesoInput.value) : null;
+    let altura = alturaInput.value ? parseDecimal(alturaInput.value) : null;
+    // Aceita altura em centímetros (ex: 175) e converte para metros
+    if (altura && altura >= 100 && altura <= 250) altura = altura / 100;
+    if (peso !== null && (isNaN(peso) || peso < 20 || peso > 300)) {
+      showFieldError(
+        "peso-error",
+        "Peso inválido. Use vírgula ou ponto (ex: 70,5).",
+      );
+      return;
+    }
+    if (altura !== null && (isNaN(altura) || altura < 1.0 || altura > 2.5)) {
+      showFieldError(
+        "altura-error",
+        "Altura inválida. Ex: 1,75 (m) ou 175 (cm).",
+      );
+      return;
+    }
 
     // Validações
     let hasError = false;

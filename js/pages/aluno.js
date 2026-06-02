@@ -315,7 +315,7 @@ async function calcularEExibirStreak() {
     let cursor = new Date();
 
     for (let i = 0; i < 365; i++) {
-      const key = cursor.toISOString().slice(0, 10);
+      const key = dateKeyOf(cursor);
       if (historico[key] && historico[key].completado) {
         streak++;
         cursor.setDate(cursor.getDate() - 1);
@@ -358,7 +358,7 @@ async function renderSemanaChart() {
     for (let i = 6; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
-      const key = d.toISOString().slice(0, 10);
+      const key = dateKeyOf(d);
       const diaSemana = diasSemana[d.getDay()];
       const isHoje = i === 0;
       labels.push(isHoje ? "Hoje" : diaSemana);

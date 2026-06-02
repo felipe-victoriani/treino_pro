@@ -187,21 +187,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Calcular IMC
   document.getElementById("calcular-imc-btn")?.addEventListener("click", () => {
-    // Normaliza vírgula para ponto e remove espaços
-    const pesoRaw = document
-      .getElementById("imc-peso")
-      .value.trim()
-      .replace(",", ".");
-    const alturaRaw = document
-      .getElementById("imc-altura")
-      .value.trim()
-      .replace(",", ".");
+    // Aceita vírgula OU ponto (pt-BR). parseDecimal normaliza ambos.
+    const pesoVal = parseDecimal(document.getElementById("imc-peso").value);
+    let alturaVal = parseDecimal(document.getElementById("imc-altura").value);
 
-    const pesoVal = parseFloat(pesoRaw);
-    let alturaVal = parseFloat(alturaRaw);
+    if (!pesoVal || isNaN(pesoVal) || pesoVal < 20 || pesoVal > 300) {
+      showToast(
+        "Peso inválido. Use vírgula ou ponto (ex: 70,5) entre 20 e 300 kg.",
+        "error",
+      );
+      document.getElementById("imc-peso")?.focus();
+      return;
+    }
 
-    if (!pesoVal || pesoVal < 20 || pesoVal > 300) {
-      showToast("Informe um peso válido (20-300 kg)", "error");
+    if (isNaN(alturaVal) || alturaVal <= 0) {
+      showToast(
+        "Altura inválida. Use 1,75 (metros) ou 175 (centímetros).",
+        "error",
+      );
+      document.getElementById("imc-altura")?.focus();
       return;
     }
 
@@ -211,8 +215,12 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("imc-altura").value = alturaVal.toFixed(2);
     }
 
-    if (!alturaVal || alturaVal < 1.0 || alturaVal > 2.5) {
-      showToast("Informe uma altura válida (ex: 1.75 ou 175)", "error");
+    if (alturaVal < 1.0 || alturaVal > 2.5) {
+      showToast(
+        "Altura fora do intervalo (1,00 m a 2,50 m). Verifique e tente de novo.",
+        "error",
+      );
+      document.getElementById("imc-altura")?.focus();
       return;
     }
 

@@ -39,6 +39,9 @@ global.iniciarTimerDescanso = jest.fn();
 global.mostrarCelebracao = jest.fn().mockResolvedValue(undefined);
 global.proximaLetraPrograma = jest.fn(() => "B");
 global.confirm = jest.fn(() => true);
+/* atualizarProgressoTreino vive em js/pages/aluno.js no browser;
+   nos testes (que só carregam treinos.js) mockamos como no-op. */
+global.atualizarProgressoTreino = jest.fn();
 
 global.alunoState = {
   uid: "aluno-123",
