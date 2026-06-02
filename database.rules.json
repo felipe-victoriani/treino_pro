@@ -17,6 +17,18 @@
         ".write": false
       }
     },
+    "users": {
+      "$uid": {
+        ".read": "$uid === auth.uid || root.child('usuarios').child(auth.uid).child('role').val() === 'professor' || root.child('usuarios').child(auth.uid).child('role').val() === 'admin'",
+        ".write": "$uid === auth.uid || root.child('usuarios').child(auth.uid).child('role').val() === 'admin'"
+      }
+    },
+    "alunos": {
+      "$uid": {
+        ".read": "$uid === auth.uid || root.child('usuarios').child(auth.uid).child('role').val() === 'professor' || root.child('usuarios').child(auth.uid).child('role').val() === 'admin'",
+        ".write": "$uid === auth.uid || root.child('usuarios').child(auth.uid).child('role').val() === 'professor' || root.child('usuarios').child(auth.uid).child('role').val() === 'admin'"
+      }
+    },
     "usuarios": {
       "$uid": {
         ".read": "$uid === auth.uid || root.child('usuarios').child(auth.uid).child('role').val() === 'professor' || root.child('usuarios').child(auth.uid).child('role').val() === 'admin'",
