@@ -7,43 +7,54 @@
     },
     "treinos": {
       "$uid": {
-        ".read": "$uid === auth.uid",
-        ".write": "$uid === auth.uid"
+        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
+        ".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'"
       }
     },
     "rateLimits": {
       "$uid": {
-        ".read": "$uid === auth.uid",
+        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
         ".write": false
       }
     },
     "users": {
+      ".read": "root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
       "$uid": {
-        ".read": "$uid === auth.uid || root.child('usuarios').child(auth.uid).child('role').val() === 'professor' || root.child('usuarios').child(auth.uid).child('role').val() === 'admin'",
-        ".write": "$uid === auth.uid || root.child('usuarios').child(auth.uid).child('role').val() === 'admin'"
+        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
+        ".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin'"
       }
     },
     "alunos": {
+      ".read": "root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
+      ".write": "root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
       "$uid": {
-        ".read": "$uid === auth.uid || root.child('usuarios').child(auth.uid).child('role').val() === 'professor' || root.child('usuarios').child(auth.uid).child('role').val() === 'admin'",
-        ".write": "$uid === auth.uid || root.child('usuarios').child(auth.uid).child('role').val() === 'professor' || root.child('usuarios').child(auth.uid).child('role').val() === 'admin'"
+        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
+        ".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'"
       }
     },
-    "usuarios": {
+    "professores": {
+      ".read": "root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
+      ".write": "root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
       "$uid": {
-        ".read": "$uid === auth.uid || root.child('usuarios').child(auth.uid).child('role').val() === 'professor' || root.child('usuarios').child(auth.uid).child('role').val() === 'admin'",
-        ".write": "$uid === auth.uid || root.child('usuarios').child(auth.uid).child('role').val() === 'admin'"
+        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
+        ".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin'"
       }
     },
     "mensagens": {
       "$uid": {
-        ".read": "$uid === auth.uid || root.child('usuarios').child(auth.uid).child('role').val() === 'professor' || root.child('usuarios').child(auth.uid).child('role').val() === 'admin'",
+        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
         ".write": "auth != null"
       }
     },
+    "usuarios": {
+      "$uid": {
+        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
+        ".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin'"
+      }
+    },
     "$other": {
-      ".read": "auth != null && (root.child('usuarios').child(auth.uid).child('role').val() === 'professor' || root.child('usuarios').child(auth.uid).child('role').val() === 'admin')",
-      ".write": "auth != null && (root.child('usuarios').child(auth.uid).child('role').val() === 'professor' || root.child('usuarios').child(auth.uid).child('role').val() === 'admin')"
+      ".read": "auth != null && (root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin')",
+      ".write": "auth != null && (root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin')"
     }
   }
 }
