@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Importar Exercícios — free-exercise-db</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Segoe UI", system-ui, sans-serif;
+        background: #0f172a;
+        color: #e2e8f0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+
+      .card {
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 16px;
+        padding: 40px;
+        max-width: 600px;
+        width: 100%;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #f8fafc;
+        margin-bottom: 6px;
+      }
+
+      .subtitle {
+        font-size: 0.875rem;
+        color: #94a3b8;
+        margin-bottom: 32px;
+      }
+
+      .source-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #0f172a;
+        border: 1px solid #475569;
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 0.75rem;
+        color: #7dd3fc;
+        margin-bottom: 32px;
+      }
+
+      /* ── Botão ── */
+      #btn-iniciar {
+        width: 100%;
+        padding: 14px;
+        background: #2563eb;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition:
+          background 0.2s,
+          transform 0.1s;
+      }
+      #btn-iniciar:hover:not(:disabled) {
+        background: #1d4ed8;
+      }
+      #btn-iniciar:active:not(:disabled) {
+        transform: scale(0.98);
+      }
+      #btn-iniciar:disabled {
+        background: #475569;
+        cursor: not-allowed;
+        opacity: 0.7;
+      }
+
+      /* ── Progresso ── */
+      #progress-section {
+        display: none;
+        margin-top: 28px;
+      }
+
+      .progress-track {
+        background: #0f172a;
+        border-radius: 999px;
+        height: 10px;
+        overflow: hidden;
+        margin-bottom: 10px;
+      }
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #2563eb, #38bdf8);
+        border-radius: 999px;
+        width: 0%;
+        transition: width 0.3s ease;
+      }
+
+      .progress-label {
+        font-size: 0.8rem;
+        color: #94a3b8;
+        text-align: right;
+        margin-bottom: 16px;
+      }
+
+      #status-text {
+        font-size: 0.875rem;
+        color: #cbd5e1;
+        min-height: 20px;
+        margin-bottom: 8px;
+      }
+
+      /* ── Log ── */
+      #log {
+        background: #0f172a;
+        border: 1px solid #1e293b;
+        border-radius: 8px;
+        padding: 12px;
+        height: 180px;
+        overflow-y: auto;
+        font-size: 0.75rem;
+        font-family: "Cascadia Code", "Fira Code", monospace;
+        color: #64748b;
+        margin-top: 16px;
+      }
+      #log .log-ok {
+        color: #4ade80;
+      }
+      #log .log-warn {
+        color: #facc15;
+      }
+      #log .log-err {
+        color: #f87171;
+      }
+      #log .log-info {
+        color: #7dd3fc;
+      }
+
+      /* ── Resultado final ── */
+      #resultado {
+        display: none;
+        margin-top: 20px;
+        padding: 16px;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-align: center;
+      }
+      #resultado.sucesso {
+        background: #14532d;
+        border: 1px solid #16a34a;
+        color: #4ade80;
+      }
+      #resultado.erro {
+        background: #450a0a;
+        border: 1px solid #dc2626;
+        color: #f87171;
+      }
+
+      /* ── Stats ── */
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 16px;
+      }
+      .stat-box {
+        background: #0f172a;
+        border: 1px solid #1e293b;
+        border-radius: 8px;
+        padding: 12px;
+        text-align: center;
+      }
+      .stat-box .val {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #f8fafc;
+      }
+      .stat-box .lbl {
+        font-size: 0.7rem;
+        color: #64748b;
+        margin-top: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Importar Exercícios</h1>
+      <p class="subtitle">
+        Popula o Firebase Realtime Database com a biblioteca free-exercise-db
+      </p>
+
+      <div class="source-badge">
+        &#128279; yuhonas/free-exercise-db · GitHub
+      </div>
+
+      <button id="btn-iniciar">&#9654; Iniciar Importação</button>
+
+      <div id="progress-section">
+        <div class="progress-track">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="progress-label" id="progress-label">0 / 0</div>
+
+        <div id="status-text">Aguardando...</div>
+
+        <div class="stats">
+          <div class="stat-box">
+            <div class="val" id="stat-total">0</div>
+            <div class="lbl">Total</div>
+          </div>
+          <div class="stat-box">
+            <div class="val" id="stat-ok" style="color: #4ade80">0</div>
+            <div class="lbl">Salvos</div>
+          </div>
+          <div class="stat-box">
+            <div class="val" id="stat-err" style="color: #f87171">0</div>
+            <div class="lbl">Erros</div>
+          </div>
+        </div>
+
+        <div id="log"></div>
+      </div>
+
+      <div id="resultado"></div>
+    </div>
+
+    <!-- Firebase SDK (compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+    <script>
+      /* ══════════════════════════════════════════════════════════
+     CONFIGURAÇÃO DO FIREBASE (mesma do projeto)
+  ══════════════════════════════════════════════════════════ */
+      const firebaseConfig = {
+        apiKey: "AIzaSyBnP4bA-sBcREdb4UzN9jOkxxIuPFog_Ek",
+        authDomain: "app-treino-academia.firebaseapp.com",
+        databaseURL: "https://app-treino-academia-default-rtdb.firebaseio.com",
+        projectId: "app-treino-academia",
+        storageBucket: "app-treino-academia.firebasestorage.app",
+        messagingSenderId: "719877721910",
+        appId: "1:719877721910:web:ab1eca0d9db20d0d39ed97",
+      };
+
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.database();
+
+      /* ══════════════════════════════════════════════════════════
+     TABELAS DE TRADUÇÃO
+  ══════════════════════════════════════════════════════════ */
+      const T_MUSCULO = {
+        chest: "Peitoral",
+        back: "Costas",
+        shoulders: "Ombros",
+        "upper arms": "Braços",
+        "lower arms": "Antebraços",
+        "upper legs": "Quadríceps / Posteriores",
+        "lower legs": "Panturrilha / Tibial",
+        waist: "Abdômen",
+        biceps: "Bíceps",
+        triceps: "Tríceps",
+        abdominals: "Abdômen",
+        quadriceps: "Quadríceps",
+        hamstrings: "Posteriores de Coxa",
+        glutes: "Glúteos",
+        calves: "Panturrilha",
+        forearms: "Antebraços",
+        traps: "Trapézio",
+        lats: "Latíssimo do Dorso",
+        "middle back": "Dorsal Médio",
+        "lower back": "Lombar",
+        neck: "Pescoço",
+        adductors: "Adutores",
+        abductors: "Abdutores",
+      };
+
+      const T_EQUIPAMENTO = {
+        barbell: "Barra",
+        dumbbell: "Halteres",
+        cable: "Cabo / Pulley",
+        machine: "Máquina",
+        kettlebell: "Kettlebell",
+        bands: "Elástico",
+        "medicine ball": "Bola Medicinal",
+        "body only": "Peso Corporal",
+        "e-z curl bar": "Barra W",
+        none: "Sem Equipamento",
+        other: "Outros",
+        "foam roll": "Rolo de Espuma",
+        "exercise ball": "Bola de Exercício",
+      };
+
+      const T_NIVEL = {
+        beginner: "Iniciante",
+        intermediate: "Intermediário",
+        expert: "Avançado",
+      };
+
+      const T_MECANICA = {
+        compound: "Composto",
+        isolation: "Isolador",
+      };
+
+      const T_FORCA = {
+        push: "Empurrar",
+        pull: "Puxar",
+        static: "Estático",
+      };
+
+      /* ══════════════════════════════════════════════════════════
+     HELPERS
+  ══════════════════════════════════════════════════════════ */
+      const IMAGENS_BASE =
+        "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/";
+
+      function traduzir(tabela, valor) {
+        if (!valor) return null;
+        const v = Array.isArray(valor) ? valor[0] : valor;
+        return tabela[v?.toLowerCase()] ?? v ?? null;
+      }
+
+      function traduzirLista(tabela, lista) {
+        if (!lista || !lista.length) return [];
+        return lista.map((v) => tabela[v?.toLowerCase()] ?? v);
+      }
+
+      function slugId(nome) {
+        return nome
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^a-z0-9]+/g, "_")
+          .replace(/^_|_$/g, "");
+      }
+
+      function transformar(ex) {
+        const imagem =
+          ex.images && ex.images.length > 0
+            ? IMAGENS_BASE + ex.images[0]
+            : null;
+
+        return {
+          id: ex.id || slugId(ex.name || "exercicio"),
+          nome_original: ex.name || "",
+          musculo_principal: traduzir(T_MUSCULO, ex.primaryMuscles),
+          musculo_secundario:
+            traduzirLista(T_MUSCULO, ex.secondaryMuscles).join(", ") || null,
+          equipamento: traduzir(T_EQUIPAMENTO, ex.equipment),
+          nivel: traduzir(T_NIVEL, ex.level),
+          mecanica: traduzir(T_MECANICA, ex.mechanic),
+          forca: traduzir(T_FORCA, ex.force),
+          instrucoes: ex.instructions || [],
+          imagem_url: imagem,
+          categoria: ex.category || null,
+          ativo: true,
+          fonte: "free-exercise-db",
+        };
+      }
+
+      /* ══════════════════════════════════════════════════════════
+     UI HELPERS
+  ══════════════════════════════════════════════════════════ */
+      const elBtn = document.getElementById("btn-iniciar");
+      const elSection = document.getElementById("progress-section");
+      const elFill = document.getElementById("progress-fill");
+      const elLabel = document.getElementById("progress-label");
+      const elStatus = document.getElementById("status-text");
+      const elLog = document.getElementById("log");
+      const elResult = document.getElementById("resultado");
+      const elTotal = document.getElementById("stat-total");
+      const elOk = document.getElementById("stat-ok");
+      const elErr = document.getElementById("stat-err");
+
+      let contOk = 0,
+        contErr = 0;
+
+      function log(msg, tipo = "info") {
+        const span = document.createElement("span");
+        span.className = "log-" + tipo;
+        span.textContent =
+          new Date().toLocaleTimeString("pt-BR") + "  " + msg + "\n";
+        elLog.appendChild(span);
+        elLog.scrollTop = elLog.scrollHeight;
+      }
+
+      function setProgresso(atual, total) {
+        const pct = total > 0 ? Math.round((atual / total) * 100) : 0;
+        elFill.style.width = pct + "%";
+        elLabel.textContent = `${atual} / ${total}  (${pct}%)`;
+        elStatus.textContent = `Salvando exercício ${atual} de ${total}...`;
+        elTotal.textContent = total;
+        elOk.textContent = contOk;
+        elErr.textContent = contErr;
+      }
+
+      /* ══════════════════════════════════════════════════════════
+     IMPORTAÇÃO EM LOTES
+  ══════════════════════════════════════════════════════════ */
+      const LOTE = 20; // exercícios por lote
+      const DELAY_LOTE = 200; // ms entre lotes (evita throttle do Firebase)
+
+      async function salvarLote(exercicios) {
+        const updates = {};
+        for (const ex of exercicios) {
+          updates[`exercicios/${ex.id}`] = ex;
+        }
+        await db.ref().update(updates);
+      }
+
+      function sleep(ms) {
+        return new Promise((r) => setTimeout(r, ms));
+      }
+
+      /* ══════════════════════════════════════════════════════════
+     PONTO DE ENTRADA
+  ══════════════════════════════════════════════════════════ */
+      elBtn.addEventListener("click", async () => {
+        elBtn.disabled = true;
+        elSection.style.display = "block";
+        elResult.style.display = "none";
+        contOk = 0;
+        contErr = 0;
+        elLog.innerHTML = "";
+
+        try {
+          /* 1. Buscar JSON do GitHub */
+          log("Buscando exercícios em free-exercise-db...", "info");
+          elStatus.textContent = "Buscando dados do GitHub...";
+
+          const resp = await fetch(
+            "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/dist/exercises.json",
+          );
+
+          if (!resp.ok) {
+            throw new Error(`HTTP ${resp.status} ao buscar exercises.json`);
+          }
+
+          const rawList = await resp.json();
+          const total = rawList.length;
+          log(
+            `✓ ${total} exercícios encontrados. Iniciando importação...`,
+            "ok",
+          );
+          elTotal.textContent = total;
+
+          /* 2. Transformar e salvar em lotes */
+          for (let i = 0; i < rawList.length; i += LOTE) {
+            const slice = rawList.slice(i, i + LOTE);
+            const transformados = [];
+
+            for (const raw of slice) {
+              try {
+                transformados.push(transformar(raw));
+              } catch (e) {
+                contErr++;
+                log(
+                  `⚠ Erro ao transformar "${raw.name}": ${e.message}`,
+                  "warn",
+                );
+              }
+            }
+
+            try {
+              await salvarLote(transformados);
+              contOk += transformados.length;
+              setProgresso(Math.min(i + LOTE, total), total);
+              log(
+                `✓ Lote ${Math.ceil((i + LOTE) / LOTE)}: ${transformados.length} exercícios salvos`,
+                "ok",
+              );
+            } catch (e) {
+              contErr += transformados.length;
+              log(`✗ Erro ao salvar lote: ${e.message}`, "err");
+            }
+
+            await sleep(DELAY_LOTE);
+          }
+
+          /* 3. Atualizar progresso final */
+          setProgresso(total, total);
+          elStatus.textContent = "Importação concluída!";
+          elResult.className = "sucesso";
+          elResult.style.display = "block";
+          elResult.textContent =
+            `✓ Importação concluída — ${contOk} exercícios salvos no Firebase` +
+            (contErr > 0 ? ` (${contErr} erros)` : "");
+          log(`═══ FIM: ${contOk} salvos, ${contErr} erros ═══`, "ok");
+        } catch (err) {
+          log(`✗ Erro fatal: ${err.message}`, "err");
+          elStatus.textContent = "Erro durante a importação.";
+          elResult.className = "erro";
+          elResult.style.display = "block";
+          elResult.textContent = `✗ Falha: ${err.message}`;
+          elBtn.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>

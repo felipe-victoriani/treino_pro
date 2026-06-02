@@ -1,0 +1,37 @@
+{
+  "rules": {
+    "exercicios": {
+      ".read": "auth != null",
+      ".write": false,
+      ".indexOn": ["musculo_principal"]
+    },
+    "treinos": {
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "$uid === auth.uid"
+      }
+    },
+    "rateLimits": {
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": false
+      }
+    },
+    "usuarios": {
+      "$uid": {
+        ".read": "$uid === auth.uid || root.child('usuarios').child(auth.uid).child('role').val() === 'professor' || root.child('usuarios').child(auth.uid).child('role').val() === 'admin'",
+        ".write": "$uid === auth.uid || root.child('usuarios').child(auth.uid).child('role').val() === 'admin'"
+      }
+    },
+    "mensagens": {
+      "$uid": {
+        ".read": "$uid === auth.uid || root.child('usuarios').child(auth.uid).child('role').val() === 'professor' || root.child('usuarios').child(auth.uid).child('role').val() === 'admin'",
+        ".write": "auth != null"
+      }
+    },
+    "$other": {
+      ".read": "auth != null && (root.child('usuarios').child(auth.uid).child('role').val() === 'professor' || root.child('usuarios').child(auth.uid).child('role').val() === 'admin')",
+      ".write": "auth != null && (root.child('usuarios').child(auth.uid).child('role').val() === 'professor' || root.child('usuarios').child(auth.uid).child('role').val() === 'admin')"
+    }
+  }
+}

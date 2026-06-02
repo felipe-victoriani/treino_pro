@@ -1,13 +1,47 @@
 /* ============================================================
    TREINO PRO - Montar Treino
-   Coleta preferências e gera plano personalizado localmente
-   (sem dependência de APIs externas)
+   Gera plano semanal personalizado usando IA (Claude via Cloud Function).
+   Exclusivo para alunos SEM vínculo com professor (treino autônomo).
    ============================================================ */
 
 const NIVEL_LABELS = {
   INICIANTE: { label: "Iniciante", icon: "🌱" },
   INTERMEDIARIO: { label: "Intermediário", icon: "💪" },
   AVANCADO: { label: "Experiente", icon: "🔥" },
+};
+
+/* Divisão de treinos por número de dias → grupo muscular principal */
+const SPLITS_POR_DIA = {
+  2: [
+    { treino: "A", nome: "Superior", musculo: "Peitoral" },
+    { treino: "B", nome: "Inferior", musculo: "Pernas" },
+  ],
+  3: [
+    { treino: "A", nome: "Peito + Tríceps", musculo: "Peitoral" },
+    { treino: "B", nome: "Costas + Bíceps", musculo: "Costas" },
+    { treino: "C", nome: "Pernas", musculo: "Pernas" },
+  ],
+  4: [
+    { treino: "A", nome: "Peito", musculo: "Peitoral" },
+    { treino: "B", nome: "Costas", musculo: "Costas" },
+    { treino: "C", nome: "Pernas", musculo: "Pernas" },
+    { treino: "D", nome: "Ombros + Braços", musculo: "Ombros" },
+  ],
+  5: [
+    { treino: "A", nome: "Peito", musculo: "Peitoral" },
+    { treino: "B", nome: "Costas", musculo: "Costas" },
+    { treino: "C", nome: "Pernas", musculo: "Pernas" },
+    { treino: "D", nome: "Ombros", musculo: "Ombros" },
+    { treino: "E", nome: "Braços", musculo: "Tríceps" },
+  ],
+  6: [
+    { treino: "A", nome: "Peito", musculo: "Peitoral" },
+    { treino: "B", nome: "Costas", musculo: "Costas" },
+    { treino: "C", nome: "Pernas", musculo: "Pernas" },
+    { treino: "D", nome: "Ombros", musculo: "Ombros" },
+    { treino: "E", nome: "Tríceps", musculo: "Tríceps" },
+    { treino: "F", nome: "Bíceps", musculo: "Bíceps" },
+  ],
 };
 
 /* ---------- Auth guard ---------- */
@@ -20,7 +54,13 @@ firebase.auth().onAuthStateChanged(async (user) => {
   const snap = await db.ref("alunos/" + user.uid).once("value");
   const userData = snap.val() || {};
 
-  // Se já tem plano, manda direto para o dashboard
+  // Usuário vinculado a professor → não usa geração IA autônoma
+  if (userData.professorId) {
+    window.location.replace("aluno.html");
+    return;
+  }
+
+  // Já tem plano ativo → vai direto pro dashboard
   if (userData.programaAtivo) {
     window.location.replace("aluno.html");
     return;
@@ -75,23 +115,106 @@ function initPage(user, nivel) {
     .addEventListener("click", () => gerarTreino(user, nivel));
 }
 
-/* ---------- Gerar treino (gerador local) ---------- */
+/* ---------- Gerar treino com IA ---------- */
 async function gerarTreino(user, nivel) {
   const objetivo = document.getElementById("objetivo-val").value;
   const dias = parseInt(document.getElementById("dias-val").value, 10);
   const equipamentos = document.getElementById("equip-val").value;
 
-  /* Mostrar loading */
+  /* Validação antes de abrir o loading */
+  if (!objetivo) {
+    if (typeof showToast === "function")
+      showToast("Selecione um objetivo antes de continuar.", "error", 4000);
+    else alert("Selecione um objetivo antes de continuar.");
+    return;
+  }
+  if (!equipamentos) {
+    if (typeof showToast === "function")
+      showToast("Selecione o equipamento disponível.", "error", 4000);
+    else alert("Selecione o equipamento disponível.");
+    return;
+  }
+
+  const split = SPLITS_POR_DIA[dias] || SPLITS_POR_DIA[3];
+
+  /* Ocultar form e mostrar loading */
   document.getElementById("form-state").style.display = "none";
   const loadingEl = document.getElementById("loading-state");
   loadingEl.classList.add("active");
-  animateLoadingSteps();
 
-  /* Delay artificial para que a animação de carregamento seja exibida */
-  await new Promise((resolve) => setTimeout(resolve, 3500));
+  /* Atualizar título do loading */
+  const titleEl = loadingEl.querySelector(".loading-title");
+  if (titleEl) {
+    titleEl.textContent =
+      `Gerando ${split.length} treinos com IA… ` +
+      `(pode levar até ${split.length * 12}s)`;
+  }
+
+  /* Montar steps dinâmicos baseados no split real */
+  const stepLabels = [
+    "🤖 Analisando seu perfil...",
+    ...split.map((s) => `🏋️ Gerando Treino ${s.treino} — ${s.nome}...`),
+    "✅ Finalizando seu plano...",
+  ];
+  const stepsEl = document.getElementById("loading-steps");
+  stepsEl.innerHTML = stepLabels
+    .map(
+      (label, i) =>
+        `<p class="loading-step${i === 0 ? " current" : ""}" id="ls-${i}">${label}</p>`,
+    )
+    .join("");
+
+  function setLoadingStep(i) {
+    stepsEl
+      .querySelectorAll(".loading-step")
+      .forEach((el) => el.classList.remove("current"));
+    const el = document.getElementById(`ls-${i}`);
+    if (el) el.classList.add("current");
+  }
 
   try {
-    const planData = gerarPlanoLocal(nivel, objetivo, dias, equipamentos);
+    setLoadingStep(0);
+    await new Promise((resolve) => setTimeout(resolve, 700));
+
+    const treinos = [];
+
+    for (let i = 0; i < split.length; i++) {
+      const day = split[i];
+      setLoadingStep(i + 1);
+
+      const treinoIA = await TreinoIAService.gerar({
+        uid: user.uid,
+        nivel,
+        objetivo,
+        grupoMuscular: day.musculo,
+        equipamentos,
+      });
+
+      /* Normaliza para o formato do app */
+      treinos.push({
+        treino: day.treino,
+        nome: day.nome,
+        exercicios: (treinoIA.exercicios || []).map((ex) => ({
+          nome: ex.nome,
+          series: ex.series,
+          repeticoes: ex.repeticoes,
+          descanso: ex.descanso_segundos ? `${ex.descanso_segundos}s` : "60s",
+          observacao: ex.dica_execucao || "",
+        })),
+      });
+    }
+
+    setLoadingStep(stepLabels.length - 1);
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    const planData = {
+      nivel: NIVEL_LABELS[nivel]?.label || nivel,
+      objetivo,
+      divisao: split.map((s) => s.treino).join("/"),
+      dias_por_semana: dias,
+      treinos,
+    };
+
     loadingEl.classList.remove("active");
     mostrarPreview(planData, user, nivel, objetivo, dias, equipamentos);
   } catch (err) {
@@ -99,28 +222,11 @@ async function gerarTreino(user, nivel) {
     document.getElementById("form-state").style.display = "";
     console.error("[MontarTreino]", err);
     if (typeof showToast === "function") {
-      showToast("Erro ao gerar treino. Tente novamente.", "error", 5000);
+      showToast("Erro ao gerar treino: " + err.message, "error", 7000);
     } else {
       alert("Erro ao gerar treino:\n" + err.message);
     }
   }
-}
-
-/* ---------- Loading animation ---------- */
-function animateLoadingSteps() {
-  const steps = document.querySelectorAll("#loading-steps .loading-step");
-  steps.forEach((s) => s.classList.remove("current"));
-  if (steps[0]) steps[0].classList.add("current");
-  let i = 0;
-  const iv = setInterval(() => {
-    if (i < steps.length - 1) {
-      steps[i].classList.remove("current");
-      i++;
-      steps[i].classList.add("current");
-    } else {
-      clearInterval(iv);
-    }
-  }, 1200);
 }
 
 /* ---------- Preview result ---------- */
@@ -160,6 +266,7 @@ function mostrarPreview(planData, user, nivel, objetivo, dias, equipamentos) {
             <div class="ex-row">
               <strong>${safe(ex.nome)}</strong>
               <span>${ex.series}x ${safe(ex.repeticoes)} · ${safe(ex.descanso)}</span>
+              ${ex.observacao ? `<span style="display:block;font-size:.75rem;color:#64748b;margin-top:2px">💡 ${safe(ex.observacao)}</span>` : ""}
             </div>`,
             )
             .join("")}
@@ -200,6 +307,7 @@ async function salvarESair(planData, user, nivel, equipamentos) {
       equipamentos: equipamentos,
       treinos: treinosObj,
       geradoEm: Date.now(),
+      geradoPor: "ia",
     };
 
     const updates = {};
@@ -217,85 +325,6 @@ async function salvarESair(planData, user, nivel, equipamentos) {
     alert("Erro ao salvar o plano. Tente novamente.");
   }
 }
-
-/* ---------- Prompt builder (removido — gerador local não usa prompt) ----------
-function buildPrompt(nivelStr, objetivo, dias, equipamentos) {
-  return `Você é um personal trainer expert em musculação. Sua tarefa é gerar um plano de treino personalizado em formato JSON estruturado, com base no nível de experiência do aluno.
-
-## REGRAS DE DIVISÃO POR NÍVEL:
-
-### INICIANTE (0–6 meses de treino)
-- Divisão: A/B ou A/B/C
-- Foco: aprender o movimento, full body ou push-pull-legs simples
-- Séries: 3 séries por exercício
-- Repetições: 10–15 reps
-- Exercícios por treino: 5–7
-- Descanso: 60–90s
-
-### INTERMEDIÁRIO (6 meses–2 anos)
-- Divisão: A/B/C/D (Upper/Lower ou Push/Pull/Legs/Full)
-- Foco: hipertrofia com mais volume
-- Séries: 3–4 séries por exercício
-- Repetições: 8–12 reps
-- Exercícios por treino: 6–8
-- Descanso: 60–90s
-
-### AVANÇADO (2+ anos)
-- Divisão: A/B/C/D/E ou A/B/C/D/E/F (por grupo muscular isolado)
-- Foco: volume alto, técnicas avançadas (drop set, bi-set, etc.)
-- Séries: 4–5 séries por exercício
-- Repetições: 6–12 reps (variado)
-- Exercícios por treino: 7–10
-- Descanso: 45–90s
-
----
-
-## ENTRADA DO USUÁRIO:
-- Nível: ${nivelStr}
-- Objetivo: ${objetivo}
-- Dias disponíveis por semana: ${dias}
-- Equipamentos: ${equipamentos}
-
----
-
-## SAÍDA ESPERADA (JSON):
-
-{
-  "nivel": "...",
-  "objetivo": "...",
-  "divisao": "A/B/C",
-  "dias_por_semana": ${dias},
-  "treinos": [
-    {
-      "treino": "A",
-      "nome": "Peito e Tríceps",
-      "exercicios": [
-        {
-          "nome": "Supino Reto com Barra",
-          "series": 4,
-          "repeticoes": "10–12",
-          "descanso": "60s",
-          "observacao": "Mantenha os pés no chão e escápulas retraídas"
-        }
-      ]
-    }
-  ]
-}
-
----
-
-## INSTRUÇÕES ADICIONAIS:
-- Sempre gere exercícios reais e apropriados para o nível
-- Para INICIANTE: priorize exercícios compostos e máquinas
-- Para INTERMEDIÁRIO: misture compostos e isolados
-- Para AVANÇADO: inclua variações técnicas (unilaterais, cabos, técnicas de intensidade)
-- Adapte os exercícios ao equipamento disponível
-- Inclua o campo "observacao" com dica de execução para cada exercício
-- Não repita o mesmo grupo muscular em dias consecutivos
-- O número de treinos (A, B, C...) DEVE ser exatamente ${dias}, correspondendo aos dias por semana informados
-- Retorne APENAS o JSON, sem explicações adicionais`;
-}
-// ------------------------------------------------------------ */
 
 /* ---------- Helper: sanitize para HTML ---------- */
 function safe(str) {

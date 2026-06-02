@@ -1,0 +1,629 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Teste — gerarTreino Cloud Function</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Segoe UI", system-ui, sans-serif;
+        background: #0f172a;
+        color: #e2e8f0;
+        min-height: 100vh;
+        padding: 32px 16px;
+      }
+
+      .container {
+        max-width: 860px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #f8fafc;
+        margin-bottom: 4px;
+      }
+      .subtitle {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-bottom: 28px;
+      }
+
+      /* ── Params card ── */
+      .params {
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 12px;
+        padding: 20px 24px;
+        margin-bottom: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 12px;
+      }
+      .param {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .param label {
+        font-size: 0.7rem;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .param span {
+        font-size: 0.9rem;
+        color: #7dd3fc;
+        font-weight: 600;
+      }
+
+      /* ── Button ── */
+      #btn {
+        width: 100%;
+        padding: 14px;
+        background: #2563eb;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        margin-bottom: 20px;
+        transition: background 0.15s;
+      }
+      #btn:hover:not(:disabled) {
+        background: #1d4ed8;
+      }
+      #btn:disabled {
+        background: #475569;
+        cursor: not-allowed;
+      }
+
+      /* ── Steps ── */
+      #steps {
+        display: none;
+        margin-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .step {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.82rem;
+        color: #64748b;
+        padding: 8px 12px;
+        background: #1e293b;
+        border-radius: 8px;
+        border: 1px solid #1e293b;
+        transition: all 0.2s;
+      }
+      .step.active {
+        color: #7dd3fc;
+        border-color: #2563eb;
+      }
+      .step.done {
+        color: #4ade80;
+        border-color: #16a34a;
+      }
+      .step.erro {
+        color: #f87171;
+        border-color: #dc2626;
+      }
+      .step .icon {
+        font-size: 1rem;
+        min-width: 20px;
+        text-align: center;
+      }
+
+      /* ── Result ── */
+      #resultado {
+        display: none;
+      }
+
+      .result-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+      .result-header h2 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #f8fafc;
+      }
+      #btn-copiar {
+        padding: 6px 14px;
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 6px;
+        color: #94a3b8;
+        font-size: 0.78rem;
+        cursor: pointer;
+      }
+      #btn-copiar:hover {
+        border-color: #7dd3fc;
+        color: #7dd3fc;
+      }
+
+      /* ── Treino card ── */
+      .treino-card {
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 12px;
+        padding: 20px 24px;
+        margin-bottom: 16px;
+      }
+      .treino-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 18px;
+      }
+      .badge {
+        padding: 3px 10px;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        background: #0f172a;
+        border: 1px solid #334155;
+        color: #94a3b8;
+      }
+      .badge.blue {
+        border-color: #2563eb;
+        color: #7dd3fc;
+      }
+      .badge.green {
+        border-color: #16a34a;
+        color: #4ade80;
+      }
+
+      .exercicio {
+        border-top: 1px solid #1e3a5f;
+        padding: 14px 0;
+      }
+      .exercicio:first-of-type {
+        border-top: none;
+      }
+
+      .ex-nome {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #f8fafc;
+        margin-bottom: 6px;
+      }
+      .ex-info {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+      .ex-pill {
+        font-size: 0.72rem;
+        padding: 2px 8px;
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 4px;
+        color: #94a3b8;
+      }
+      .ex-pill.destaque {
+        border-color: #7c3aed;
+        color: #c4b5fd;
+      }
+      .ex-dica {
+        font-size: 0.78rem;
+        color: #64748b;
+        line-height: 1.5;
+      }
+
+      /* ── JSON raw ── */
+      #json-raw {
+        background: #020617;
+        border: 1px solid #1e293b;
+        border-radius: 8px;
+        padding: 16px;
+        font-family: "Cascadia Code", "Fira Code", monospace;
+        font-size: 0.72rem;
+        color: #4ade80;
+        white-space: pre-wrap;
+        word-break: break-all;
+        max-height: 400px;
+        overflow-y: auto;
+        margin-top: 16px;
+      }
+
+      /* ── Erro ── */
+      #erro {
+        display: none;
+        background: #450a0a;
+        border: 1px solid #dc2626;
+        border-radius: 10px;
+        padding: 16px 20px;
+        color: #f87171;
+        font-size: 0.88rem;
+        margin-bottom: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>&#9889; Teste — Cloud Function <code>gerarTreino</code></h1>
+      <p class="subtitle">
+        Chama a função em produção e exibe o treino gerado pelo Claude
+      </p>
+
+      <!-- Parâmetros fixos -->
+      <div class="params">
+        <div class="param">
+          <label>Nível</label>
+          <span id="p-nivel">Intermediário</span>
+        </div>
+        <div class="param">
+          <label>Objetivo</label>
+          <span id="p-objetivo">Hipertrofia</span>
+        </div>
+        <div class="param">
+          <label>Grupo muscular</label>
+          <span id="p-grupo">Peitoral</span>
+        </div>
+        <div class="param">
+          <label>Equipamentos</label>
+          <span id="p-equip">Barra, Halteres, Cabo / Pulley</span>
+        </div>
+      </div>
+
+      <button id="btn">&#9654; Executar Teste</button>
+
+      <!-- Passos -->
+      <div id="steps">
+        <div class="step" id="step-0">
+          <span class="icon">&#9675;</span> Autenticando (login anônimo)
+        </div>
+        <div class="step" id="step-1">
+          <span class="icon">&#9675;</span> Conectando ao Firebase
+        </div>
+        <div class="step" id="step-2">
+          <span class="icon">&#9675;</span> Buscando exercícios no Realtime
+          Database
+        </div>
+        <div class="step" id="step-3">
+          <span class="icon">&#9675;</span> Montando prompt para o Claude
+        </div>
+        <div class="step" id="step-4">
+          <span class="icon">&#9675;</span> Chamando Cloud Function gerarTreino
+        </div>
+        <div class="step" id="step-5">
+          <span class="icon">&#9675;</span> Processando resposta
+        </div>
+      </div>
+
+      <!-- Erro -->
+      <div id="erro"></div>
+
+      <!-- Resultado -->
+      <div id="resultado">
+        <div class="result-header">
+          <h2>&#10003; Treino gerado com sucesso</h2>
+          <button id="btn-copiar">Copiar JSON</button>
+        </div>
+        <div id="treino-visual"></div>
+        <details>
+          <summary
+            style="
+              cursor: pointer;
+              font-size: 0.8rem;
+              color: #64748b;
+              margin-bottom: 8px;
+            "
+          >
+            Ver JSON bruto
+          </summary>
+          <pre id="json-raw"></pre>
+        </details>
+      </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-functions-compat.js"></script>
+
+    <script>
+      /* ── Firebase config ────────────────────────────────────── */
+      firebase.initializeApp({
+        apiKey: "AIzaSyBnP4bA-sBcREdb4UzN9jOkxxIuPFog_Ek",
+        authDomain: "app-treino-academia.firebaseapp.com",
+        databaseURL: "https://app-treino-academia-default-rtdb.firebaseio.com",
+        projectId: "app-treino-academia",
+        storageBucket: "app-treino-academia.firebasestorage.app",
+        messagingSenderId: "719877721910",
+        appId: "1:719877721910:web:ab1eca0d9db20d0d39ed97",
+      });
+      const db = firebase.database();
+      const functions = firebase.functions();
+
+      /* ── Parâmetros do teste ─────────────────────────────────── */
+      const PARAMS = {
+        nivel: "Intermediário",
+        objetivo: "Hipertrofia",
+        grupoMuscular: "Peitoral",
+        equipamentos: ["Barra", "Halteres", "Cabo / Pulley"],
+      };
+
+      /* ── Niveis permitidos por nível do aluno ────────────────── */
+      const NIVEIS_PERMITIDOS = {
+        Iniciante: ["Iniciante"],
+        Intermediário: ["Iniciante", "Intermediário"],
+        Avançado: ["Iniciante", "Intermediário", "Avançado"],
+      };
+
+      /* ── Helpers de UI ───────────────────────────────────────── */
+      function setStep(n, estado, texto) {
+        const el = document.getElementById("step-" + n);
+        el.className = "step " + estado;
+        const icons = { active: "&#9654;", done: "&#10003;", erro: "&#10007;" };
+        el.innerHTML = `<span class="icon">${icons[estado] ?? "&#9675;"}</span> ${texto}`;
+      }
+
+      function mostrarErro(msg) {
+        const el = document.getElementById("erro");
+        el.style.display = "block";
+        el.textContent = "Erro: " + msg;
+      }
+
+      function escHtml(str) {
+        return String(str ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      /* ── Montar prompt ───────────────────────────────────────── */
+      function construirPrompt(exercicios) {
+        const lista = exercicios
+          .map(
+            (ex) =>
+              `• ID: "${ex.id}" | Nome: "${ex.nome_original}" | ` +
+              `Equipamento: "${ex.equipamento ?? "?"}" | ` +
+              `Mecânica: "${ex.mecanica ?? "?"}" | ` +
+              `Força: "${ex.forca ?? "?"}" | ` +
+              `Nível: "${ex.nivel ?? "?"}"`,
+          )
+          .join("\n");
+
+        return `Você é um personal trainer especialista.
+Monte um treino usando APENAS os exercícios da lista abaixo.
+NUNCA invente exercícios fora desta lista.
+
+DADOS DO ALUNO:
+- Nível: ${PARAMS.nivel}
+- Objetivo: ${PARAMS.objetivo}
+- Grupo muscular: ${PARAMS.grupoMuscular}
+
+EXERCÍCIOS DISPONÍVEIS (${exercicios.length} no total):
+${lista}
+
+REGRAS OBRIGATÓRIAS:
+1. Use SOMENTE exercícios da lista acima (use o campo ID exatamente como está na lista)
+2. Nunca repita o mesmo padrão de movimento
+3. Máximo 1 exercício por ângulo (reto, inclinado, declinado)
+4. Comece sempre com exercício composto (mecanica: Composto)
+5. Finalize com isoladores (mecanica: Isolador)
+6. Não coloque dois exercícios com mesmo equipamento seguidos
+
+VOLUME:
+- Iniciante: 3 exercícios, 3 séries, 12-15 reps
+- Intermediário: 4-5 exercícios, 3-4 séries, 10-12 reps
+- Avançado: 5-6 exercícios, 4 séries, 6-12 reps
+
+DESCANSO:
+- Exercício Composto: 90-120s
+- Exercício Isolador: 60s
+
+VALIDAÇÃO ANTES DE RESPONDER:
+✓ Todos os exercícios estão na lista fornecida?
+✓ Existe algum exercício redundante? Se sim, troque.
+✓ A ordem está correta (composto → isolador)?
+✓ Há variação de equipamentos?
+
+Retorne APENAS este JSON, sem texto adicional:
+{
+  "treino": {
+    "nivel": "",
+    "objetivo": "",
+    "grupo_muscular": "",
+    "exercicios": [
+      {
+        "id": "",
+        "nome": "",
+        "musculo_principal": "",
+        "musculo_secundario": "",
+        "series": 0,
+        "repeticoes": "",
+        "descanso_segundos": 0,
+        "tipo": "composto | isolador",
+        "dica_execucao": ""
+      }
+    ]
+  }
+}`;
+      }
+
+      /* ── Renderizar treino visual ────────────────────────────── */
+      function renderizarTreino(treino) {
+        const el = document.getElementById("treino-visual");
+        const exs = treino.exercicios || [];
+
+        el.innerHTML = `
+    <div class="treino-card">
+      <div class="treino-meta">
+        <span class="badge blue">${escHtml(treino.nivel)}</span>
+        <span class="badge blue">&#127919; ${escHtml(treino.objetivo)}</span>
+        <span class="badge blue">&#128170; ${escHtml(treino.grupo_muscular)}</span>
+        <span class="badge green">${exs.length} exercícios</span>
+      </div>
+      ${exs
+        .map(
+          (ex, i) => `
+        <div class="exercicio">
+          <div class="ex-nome">${i + 1}. ${escHtml(ex.nome)}</div>
+          <div class="ex-info">
+            <span class="ex-pill destaque">${escHtml(ex.tipo)}</span>
+            <span class="ex-pill">${escHtml(ex.series)}x ${escHtml(ex.repeticoes)}</span>
+            <span class="ex-pill">&#9201; ${escHtml(ex.descanso_segundos)}s descanso</span>
+            ${ex.musculo_secundario ? `<span class="ex-pill">&#128170; ${escHtml(ex.musculo_secundario)}</span>` : ""}
+          </div>
+          ${ex.dica_execucao ? `<div class="ex-dica">&#128161; ${escHtml(ex.dica_execucao)}</div>` : ""}
+        </div>
+      `,
+        )
+        .join("")}
+    </div>
+  `;
+      }
+
+      /* ── Fluxo principal ─────────────────────────────────────── */
+      document.getElementById("btn").addEventListener("click", async () => {
+        const btn = document.getElementById("btn");
+        btn.disabled = true;
+        btn.textContent = "Aguarde...";
+        document.getElementById("erro").style.display = "none";
+        document.getElementById("resultado").style.display = "none";
+        document.getElementById("steps").style.display = "flex";
+
+        [0, 1, 2, 3, 4, 5].forEach((n) =>
+          setStep(
+            n,
+            "",
+            [
+              "Autenticando (login anônimo)",
+              "Conectando ao Firebase",
+              "Buscando exercícios no Realtime Database",
+              "Montando prompt para o Claude",
+              "Chamando Cloud Function gerarTreino",
+              "Processando resposta",
+            ][n],
+          ),
+        );
+
+        try {
+          /* 0. Login anônimo */
+          setStep(0, "active", "Autenticando...");
+          const auth = firebase.auth();
+          if (!auth.currentUser) {
+            await auth.signInAnonymously();
+          }
+          setStep(
+            0,
+            "done",
+            `Autenticado (uid: ${auth.currentUser.uid.slice(0, 8)}...)`,
+          );
+
+          /* 1. Firebase */
+          setStep(1, "active", "Conectando ao Firebase...");
+          await db.ref(".info/connected").once("value");
+          setStep(1, "done", "Firebase conectado");
+
+          /* 2. Buscar exercícios */
+          setStep(2, "active", "Buscando exercícios de Peitoral...");
+          const snap = await db
+            .ref("exercicios")
+            .orderByChild("musculo_principal")
+            .equalTo(PARAMS.grupoMuscular)
+            .once("value");
+
+          const niveisOk =
+            NIVEIS_PERMITIDOS[PARAMS.nivel] ??
+            Object.values(NIVEIS_PERMITIDOS).flat();
+          const exercicios = [];
+          snap.forEach((child) => {
+            const ex = child.val();
+            if (ex.ativo === false) return;
+            if (!niveisOk.includes(ex.nivel)) return;
+            if (!PARAMS.equipamentos.includes(ex.equipamento)) return;
+            exercicios.push(ex);
+          });
+
+          if (exercicios.length < 3) {
+            throw new Error(
+              `Apenas ${exercicios.length} exercício(s) encontrado(s) com esses filtros. Verifique se a importação foi feita.`,
+            );
+          }
+          setStep(2, "done", `${exercicios.length} exercícios encontrados`);
+
+          /* 3. Montar prompt */
+          setStep(3, "active", "Montando prompt...");
+          const prompt = construirPrompt(exercicios);
+          setStep(3, "done", `Prompt montado (${prompt.length} chars)`);
+
+          /* 4. Chamar Cloud Function */
+          setStep(4, "active", "Chamando gerarTreino (aguarde ~10s)...");
+          const fn = functions.httpsCallable("gerarTreino", { timeout: 60000 });
+          const result = await fn({ prompt });
+
+          if (!result.data?.treino)
+            throw new Error("Resposta inválida da Cloud Function");
+          setStep(4, "done", "Cloud Function respondeu");
+
+          /* 5. Processar */
+          setStep(5, "active", "Processando resposta...");
+          const treino = result.data.treino;
+          setStep(
+            5,
+            "done",
+            `${treino.exercicios?.length ?? 0} exercícios no treino`,
+          );
+
+          /* Exibir */
+          document.getElementById("json-raw").textContent = JSON.stringify(
+            result.data,
+            null,
+            2,
+          );
+          renderizarTreino(treino);
+          document.getElementById("resultado").style.display = "block";
+        } catch (err) {
+          console.error(err);
+          const msg = err?.message || String(err);
+          // Marca o step ativo como erro
+          [0, 1, 2, 3, 4, 5].forEach((n) => {
+            if (
+              document.getElementById("step-" + n).classList.contains("active")
+            ) {
+              setStep(
+                n,
+                "erro",
+                document.getElementById("step-" + n).textContent.trim(),
+              );
+            }
+          });
+          mostrarErro(msg);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "▶ Executar Teste";
+        }
+      });
+
+      /* ── Copiar JSON ─────────────────────────────────────────── */
+      document.getElementById("btn-copiar").addEventListener("click", () => {
+        const txt = document.getElementById("json-raw").textContent;
+        navigator.clipboard.writeText(txt).then(() => {
+          const el = document.getElementById("btn-copiar");
+          el.textContent = "Copiado!";
+          setTimeout(() => (el.textContent = "Copiar JSON"), 2000);
+        });
+      });
+    </script>
+  </body>
+</html>
