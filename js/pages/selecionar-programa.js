@@ -19,9 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Verificar se o usuário já tem um programa selecionado
-    const snap = await db
-      .ref(`usuarios/${user.uid}/programaAtivo`)
-      .once("value");
+    const snap = await db.ref(`users/${user.uid}/programaAtivo`).once("value");
 
     const programaExistente = snap.val();
     if (programaExistente) {

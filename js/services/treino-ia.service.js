@@ -48,6 +48,41 @@ const TreinoIAService = (() => {
     "Sem equipamento": ["Peso Corporal", "Sem Equipamento"],
   };
 
+  // ── Compatibilidade com schema antigo (seed) ─────────────
+  // Grupo muscular: novo formato → antigo
+  const MUSCULO_NEW_TO_OLD = {
+    Peitoral: "peito",
+    Costas: "costas",
+    Pernas: "pernas",
+    Ombros: "ombros",
+    Bíceps: "biceps",
+    Tríceps: "triceps",
+    Abdômen: "abdomen",
+    Glúteos: "gluteos",
+    Panturrilha: "panturrilha",
+    Antebraço: "antebraco",
+  };
+
+  // Nível: antigo → novo
+  const NIVEL_OLD_TO_NEW = {
+    iniciante: "Iniciante",
+    intermediario: "Intermediário",
+    avancado: "Avançado",
+  };
+
+  // Equipamento: antigo → novo
+  const EQUIP_OLD_TO_NEW = {
+    barra: "Barra",
+    barra_w: "Barra W",
+    haltere: "Halteres",
+    cabo: "Cabo / Pulley",
+    maquina: "Máquina",
+    kettlebell: "Kettlebell",
+    sem_equipamento: "Sem Equipamento",
+    peso_corporal: "Peso Corporal",
+    funcional: "Peso Corporal",
+  };
+
   /* ── 1. Buscar exercícios do Firebase ───────────────────── */
 
   async function _buscarExercicios({ grupoMuscular, equipamentos, nivel }) {
@@ -55,19 +90,45 @@ const TreinoIAService = (() => {
     const niveisOk = NIVEIS_PERMITIDOS[nivelPT] || Object.values(NIVEL_PT);
     const equipFiltro = EQUIPAMENTOS_MAP[equipamentos] ?? null;
 
-    const snap = await db
-      .ref("exercicios")
-      .orderByChild("musculo_principal")
-      .equalTo(grupoMuscular)
-      .once("value");
+    // Valor equivalente no schema antigo (ex: "Peitoral" → "peito")
+    const grupoOld =
+      MUSCULO_NEW_TO_OLD[grupoMuscular] || grupoMuscular.toLowerCase();
+
+    // Carrega todos os exercícios e filtra em memória para suportar
+    // tanto o schema novo (musculo_principal) quanto o antigo (grupoMuscular)
+    const snap = await db.ref("exercicios").once("value");
 
     const lista = [];
-    snap.forEach((child) => lista.push(child.val()));
+    snap.forEach((child) => {
+      const val = child.val();
+
+      const musculoMatch =
+        val.musculo_principal === grupoMuscular ||
+        val.grupoMuscular === grupoOld;
+      if (!musculoMatch) return;
+
+      // Normaliza campos do schema antigo para o novo formato
+      lista.push({
+        id: child.key,
+        ...val,
+        nome_original: val.nome_original || val.nome,
+        nivel: NIVEL_OLD_TO_NEW[val.nivel] || val.nivel,
+        equipamento: EQUIP_OLD_TO_NEW[val.equipamento] || val.equipamento,
+        musculo_principal: val.musculo_principal || grupoMuscular,
+      });
+    });
 
     return lista.filter((ex) => {
       if (ex.ativo === false) return false;
-      if (!niveisOk.includes(ex.nivel)) return false;
-      if (equipFiltro && !equipFiltro.includes(ex.equipamento)) return false;
+      // Se o exercício não tem nível definido, aceita (não penaliza por dado ausente)
+      if (ex.nivel && !niveisOk.includes(ex.nivel)) return false;
+      // Se o exercício não tem equipamento definido, aceita
+      if (
+        equipFiltro &&
+        ex.equipamento &&
+        !equipFiltro.includes(ex.equipamento)
+      )
+        return false;
       return true;
     });
   }
@@ -80,7 +141,7 @@ const TreinoIAService = (() => {
     const listaStr = exercicios
       .map(
         (ex) =>
-          `• ID: "${ex.id}" | Nome: "${ex.nome_original}" | ` +
+          `• ID: "${ex.id}" | NomeOriginal: "${ex.nome_original}" | ` +
           `Equipamento: "${ex.equipamento || "?"}" | ` +
           `Mecânica: "${ex.mecanica || "?"}" | ` +
           `Força: "${ex.forca || "?"}" | ` +
@@ -88,7 +149,23 @@ const TreinoIAService = (() => {
       )
       .join("\n");
 
-    return `Você é um personal trainer especialista.
+    return `Você é um personal trainer especialista. Responda SEMPRE em português do Brasil.
+
+INSTRUÇÕES CRÍTICAS:
+- O campo "nome" no JSON de saída DEVE ser a tradução para português do Brasil do campo NomeOriginal
+- NUNCA coloque nomes em inglês no campo "nome"
+- Exemplos de tradução obrigatória:
+  "Barbell Bench Press" → "Supino Reto com Barra"
+  "Dumbbell Curl" → "Rosca Direta com Halteres"
+  "Pull-Up" → "Barra Fixa"
+  "Squat" → "Agachamento"
+  "Deadlift" → "Levantamento Terra"
+  "Shoulder Press" → "Desenvolvimento de Ombros"
+  "Lat Pulldown" → "Puxada na Polia Alta"
+  "Leg Press" → "Leg Press"
+  "Tricep Pushdown" → "Tríceps na Polia"
+  "Dumbbell Fly" → "Crucifixo com Halteres"
+
 Monte um treino usando APENAS os exercícios da lista abaixo.
 NUNCA invente exercícios fora desta lista.
 
@@ -100,28 +177,20 @@ DADOS DO ALUNO:
 EXERCÍCIOS DISPONÍVEIS (${exercicios.length} no total):
 ${listaStr}
 
-REGRAS OBRIGATÓRIAS:
-1. Use SOMENTE exercícios da lista acima (use o campo ID exatamente como está na lista)
-2. Nunca repita o mesmo padrão de movimento
-3. Máximo 1 exercício por ângulo (reto, inclinado, declinado)
-4. Comece sempre com exercício composto (mecanica: Composto)
-5. Finalize com isoladores (mecanica: Isolador)
-6. Não coloque dois exercícios com mesmo equipamento seguidos
+REGRAS:
+1. Use SOMENTE exercícios da lista acima (use o campo ID exatamente como está)
+2. Escolha exercícios variados (diferentes equipamentos quando possível)
+3. Prefira começar por exercícios compostos e terminar com isoladores
+4. Não repita o mesmo exercício
 
-VOLUME:
-- Iniciante: 3 exercícios, 3 séries, 12-15 reps
-- Intermediário: 4-5 exercícios, 3-4 séries, 10-12 reps
-- Avançado: 5-6 exercícios, 4 séries, 6-12 reps
+VOLUME OBRIGATÓRIO (respeite exatamente):
+- Iniciante: EXATAMENTE 5 exercícios, 3 séries, 12-15 reps
+- Intermediário: EXATAMENTE 6 exercícios, 3-4 séries, 10-12 reps
+- Avançado: EXATAMENTE 7 exercícios, 4 séries, 6-12 reps
 
 DESCANSO:
-- Exercício Composto: 90-120s
-- Exercício Isolador: 60s
-
-VALIDAÇÃO ANTES DE RESPONDER:
-✓ Todos os exercícios estão na lista fornecida?
-✓ Existe algum exercício redundante? Se sim, troque.
-✓ A ordem está correta (composto → isolador)?
-✓ Há variação de equipamentos?
+- Exercício composto: 90s
+- Exercício isolador: 60s
 
 Retorne APENAS este JSON, sem texto adicional:
 {

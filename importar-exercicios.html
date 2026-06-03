@@ -206,7 +206,75 @@
         &#128279; yuhonas/free-exercise-db · GitHub
       </div>
 
-      <button id="btn-iniciar">&#9654; Iniciar Importação</button>
+      <!-- Auth status -->
+      <div id="auth-section" style="margin-bottom: 24px">
+        <div
+          id="auth-logado"
+          style="
+            display: none;
+            background: #14532d;
+            border: 1px solid #16a34a;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.85rem;
+            color: #bbf7d0;
+          "
+        >
+          &#10003; Autenticado como admin
+        </div>
+        <div
+          id="auth-form"
+          style="display: flex; flex-direction: column; gap: 10px"
+        >
+          <p style="font-size: 0.8rem; color: #f87171; margin-bottom: 4px">
+            &#9888; Faça login como admin para importar.
+          </p>
+          <input
+            id="auth-email"
+            type="email"
+            placeholder="E-mail admin"
+            style="
+              padding: 10px;
+              border-radius: 8px;
+              border: 1px solid #475569;
+              background: #0f172a;
+              color: #e2e8f0;
+              font-size: 0.9rem;
+            "
+          />
+          <input
+            id="auth-senha"
+            type="password"
+            placeholder="Senha"
+            style="
+              padding: 10px;
+              border-radius: 8px;
+              border: 1px solid #475569;
+              background: #0f172a;
+              color: #e2e8f0;
+              font-size: 0.9rem;
+            "
+          />
+          <button
+            id="btn-login"
+            style="
+              padding: 10px;
+              background: #0ea5e9;
+              color: #fff;
+              border: none;
+              border-radius: 8px;
+              font-size: 0.9rem;
+              font-weight: 600;
+              cursor: pointer;
+            "
+          >
+            Entrar
+          </button>
+          <div id="auth-erro" style="color: #f87171; font-size: 0.8rem"></div>
+        </div>
+      </div>
+
+      <button id="btn-iniciar" disabled>&#9654; Iniciar Importação</button>
 
       <div id="progress-section">
         <div class="progress-track">
@@ -258,34 +326,82 @@
 
       firebase.initializeApp(firebaseConfig);
       const db = firebase.database();
+      const auth = firebase.auth();
+
+      /* ══════════════════════════════════════════════════════════
+     AUTENTICAÇÃO
+  ══════════════════════════════════════════════════════════ */
+      const elAuthForm = document.getElementById("auth-form");
+      const elAuthLogado = document.getElementById("auth-logado");
+      const elAuthErro = document.getElementById("auth-erro");
+
+      document
+        .getElementById("btn-login")
+        .addEventListener("click", async () => {
+          const email = document.getElementById("auth-email").value.trim();
+          const senha = document.getElementById("auth-senha").value;
+          elAuthErro.textContent = "";
+          try {
+            await auth.signInWithEmailAndPassword(email, senha);
+          } catch (e) {
+            elAuthErro.textContent = "Erro: " + (e.message || e.code);
+          }
+        });
+
+      auth.onAuthStateChanged(async (user) => {
+        if (!user) {
+          elAuthForm.style.display = "flex";
+          elAuthLogado.style.display = "none";
+          document.getElementById("btn-iniciar").disabled = true;
+          return;
+        }
+        // Verificar se é admin no DB
+        const snap = await db.ref(`users/${user.uid}/tipo`).once("value");
+        if (snap.val() === "admin") {
+          elAuthForm.style.display = "none";
+          elAuthLogado.style.display = "block";
+          document.getElementById("btn-iniciar").disabled = false;
+        } else {
+          elAuthErro.textContent = "Usuário não tem permissão de admin.";
+          await auth.signOut();
+        }
+      });
 
       /* ══════════════════════════════════════════════════════════
      TABELAS DE TRADUÇÃO
   ══════════════════════════════════════════════════════════ */
       const T_MUSCULO = {
+        // Peitoral
         chest: "Peitoral",
+        // Costas — todos os músculos do dorso mapeiam para o mesmo grupo
         back: "Costas",
+        lats: "Costas",
+        "middle back": "Costas",
+        "lower back": "Costas",
+        traps: "Costas",
+        // Ombros
         shoulders: "Ombros",
-        "upper arms": "Braços",
-        "lower arms": "Antebraços",
-        "upper legs": "Quadríceps / Posteriores",
-        "lower legs": "Panturrilha / Tibial",
-        waist: "Abdômen",
+        // Braços
         biceps: "Bíceps",
         triceps: "Tríceps",
-        abdominals: "Abdômen",
-        quadriceps: "Quadríceps",
-        hamstrings: "Posteriores de Coxa",
+        forearms: "Antebraço",
+        "upper arms": "Bíceps",
+        "lower arms": "Antebraço",
+        // Pernas — todos os músculos das pernas mapeiam para o mesmo grupo
+        quadriceps: "Pernas",
+        hamstrings: "Pernas",
+        calves: "Pernas",
+        "upper legs": "Pernas",
+        "lower legs": "Pernas",
+        adductors: "Pernas",
+        abductors: "Pernas",
+        // Glúteos
         glutes: "Glúteos",
-        calves: "Panturrilha",
-        forearms: "Antebraços",
-        traps: "Trapézio",
-        lats: "Latíssimo do Dorso",
-        "middle back": "Dorsal Médio",
-        "lower back": "Lombar",
+        // Core
+        abdominals: "Abdômen",
+        waist: "Abdômen",
+        // Outros
         neck: "Pescoço",
-        adductors: "Adutores",
-        abductors: "Abdutores",
       };
 
       const T_EQUIPAMENTO = {
@@ -416,9 +532,9 @@
       async function salvarLote(exercicios) {
         const updates = {};
         for (const ex of exercicios) {
-          updates[`exercicios/${ex.id}`] = ex;
+          updates[ex.id] = ex;
         }
-        await db.ref().update(updates);
+        await db.ref("exercicios").update(updates);
       }
 
       function sleep(ms) {
