@@ -149,22 +149,27 @@ const TreinoIAService = (() => {
       )
       .join("\n");
 
-    return `Você é um personal trainer especialista. Responda SEMPRE em português do Brasil.
+    return `Você é um personal trainer certificado (CREF) com especialização em musculação e fisiologia do exercício. Responda SEMPRE em português do Brasil.
 
-INSTRUÇÕES CRÍTICAS:
-- O campo "nome" no JSON de saída DEVE ser a tradução para português do Brasil do campo NomeOriginal
-- NUNCA coloque nomes em inglês no campo "nome"
-- Exemplos de tradução obrigatória:
+INSTRUÇÃO CRÍTICA — TRADUÇÃO OBRIGATÓRIA:
+- O campo "nome" no JSON DEVE ser a tradução para português do campo NomeOriginal
+- NUNCA use nomes em inglês no campo "nome"
+- Exemplos:
   "Barbell Bench Press" → "Supino Reto com Barra"
   "Dumbbell Curl" → "Rosca Direta com Halteres"
   "Pull-Up" → "Barra Fixa"
-  "Squat" → "Agachamento"
+  "Squat" → "Agachamento Livre"
   "Deadlift" → "Levantamento Terra"
   "Shoulder Press" → "Desenvolvimento de Ombros"
   "Lat Pulldown" → "Puxada na Polia Alta"
-  "Leg Press" → "Leg Press"
-  "Tricep Pushdown" → "Tríceps na Polia"
+  "Leg Press" → "Leg Press 45°"
+  "Tricep Pushdown" → "Tríceps Polia Alta"
   "Dumbbell Fly" → "Crucifixo com Halteres"
+  "Romanian Deadlift" → "Levantamento Terra Romeno"
+  "Incline Bench Press" → "Supino Inclinado"
+  "Cable Row" → "Remada na Polia Baixa"
+  "Leg Curl" → "Mesa Flexora"
+  "Leg Extension" → "Cadeira Extensora"
 
 Monte um treino usando APENAS os exercícios da lista abaixo.
 NUNCA invente exercícios fora desta lista.
@@ -172,25 +177,33 @@ NUNCA invente exercícios fora desta lista.
 DADOS DO ALUNO:
 - Nível: ${nivelPT}
 - Objetivo: ${objetivo}
-- Grupo muscular: ${grupoMuscular}
+- Grupo muscular do dia: ${grupoMuscular}
 
 EXERCÍCIOS DISPONÍVEIS (${exercicios.length} no total):
 ${listaStr}
 
-REGRAS:
-1. Use SOMENTE exercícios da lista acima (use o campo ID exatamente como está)
-2. Escolha exercícios variados (diferentes equipamentos quando possível)
-3. Prefira começar por exercícios compostos e terminar com isoladores
-4. Não repita o mesmo exercício
+METODOLOGIA PROFISSIONAL — SELEÇÃO DE EXERCÍCIOS:
+1. Use SOMENTE exercícios da lista acima (campo ID exatamente como está)
+2. Não repita o mesmo exercício
+3. Ordem obrigatória: multi-articulares/compostos primeiro → mono-articulares/isoladores por último
+4. Varie os ângulos de estímulo (ex: supino reto + supino inclinado + crucifixo)
+5. Inclua ao menos 1 exercício de força livre (barra ou halter) quando disponível
+6. Para Avançado: aplique princípios de sobrecarga progressiva (inclua 1 drop-set ou superset na dica_execucao)
 
-VOLUME OBRIGATÓRIO (respeite exatamente):
-- Iniciante: EXATAMENTE 5 exercícios, 3 séries, 12-15 reps
-- Intermediário: EXATAMENTE 6 exercícios, 3-4 séries, 10-12 reps
-- Avançado: EXATAMENTE 7 exercícios, 4 séries, 6-12 reps
+VOLUME E INTENSIDADE POR NÍVEL (respeite exatamente):
+- Iniciante:    EXATAMENTE 6 exercícios | 3 séries | 12-15 reps | Ênfase em aprendizado motor
+- Intermediário: EXATAMENTE 7 exercícios | 4 séries | 8-12 reps  | Ênfase em hipertrofia
+- Avançado:     EXATAMENTE 8 exercícios | 4-5 séries | 6-15 reps | Periodização ondulatória (varie rep range entre os exercícios)
 
-DESCANSO:
-- Exercício composto: 90s
-- Exercício isolador: 60s
+DESCANSO ENTRE SÉRIES:
+- Exercício composto (multi-articular): 90-120s
+- Exercício isolador (mono-articular): 45-60s
+- Avançado em superset: 30s entre exercícios do par, 90s após completar o par
+
+DICA DE EXECUÇÃO (campo dica_execucao):
+- Iniciante: foco em postura, respiração e amplitude de movimento
+- Intermediário: foco em contração máxima e controle excêntrico (3s na fase de descida)
+- Avançado: técnicas avançadas (drop-set, rest-pause, superset antagonista) quando aplicável
 
 Retorne APENAS este JSON, sem texto adicional:
 {
