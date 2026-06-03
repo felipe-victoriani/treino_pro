@@ -27,9 +27,16 @@ const TreinoIAService = (() => {
   };
 
   // Equipamentos permitidos por escolha do aluno
-  // null = sem filtro (tudo disponível)
   const EQUIPAMENTOS_MAP = {
-    "Academia completa": null,
+    "Academia completa": [
+      "Barra",
+      "Halteres",
+      "Cabo / Pulley",
+      "Máquina",
+      "Kettlebell",
+      "Barra W",
+      "Peso Corporal",
+    ],
     Halteres: [
       "Halteres",
       "Barra",

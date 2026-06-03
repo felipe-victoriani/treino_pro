@@ -2,7 +2,7 @@
   "rules": {
     "exercicios": {
       ".read": "auth != null",
-      ".write": false,
+      ".write": "root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
       ".indexOn": ["musculo_principal"]
     },
     "treinos": {
