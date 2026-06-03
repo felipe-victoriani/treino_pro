@@ -176,9 +176,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       overlay.classList.remove("open");
     });
 
-    overlay.addEventListener("click", (e) => {
-      if (e.target === overlay) overlay.classList.remove("open");
-    });
+    // Delay antes de aceitar cliques fora da sheet para evitar
+    // fechamento acidental por duplo toque no botão de submit
+    setTimeout(() => {
+      overlay.addEventListener(
+        "click",
+        (e) => {
+          if (e.target === overlay) overlay.classList.remove("open");
+        },
+        { once: true },
+      );
+    }, 400);
   }
 
   /* --- Lógica de criação de conta --- */

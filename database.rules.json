@@ -33,23 +33,60 @@
       }
     },
     "professores": {
-      ".read": "root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
+      ".read": true,
       ".write": "root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
       "$uid": {
         ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
         ".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin'"
       }
     },
+    "historicoTreinos": {
+      "$uid": {
+        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
+        ".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'"
+      }
+    },
     "mensagens": {
       "$uid": {
         ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
-        ".write": "auth != null"
+        ".write": "auth != null",
+        ".indexOn": ["lida"]
       }
     },
     "usuarios": {
       "$uid": {
         ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
         ".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin'"
+      }
+    },
+    "historicoIMC": {
+      "$uid": {
+        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
+        ".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'"
+      }
+    },
+    "conquistas": {
+      "$uid": {
+        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
+        ".write": "$uid === auth.uid"
+      }
+    },
+    "favoritosProfessor": {
+      "$uid": {
+        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
+        ".write": "$uid === auth.uid"
+      }
+    },
+    "recentesProfessor": {
+      "$uid": {
+        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
+        ".write": "$uid === auth.uid"
+      }
+    },
+    "exerciciosCustom": {
+      "$uid": {
+        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
+        ".write": "$uid === auth.uid"
       }
     },
     "$other": {
