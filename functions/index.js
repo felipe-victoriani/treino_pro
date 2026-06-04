@@ -191,14 +191,14 @@ exports.gerarTreino = onCall(
       );
     }
 
-    // ── Rate limit: máx 10 chamadas por usuário por dia ────
+    // ── Rate limit: máx 20 chamadas por usuário por dia ────
     const hoje = new Date().toISOString().split("T")[0]; // ex: "2026-06-02"
     const rateRef = db.ref(`rateLimits/${uid}/${hoje}`);
 
     let permitido = false;
     await rateRef.transaction((atual) => {
       const count = atual ?? 0;
-      if (count >= 10) {
+      if (count >= 20) {
         permitido = false;
         return; // undefined = aborta sem gravar
       }
@@ -209,7 +209,7 @@ exports.gerarTreino = onCall(
     if (!permitido) {
       throw new HttpsError(
         "resource-exhausted",
-        "Limite diário de 10 gerações atingido. Tente novamente amanhã.",
+        "Limite diário de 20 gerações atingido. Tente novamente amanhã.",
       );
     }
 
