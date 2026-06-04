@@ -379,6 +379,38 @@
 
           <!-- Card de dados pessoais -->
           <div class="card mb-16">
+            <div
+              style="
+                display: flex;
+                justify-content: flex-end;
+                margin-bottom: 8px;
+              "
+            >
+              <button
+                class="btn-editar"
+                id="btn-editar-perfil"
+                onclick="openEditarPerfilModal()"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+                  />
+                  <path
+                    d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+                  />
+                </svg>
+                Editar
+              </button>
+            </div>
             <div class="profile-header-sm">
               <div style="position: relative; display: inline-block">
                 <div
@@ -400,16 +432,50 @@
             </div>
             <div class="profile-info-box">
               <div class="profile-info-row">
-                <span class="text-muted">Professor</span>
+                <span
+                  class="text-muted"
+                  style="display: flex; align-items: center; gap: 6px"
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#6b7280"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  Professor
+                </span>
                 <span class="text-primary-c fw-600" id="perfil-professor"
                   >-</span
                 >
               </div>
               <div class="profile-info-row">
-                <span class="text-muted">Treino atual</span>
+                <span
+                  class="text-muted"
+                  style="display: flex; align-items: center; gap: 6px"
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#6b7280"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                  </svg>
+                  Treino atual
+                </span>
                 <span class="text-purple fw-700" id="perfil-treino-atual"
                   >-</span
-                >
                 >
               </div>
               <div
@@ -423,7 +489,27 @@
                 >
               </div>
               <div class="profile-info-row">
-                <span class="text-muted">Membro desde</span>
+                <span
+                  class="text-muted"
+                  style="display: flex; align-items: center; gap: 6px"
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#6b7280"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                  Membro desde
+                </span>
                 <span class="text-primary-c fw-600" id="perfil-data-cadastro"
                   >-</span
                 >
@@ -507,6 +593,9 @@
               </h3>
               <span id="conquistas-total" class="badge-count">0/10</span>
             </div>
+            <p class="conquistas-hint" id="conquistas-hint">
+              Complete seu primeiro treino para desbloquear!
+            </p>
             <div id="conquistas-grid" class="conquistas-grid">
               <div class="empty-state"><div class="spinner"></div></div>
             </div>
@@ -877,5 +966,73 @@
     <script src="js/services/programas.service.js"></script>
     <script src="js/features/progressao.js"></script>
     <script src="js/pages/aluno.js"></script>
+
+    <!-- Modal: Editar Perfil -->
+    <div class="modal" id="modal-editar-perfil">
+      <div class="modal-content" style="max-width: 400px">
+        <div class="modal-header">
+          <h2 class="modal-title">Editar Perfil</h2>
+          <button
+            class="btn-icon btn-icon-ghost"
+            id="close-editar-perfil"
+            onclick="closeEditarPerfilModal()"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+              />
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="editar-nome">Nome</label>
+            <input
+              class="form-control"
+              type="text"
+              id="editar-nome"
+              placeholder="Seu nome"
+              maxlength="80"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editar-peso">Peso (kg)</label>
+            <input
+              class="form-control"
+              type="number"
+              id="editar-peso"
+              placeholder="Ex: 75.5"
+              min="20"
+              max="300"
+              step="0.1"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editar-altura">Altura (m)</label>
+            <input
+              class="form-control"
+              type="number"
+              id="editar-altura"
+              placeholder="Ex: 1.75"
+              min="1.00"
+              max="2.50"
+              step="0.01"
+            />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary" onclick="closeEditarPerfilModal()">
+            Cancelar
+          </button>
+          <button
+            class="btn-primary"
+            id="salvar-editar-perfil"
+            onclick="salvarEdicaoPerfil()"
+          >
+            Salvar
+          </button>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

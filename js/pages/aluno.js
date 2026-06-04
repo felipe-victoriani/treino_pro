@@ -749,14 +749,24 @@ async function loadPerfilSection() {
     });
     // Nome do professor
     var pid = data.professorId || alunoState.professorId;
+    var profEl = document.getElementById("perfil-professor");
     if (pid) {
       db.ref("users/" + pid)
         .once("value")
         .then(function (s) {
-          var profEl = document.getElementById("perfil-professor");
-          if (profEl && s.val())
-            profEl.textContent = sanitize(s.val().nome || "Professor");
+          if (profEl) {
+            if (s.val() && s.val().nome) {
+              profEl.textContent = sanitize(s.val().nome);
+              profEl.style.color = "";
+            } else {
+              profEl.textContent = "Sem professor vinculado";
+              profEl.style.color = "#4b5563";
+            }
+          }
         });
+    } else if (profEl) {
+      profEl.textContent = "Sem professor vinculado";
+      profEl.style.color = "#4b5563";
     }
     // Objetivo
     const objetivoRow = document.getElementById("perfil-objetivo-row");
@@ -1338,7 +1348,9 @@ async function renderConquistasPerfil() {
   // se o Firebase demorar/falhar ou se o usuário não tiver UID ainda.
   _renderGridConquistas([]);
   const totalEl = document.getElementById("conquistas-total");
-  if (totalEl) totalEl.textContent = "0/" + CONQUISTAS_DEFS.length;
+  const hintElInit = document.getElementById("conquistas-hint");
+  if (totalEl) totalEl.style.display = "none";
+  if (hintElInit) hintElInit.style.display = "block";
 
   if (!alunoState.uid) return;
 
@@ -1376,8 +1388,18 @@ async function renderConquistasPerfil() {
         .catch(() => {});
     }
 
-    if (totalEl)
-      totalEl.textContent = ganhas.length + "/" + CONQUISTAS_DEFS.length;
+    const badgeEl = document.getElementById("conquistas-total");
+    const hintEl = document.getElementById("conquistas-hint");
+    if (ganhas.length === 0) {
+      if (badgeEl) badgeEl.style.display = "none";
+      if (hintEl) hintEl.style.display = "block";
+    } else {
+      if (badgeEl) {
+        badgeEl.textContent = ganhas.length + "/" + CONQUISTAS_DEFS.length;
+        badgeEl.style.display = "flex";
+      }
+      if (hintEl) hintEl.style.display = "none";
+    }
     _renderGridConquistas(ganhas);
   } catch (e) {
     console.error("[Aluno] Erro ao carregar conquistas:", e);
@@ -1550,3 +1572,116 @@ function fecharFaseDesbloqueada() {
   // Recarrega a seção de treino para mostrar os novos exercícios
   alunoNavigate("treino");
 }
+
+/* -- Modal: Editar Perfil ------------------------------------ */
+function openEditarPerfilModal() {
+  const modal = document.getElementById("modal-editar-perfil");
+  if (!modal) return;
+  // Pré-preencher com dados atuais
+  const nomeEl = document.getElementById("editar-nome");
+  const pesoEl = document.getElementById("editar-peso");
+  const alturaEl = document.getElementById("editar-altura");
+  if (nomeEl)
+    nomeEl.value = document.getElementById("perfil-nome")?.textContent || "";
+  if (pesoEl && window.currentUserData?.peso)
+    pesoEl.value = window.currentUserData.peso;
+  if (alturaEl && window.currentUserData?.altura)
+    alturaEl.value = window.currentUserData.altura;
+  modal.classList.add("open");
+}
+
+function closeEditarPerfilModal() {
+  const modal = document.getElementById("modal-editar-perfil");
+  if (modal) modal.classList.remove("open");
+}
+
+async function salvarEdicaoPerfil() {
+  if (!window.currentUser) {
+    showToast("Usuário não autenticado.", "error");
+    return;
+  }
+  const uid = window.currentUser.uid;
+  const nome = sanitize(
+    (document.getElementById("editar-nome")?.value || "").trim(),
+  );
+  const pesoRaw = parseFloat(document.getElementById("editar-peso")?.value);
+  const alturaRaw = parseFloat(document.getElementById("editar-altura")?.value);
+
+  if (!nome) {
+    showToast("O nome não pode estar vazio.", "warning");
+    return;
+  }
+  if (isNaN(pesoRaw) || pesoRaw < 20 || pesoRaw > 300) {
+    showToast("Peso inválido (entre 20 e 300 kg).", "warning");
+    return;
+  }
+  let altura = alturaRaw;
+  if (altura >= 100 && altura <= 250) altura = altura / 100;
+  if (isNaN(altura) || altura < 1.0 || altura > 2.5) {
+    showToast("Altura inválida (entre 1,00 m e 2,50 m).", "warning");
+    return;
+  }
+  altura = parseFloat(altura.toFixed(2));
+  const peso = parseFloat(pesoRaw.toFixed(1));
+
+  const btn = document.getElementById("salvar-editar-perfil");
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "Salvando...";
+  }
+
+  try {
+    const updates = { nome, peso, altura };
+    await Promise.all([
+      db.ref("users/" + uid).update(updates),
+      db.ref("alunos/" + uid).update(updates),
+    ]);
+
+    // Atualiza cache local
+    if (window.currentUserData) Object.assign(window.currentUserData, updates);
+    alunoState.nome = nome;
+
+    // Atualiza UI sem recarregar
+    const nomeEl = document.getElementById("perfil-nome");
+    const welcomeEl = document.getElementById("welcome-name");
+    if (nomeEl) nomeEl.textContent = nome;
+    if (welcomeEl)
+      welcomeEl.textContent = "Olá, " + nome.split(" ")[0] + "! 💪";
+
+    // Atualiza avatar com nova inicial/cor
+    const avatarEl = document.getElementById("perfil-avatar");
+    if (avatarEl) {
+      avatarEl.textContent = getInitials(nome);
+      avatarEl.style.background = getAvatarColor(nome);
+    }
+
+    // Recalcula IMC se houve mudança de peso/altura
+    const novoIMC = calcularIMC(peso, altura);
+    if (novoIMC) {
+      await db.ref("alunos/" + uid).update({ imc: novoIMC });
+      await db.ref("users/" + uid).update({ imc: novoIMC });
+      if (window.currentUserData) window.currentUserData.imc = novoIMC;
+      renderIMCPerfil(novoIMC, peso, altura);
+    }
+
+    showToast("Perfil atualizado com sucesso!", "success");
+    closeEditarPerfilModal();
+  } catch (e) {
+    console.error("[Perfil] Erro ao salvar:", e);
+    showToast("Erro ao salvar perfil. Tente novamente.", "error");
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Salvar";
+    }
+  }
+}
+
+// Fechar modal ao clicar fora
+document.addEventListener("DOMContentLoaded", function () {
+  document
+    .getElementById("modal-editar-perfil")
+    ?.addEventListener("click", function (e) {
+      if (e.target.id === "modal-editar-perfil") closeEditarPerfilModal();
+    });
+});

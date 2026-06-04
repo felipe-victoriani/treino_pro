@@ -668,6 +668,17 @@ textarea.form-control {
   letter-spacing: 0.3px;
 }
 
+/* Avatar circular no perfil do aluno */
+#perfil-avatar {
+  width: 64px;
+  min-width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  font-weight: 700;
+  padding: 0;
+}
+
 .avatar-sm {
   width: 34px;
   height: 34px;
@@ -2476,6 +2487,65 @@ textarea.form-control {
   background: var(--gradient-primary);
 }
 
+/* Barra segmentada do IMC no perfil */
+.imc-bar-segmentada-wrap {
+  padding: 0 4px;
+}
+
+.imc-bar-segmentada {
+  display: flex;
+  height: 12px;
+  border-radius: var(--radius-pill);
+  overflow: visible;
+  position: relative;
+  gap: 2px;
+}
+
+.imc-seg {
+  flex: 1;
+  height: 100%;
+  border-radius: 4px;
+}
+
+.imc-seg-abaixo {
+  background: #60a5fa;
+  flex: 14;
+} /* <18.5  → 14% dos 25 pts */
+.imc-seg-normal {
+  background: #22c55e;
+  flex: 25;
+} /* 18.5–24.9 */
+.imc-seg-sobrepeso {
+  background: #facc15;
+  flex: 20;
+} /* 25–29.9 */
+.imc-seg-obesidade {
+  background: #ef4444;
+  flex: 41;
+} /* 30+ */
+
+.imc-bar-marker {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.imc-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+
 .imc-scale {
   display: flex;
   justify-content: space-between;
@@ -3124,6 +3194,25 @@ textarea.form-control {
    ============================================================ */
 .card-wide {
   max-width: 500px;
+}
+
+/* Botão Editar Perfil */
+.btn-editar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: 1px solid #22c55e;
+  color: #22c55e;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-editar:hover {
+  background: rgba(34, 197, 94, 0.1);
 }
 
 /* ============================================================
@@ -4734,15 +4823,24 @@ textarea.form-control {
 .conquista-item.locked {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.07);
-  opacity: 0.5;
+  opacity: 0.45;
+}
+
+.conquistas-hint {
+  font-size: 0.75rem;
+  color: #4b5563;
+  margin-top: 4px;
+  text-align: center;
+  padding: 0 8px;
+  display: none;
 }
 .conquista-emoji {
   font-size: 1.6rem;
   line-height: 1;
 }
 .conquista-nome {
-  font-size: 0.64rem;
-  color: var(--text-muted);
+  font-size: 0.7rem;
+  color: #6b7280;
   font-weight: 600;
   line-height: 1.2;
 }

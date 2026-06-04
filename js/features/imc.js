@@ -138,6 +138,26 @@ async function salvarIMC() {
 }
 
 /**
+ * Calcula posição do marcador na barra segmentada (intervalo 15–40 → 0%–100%)
+ */
+function calcularPosicaoIMC(imc) {
+  const min = 15,
+    max = 40;
+  const pos = ((imc - min) / (max - min)) * 100;
+  return Math.min(Math.max(pos, 0), 100);
+}
+
+/**
+ * Retorna a cor do valor numérico conforme categoria
+ */
+function corValorIMC(imc) {
+  if (imc < 18.5) return "#60a5fa";
+  if (imc < 25) return "#22c55e";
+  if (imc < 30) return "#facc15";
+  return "#ef4444";
+}
+
+/**
  * Renderiza o IMC na seção de perfil
  */
 function renderIMCPerfil(imc, peso, altura) {
@@ -156,19 +176,33 @@ function renderIMCPerfil(imc, peso, altura) {
     return;
   }
 
-  const { classe, cor, emoji } = classificarIMC(imc);
-  const min = 15,
-    max = 45;
-  const pct = Math.min(100, Math.max(0, ((imc - min) / (max - min)) * 100));
+  const { classe, emoji } = classificarIMC(imc);
+  const corValor = corValorIMC(imc);
+  const markerPos = calcularPosicaoIMC(parseFloat(imc));
 
   container.innerHTML = `
     <div style="text-align:center;padding:16px 0;">
-      <div style="font-size:3rem;font-weight:900;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">${formatIMC(imc)}</div>
-      <div style="font-size:1rem;font-weight:700;color:${cor};margin-bottom:12px;">${emoji} ${classe}</div>
-      <div class="imc-bar-container">
-        <div class="imc-bar-fill" style="width:${pct}%;background:${cor}"></div>
+      <div style="font-size:3rem;font-weight:900;color:${corValor};line-height:1;">${formatIMC(imc)}</div>
+      <div style="font-size:1rem;font-weight:700;color:${corValor};margin-bottom:16px;">${emoji} ${classe}</div>
+
+      <!-- Barra segmentada com marcador -->
+      <div class="imc-bar-segmentada-wrap">
+        <div class="imc-bar-segmentada">
+          <div class="imc-seg imc-seg-abaixo"></div>
+          <div class="imc-seg imc-seg-normal"></div>
+          <div class="imc-seg imc-seg-sobrepeso"></div>
+          <div class="imc-seg imc-seg-obesidade"></div>
+          <div class="imc-bar-marker" style="left:${markerPos}%"></div>
+        </div>
+        <div class="imc-bar-labels">
+          <span style="color:#60a5fa;">Abaixo</span>
+          <span style="color:#22c55e;">Normal</span>
+          <span style="color:#facc15;">Sobrepeso</span>
+          <span style="color:#ef4444;">Obesidade</span>
+        </div>
       </div>
-      <div class="imc-info-grid" style="margin-top:12px;">
+
+      <div class="imc-info-grid" style="margin-top:16px;">
         <div class="imc-info-card"><div class="label">Peso</div><div class="value">${peso} kg</div></div>
         <div class="imc-info-card"><div class="label">Altura</div><div class="value">${altura} m</div></div>
       </div>

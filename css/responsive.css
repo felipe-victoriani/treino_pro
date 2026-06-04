@@ -298,6 +298,116 @@
 }
 
 /* ============================================================
+   MELHORIAS PERFIL — RESPONSIVO MOBILE / PWA
+   ============================================================ */
+
+/* ---- ≤ 600px: modal Editar Perfil como bottom sheet ---- */
+@media (max-width: 600px) {
+  #modal-editar-perfil {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  #modal-editar-perfil .modal-content {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 20px 20px 0 0;
+    max-height: 92dvh;
+    max-height: 92vh; /* fallback para browsers antigos */
+    padding: 24px 20px 20px;
+    animation: slideUpSheet 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+    overflow-y: auto;
+  }
+
+  /* Alça visual de drag (bottom sheet) */
+  #modal-editar-perfil .modal-content::before {
+    content: "";
+    display: block;
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.15);
+    margin: 0 auto 20px;
+  }
+
+  /* Botões do footer: empilhados e full-width */
+  #modal-editar-perfil .modal-footer {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  #modal-editar-perfil .modal-footer .btn-primary,
+  #modal-editar-perfil .modal-footer .btn-secondary {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+    padding: 14px 20px;
+    font-size: 1rem;
+  }
+
+  /* Inputs com área de toque adequada (mín 44px) */
+  #modal-editar-perfil .form-control {
+    min-height: 48px;
+    font-size: 1rem; /* evita zoom automático do iOS */
+  }
+}
+
+/* ---- ≤ 480px: ajustes finos ---- */
+@media (max-width: 480px) {
+  /* IMC bar labels: reduzir fonte para caber as 4 etiquetas */
+  .imc-bar-labels {
+    font-size: 0.62rem;
+    gap: 0;
+  }
+
+  /* Profile info row: permite quebra se o valor for muito longo */
+  .profile-info-row {
+    flex-wrap: wrap;
+    row-gap: 2px;
+  }
+
+  /* Conquistas hint: aumentar área de leitura */
+  .conquistas-hint {
+    font-size: 0.78rem;
+    padding: 0 16px;
+  }
+}
+
+/* ---- ≤ 360px: telas mínimas ---- */
+@media (max-width: 360px) {
+  /* IMC bar labels ainda menores */
+  .imc-bar-labels {
+    font-size: 0.56rem;
+  }
+
+  /* Ícones do perfil: esconder em telas minúsculas para não apertar */
+  .profile-info-row > span:first-child svg {
+    display: none;
+  }
+
+  /* Avatar circular: garantir tamanho mínimo */
+  #perfil-avatar {
+    width: 56px;
+    min-width: 56px;
+    height: 56px;
+  }
+}
+
+/* ---- PWA Standalone (iPhone notch / home bar) ---- */
+@media (display-mode: standalone) {
+  /* Safe area no bottom do modal editar perfil */
+  #modal-editar-perfil .modal-content {
+    padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Btn de editar com área de toque confortável */
+  .btn-editar {
+    min-height: 36px;
+    padding: 6px 14px;
+  }
+}
+
+/* ============================================================
    PRINT
    ============================================================ */
 @media print {
