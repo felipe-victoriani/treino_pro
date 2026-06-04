@@ -11,10 +11,15 @@ document.addEventListener("userReady", ({ detail: { user, userData } }) => {
   }
   const nomeEl = document.getElementById("admin-nome");
   if (nomeEl) nomeEl.textContent = userData.nome || "";
+  // Registra o UID do admin para que alunos sem professor possam enviar mensagens
+  db.ref("config/adminUid")
+    .set(user.uid)
+    .catch(() => {});
   initAdmin(user.uid);
 });
 
 async function initAdmin(adminUid) {
+  suporteAdminUid = adminUid;
   /* --- Toggle senha --- */
   const togglePw = document.getElementById("toggle-prof-pw");
   const senhaInput = document.getElementById("prof-senha");
@@ -266,11 +271,18 @@ function switchTab(tab) {
     .getElementById("tab-alunos")
     .classList.toggle("hidden", tab !== "alunos");
   document
+    .getElementById("tab-suporte")
+    .classList.toggle("hidden", tab !== "suporte");
+  document
     .getElementById("tab-btn-professores")
     .classList.toggle("active", tab === "professores");
   document
     .getElementById("tab-btn-alunos")
     .classList.toggle("active", tab === "alunos");
+  document
+    .getElementById("tab-btn-suporte")
+    .classList.toggle("active", tab === "suporte");
+  if (tab === "suporte") carregarSuporteAlunos();
 }
 
 /* ---- Carregar lista de alunos ---- */
@@ -571,4 +583,143 @@ async function salvarEditarAluno() {
   } finally {
     hideLoading();
   }
+}
+
+/* ============================================================
+   SUPORTE — mensagens de alunos sem professor
+   ============================================================ */
+
+let suporteAdminUid = null;
+let suporteAlunoAtivo = null;
+
+async function carregarSuporteAlunos() {
+  const lista = document.getElementById("lista-suporte-alunos");
+  const totalEl = document.getElementById("total-suporte");
+  if (!lista) return;
+  lista.innerHTML =
+    '<div class="empty-state"><div class="spinner"></div></div>';
+
+  try {
+    const alunosSnap = await db.ref("alunos").once("value");
+    const alunosData = alunosSnap.val();
+
+    if (!alunosData) {
+      lista.innerHTML =
+        '<div class="empty-state"><p>Nenhum aluno sem professor.</p></div>';
+      if (totalEl) totalEl.textContent = "0";
+      return;
+    }
+
+    // Filtrar apenas alunos sem professor
+    const semProfessor = Object.entries(alunosData)
+      .filter(([, a]) => !a.professorId)
+      .map(([id, a]) => ({ id, ...a }))
+      .sort((a, b) => (a.nome || "").localeCompare(b.nome || ""));
+
+    if (semProfessor.length === 0) {
+      lista.innerHTML =
+        '<div class="empty-state"><p>Nenhum aluno sem professor.</p></div>';
+      if (totalEl) totalEl.textContent = "0";
+      return;
+    }
+
+    if (totalEl) totalEl.textContent = semProfessor.length;
+
+    // Para cada aluno, contar mensagens não lidas pelo admin
+    const htmlItems = await Promise.all(
+      semProfessor.map(async (a) => {
+        let naoLidas = 0;
+        try {
+          const msgSnap = await db
+            .ref(`mensagens/${a.id}`)
+            .orderByChild("lida")
+            .equalTo(false)
+            .once("value");
+          const msgs = msgSnap.val();
+          if (msgs) {
+            naoLidas = Object.values(msgs).filter(
+              (m) => m.deUid !== suporteAdminUid,
+            ).length;
+          }
+        } catch (_) {}
+
+        return `
+          <div class="admin-aluno-card" style="cursor:pointer;" onclick="abrirSuporteConversa('${a.id}', '${sanitize(a.nome || "Aluno")}')">
+            <div class="admin-prof-info">
+              <div class="admin-prof-nome">${sanitize(a.nome || "—")}</div>
+              <div class="admin-prof-email">${sanitize(a.email || "—")}</div>
+            </div>
+            <div class="admin-prof-actions" style="align-items:center;gap:8px;">
+              ${naoLidas > 0 ? `<span style="background:var(--danger,#e53e3e);color:#fff;border-radius:12px;padding:2px 8px;font-size:12px;font-weight:700;">${naoLidas} nova${naoLidas > 1 ? "s" : ""}</span>` : ""}
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="opacity:.5;">
+                <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
+              </svg>
+            </div>
+          </div>`;
+      }),
+    );
+
+    lista.innerHTML = htmlItems.join('<div class="list-divider"></div>');
+
+    // Badge na aba
+    const totalNaoLidas = await contarTotalNaoLidasSuporte(semProfessor);
+    atualizarBadgeSuporte(totalNaoLidas);
+  } catch (err) {
+    lista.innerHTML = '<div class="empty-state"><p>Erro ao carregar.</p></div>';
+    console.error("[Admin Suporte]", err);
+  }
+}
+
+async function contarTotalNaoLidasSuporte(alunos) {
+  let total = 0;
+  for (const a of alunos) {
+    try {
+      const snap = await db
+        .ref(`mensagens/${a.id}`)
+        .orderByChild("lida")
+        .equalTo(false)
+        .once("value");
+      const msgs = snap.val();
+      if (msgs) {
+        total += Object.values(msgs).filter(
+          (m) => m.deUid !== suporteAdminUid,
+        ).length;
+      }
+    } catch (_) {}
+  }
+  return total;
+}
+
+function atualizarBadgeSuporte(count) {
+  const badge = document.getElementById("badge-suporte");
+  if (!badge) return;
+  if (count > 0) {
+    badge.textContent = count > 9 ? "9+" : count;
+    badge.classList.remove("hidden");
+  } else {
+    badge.classList.add("hidden");
+  }
+}
+
+function abrirSuporteConversa(alunoId, alunoNome) {
+  suporteAlunoAtivo = alunoId;
+  const card = document.getElementById("suporte-conversa-card");
+  const nomeEl = document.getElementById("suporte-conversa-nome");
+  if (nomeEl) nomeEl.textContent = alunoNome;
+  if (card) card.classList.remove("hidden");
+
+  loadMensagens(alunoId, "suporte-messages-container", suporteAdminUid);
+  setupMensagemForm(
+    alunoId,
+    "suporte-msg-input",
+    "suporte-send-msg-btn",
+    alunoId,
+  );
+}
+
+function fecharSuporteConversa() {
+  suporteAlunoAtivo = null;
+  const card = document.getElementById("suporte-conversa-card");
+  if (card) card.classList.add("hidden");
+  stopMensagensListener();
 }

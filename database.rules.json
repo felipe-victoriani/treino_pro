@@ -89,6 +89,12 @@
         ".write": "$uid === auth.uid"
       }
     },
+    "config": {
+      "adminUid": {
+        ".read": "auth != null",
+        ".write": "root.child('users').child(auth.uid).child('tipo').val() === 'admin'"
+      }
+    },
     "$other": {
       ".read": "auth != null && (root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin')",
       ".write": "auth != null && (root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin')"

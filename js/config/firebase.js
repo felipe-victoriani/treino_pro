@@ -105,8 +105,8 @@ auth
     },
     "mensagens": {
       "$alunoId": {
-        ".read":  "auth.uid === $alunoId || root.child('alunos/' + $alunoId + '/professorId').val() === auth.uid",
-        ".write": "auth.uid === $alunoId || root.child('alunos/' + $alunoId + '/professorId').val() === auth.uid"
+        ".read":  "auth.uid === $alunoId || root.child('alunos/' + $alunoId + '/professorId').val() === auth.uid || root.child('users/' + auth.uid + '/tipo').val() === 'admin'",
+        ".write": "auth.uid === $alunoId || root.child('alunos/' + $alunoId + '/professorId').val() === auth.uid || root.child('users/' + auth.uid + '/tipo').val() === 'admin'"
       }
     },
     "historicoTreinos": {

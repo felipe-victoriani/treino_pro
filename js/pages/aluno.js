@@ -657,14 +657,47 @@ async function loadDietaSection() {
   await loadDietaAluno(alunoState.uid, "aluno-dieta-content");
 }
 /* -- Secao Mensagens ----------------------------------------- */
-function loadMensagensSection() {
+async function loadMensagensSection() {
   loadMensagens(alunoState.uid, "aluno-messages-container", alunoState.uid);
+
+  // Se o aluno não tem professor, as mensagens são enviadas ao administrador
+  let paraUid = alunoState.professorId;
+  if (!paraUid) {
+    paraUid = await getAdminUid();
+    const nomeProfEl = document.getElementById("msgs-professor-name");
+    if (nomeProfEl) nomeProfEl.classList.add("hidden");
+    const subtitulo = document.getElementById("msg-section-subtitulo");
+    if (subtitulo) {
+      subtitulo.textContent = "Fale com o suporte";
+      subtitulo.classList.remove("hidden");
+    }
+  } else {
+    const nomeProfEl = document.getElementById("msgs-professor-name");
+    if (nomeProfEl) nomeProfEl.classList.remove("hidden");
+    const subtitulo = document.getElementById("msg-section-subtitulo");
+    if (subtitulo) subtitulo.classList.add("hidden");
+  }
+
   setupMensagemForm(
     alunoState.uid,
     "aluno-msg-input",
     "aluno-send-msg-btn",
-    alunoState.professorId,
+    paraUid,
   );
+}
+
+/**
+ * Busca o UID do administrador no Firebase via config/adminUid.
+ * @returns {Promise<string|null>}
+ */
+async function getAdminUid() {
+  try {
+    const snap = await db.ref("config/adminUid").once("value");
+    return snap.val() || null;
+  } catch (err) {
+    console.error("[Mensagens] Erro ao buscar admin:", err);
+    return null;
+  }
 }
 /* -- Secao Perfil -------------------------------------------- */
 async function loadPerfilSection() {
