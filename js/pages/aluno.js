@@ -662,6 +662,7 @@ async function loadMensagensSection() {
 
   // Se o aluno não tem professor, as mensagens são enviadas ao administrador
   let paraUid = alunoState.professorId;
+  const msgInput = document.getElementById("aluno-msg-input");
   if (!paraUid) {
     paraUid = await getAdminUid();
     const nomeProfEl = document.getElementById("msgs-professor-name");
@@ -671,11 +672,16 @@ async function loadMensagensSection() {
       subtitulo.textContent = "Fale com o suporte";
       subtitulo.classList.remove("hidden");
     }
+    if (msgInput)
+      msgInput.placeholder = "Escreva uma mensagem para o suporte...";
+    const quickInfo = document.getElementById("quick-msg-info");
+    if (quickInfo) quickInfo.textContent = "Fale com o suporte";
   } else {
     const nomeProfEl = document.getElementById("msgs-professor-name");
     if (nomeProfEl) nomeProfEl.classList.remove("hidden");
     const subtitulo = document.getElementById("msg-section-subtitulo");
     if (subtitulo) subtitulo.classList.add("hidden");
+    if (msgInput) msgInput.placeholder = "Escreva para o seu professor...";
   }
 
   setupMensagemForm(
