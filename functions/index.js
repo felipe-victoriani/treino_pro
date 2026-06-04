@@ -184,10 +184,10 @@ exports.gerarTreino = onCall(
     if (prompt.length < 50) {
       throw new HttpsError("invalid-argument", "Prompt muito curto");
     }
-    if (prompt.length > 20000) {
+    if (prompt.length > 40000) {
       throw new HttpsError(
         "invalid-argument",
-        "Prompt excede o tamanho máximo (20.000 chars)",
+        "Prompt excede o tamanho máximo (40.000 chars)",
       );
     }
 
@@ -227,7 +227,8 @@ exports.gerarTreino = onCall(
         },
         body: JSON.stringify({
           model: "claude-haiku-4-5-20251001",
-          max_tokens: 1500,
+          max_tokens: 4096,
+          temperature: 0,
           messages: [{ role: "user", content: prompt }],
         }),
       });
@@ -248,12 +249,19 @@ exports.gerarTreino = onCall(
     const apiData = await resp.json();
     const text = apiData.content?.[0]?.text || "";
 
+    // Remove blocos markdown (```json ... ```) se presentes
+    const cleanText = text
+      .replace(/```(?:json)?\s*/gi, "")
+      .replace(/```\s*/g, "");
+
     // Extrai o bloco JSON (Claude às vezes adiciona texto antes/depois)
-    const match = text.match(/\{[\s\S]*\}/);
+    const match = cleanText.match(/\{[\s\S]*\}/);
     if (!match) {
       console.error(
-        "[Claude] Resposta sem JSON válido:",
-        text.substring(0, 500),
+        "[Claude] Resposta sem JSON válido. finish_reason:",
+        apiData.stop_reason,
+        "| Texto:",
+        text.substring(0, 800),
       );
       throw new HttpsError(
         "internal",
@@ -266,8 +274,10 @@ exports.gerarTreino = onCall(
       resultado = JSON.parse(match[0]);
     } catch (parseErr) {
       console.error(
-        "[Claude] Falha ao parsear JSON:",
-        match[0].substring(0, 500),
+        "[Claude] Falha ao parsear JSON. finish_reason:",
+        apiData.stop_reason,
+        "| JSON extraído:",
+        match[0].substring(0, 800),
       );
       throw new HttpsError(
         "internal",

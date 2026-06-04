@@ -138,7 +138,17 @@ const TreinoIAService = (() => {
   function _construirPrompt({ nivel, objetivo, grupoMuscular, exercicios }) {
     const nivelPT = NIVEL_PT[nivel] || nivel;
 
-    const listaStr = exercicios
+    // Limita a 25 exercícios (embaralhados) — o Claude só precisa de 6–8
+    const MAX_EXERCICIOS = 25;
+    const lista =
+      exercicios.length > MAX_EXERCICIOS
+        ? exercicios
+            .slice()
+            .sort(() => Math.random() - 0.5)
+            .slice(0, MAX_EXERCICIOS)
+        : exercicios;
+
+    const listaStr = lista
       .map(
         (ex) =>
           `• ID: "${ex.id}" | NomeOriginal: "${ex.nome_original}" | ` +
@@ -179,7 +189,7 @@ DADOS DO ALUNO:
 - Objetivo: ${objetivo}
 - Grupo muscular do dia: ${grupoMuscular}
 
-EXERCÍCIOS DISPONÍVEIS (${exercicios.length} no total):
+EXERCÍCIOS DISPONÍVEIS (${lista.length} no total):
 ${listaStr}
 
 METODOLOGIA PROFISSIONAL — SELEÇÃO DE EXERCÍCIOS:
