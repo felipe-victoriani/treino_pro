@@ -890,9 +890,6 @@ async function mostrarCelebracao(letra, proxLetra, feitos, total) {
     streakEl.classList.add("hidden");
   }
   modal.classList.add("open");
-
-  // Verifica conquistas (todos os alunos) e progressão de fase (só independentes)
-  setTimeout(() => verificarProgressaoAposTreino(), 1600);
 }
 
 function fecharCelebracao() {
@@ -910,6 +907,9 @@ function fecharCelebracao() {
     if (btn) btn.classList.add("active");
     if (typeof mostrarTreino === "function") mostrarTreino(proxLetra);
   }
+  // Verifica conquistas e progressão de fase APÓS fechar o modal
+  // (garante que os toasts de conquistas fiquem visíveis ao usuário)
+  verificarProgressaoAposTreino();
 }
 
 /* -- Badge de Mensagens nao lidas ---------------------------- */
@@ -1436,49 +1436,8 @@ async function verificarProgressaoAposTreino() {
     alunoState.treinosCompletos = total;
     if (temProgressaoFase) alunoState.programaFase = novaFase;
 
-    // Avança treinoAtual para a próxima letra do programa (só independentes)
-    if (
-      temProgressaoFase &&
-      alunoState.programaAtivo === "ia-custom" &&
-      alunoState.treinoGerado
-    ) {
-      // IA: cicla circularmente pelas letras disponíveis
-      const letrasIA = Object.keys(
-        alunoState.treinoGerado.treinos || {},
-      ).sort();
-      if (letrasIA.length > 1) {
-        const letraHojeSnap = await db
-          .ref("historicoTreinos/" + alunoState.uid + "/" + getDateKey())
-          .once("value");
-        const letraHoje =
-          (letraHojeSnap.val() || {}).letra || alunoState.treinoAtual;
-        const idxIA = letrasIA.indexOf(letraHoje);
-        const proxIA =
-          idxIA !== -1 ? letrasIA[(idxIA + 1) % letrasIA.length] : letrasIA[0];
-        alunoState.treinoAtual = proxIA;
-        await db.ref("alunos/" + alunoState.uid + "/treinoAtual").set(proxIA);
-      }
-    } else if (
-      temProgressaoFase &&
-      alunoState.programaAtivo !== "ia-custom" &&
-      typeof proximaLetraPrograma !== "undefined"
-    ) {
-      const hiHojeSnap = await db
-        .ref("historicoTreinos/" + alunoState.uid + "/" + getDateKey())
-        .once("value");
-      const letraHoje =
-        (hiHojeSnap.val() || {}).letra || alunoState.treinoAtual;
-      const proxLetra = proximaLetraPrograma(
-        alunoState.programaAtivo,
-        letraHoje,
-      );
-      if (proxLetra !== letraHoje) {
-        await db
-          .ref("alunos/" + alunoState.uid + "/treinoAtual")
-          .set(proxLetra);
-        alunoState.treinoAtual = proxLetra;
-      }
-    }
+    // NOTA: O avanço de treinoAtual já é feito por finalizarTreino() antes de
+    // chamar mostrarCelebracao(). Não avançar aqui evita pular letras.
 
     // Persiste fase, treinos e novas conquistas no Firebase
     const updates = {
@@ -1498,8 +1457,8 @@ async function verificarProgressaoAposTreino() {
     await db.ref().update(updates);
 
     // Celebração de fase desbloqueada (prioridade máxima)
+    // Modal de celebração já está fechado (esta função é chamada por fecharCelebracao)
     if (faseMudou) {
-      fecharCelebracao();
       setTimeout(() => mostrarFaseDesbloqueada(novaFase), 400);
       return;
     }

@@ -387,7 +387,7 @@ function renderAlunosRecentes(alunos) {
         '<div class="student-avatar" style="background:' +
         getAvatarColor(a.nome) +
         '">' +
-        sanitize(a.nome || "Aluno") +
+        sanitize(getInitials(a.nome || "Aluno")) +
         "</div>" +
         "</div>" +
         '<div class="student-card-stats">' +

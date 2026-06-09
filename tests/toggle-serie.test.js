@@ -71,7 +71,7 @@ describe("toggleSerie — atualização de estado local", () => {
     global.toggleSerie(EX_ID, ALUNO, LETRA, 0, TOTAL, 0);
 
     const s = global._getSessaoLetra(LETRA);
-    expect(s.seriesCompletas[EX_ID]).toEqual({ s0: true });
+    expect(s.seriesCompletas[EX_ID]).toEqual({ s1: true });
   });
 
   test("desmarca série ao chamar novamente (toggle)", () => {
@@ -80,7 +80,7 @@ describe("toggleSerie — atualização de estado local", () => {
     global.toggleSerie(EX_ID, ALUNO, LETRA, 0, TOTAL, 0);
 
     const s = global._getSessaoLetra(LETRA);
-    expect(s.seriesCompletas[EX_ID]).not.toHaveProperty("s0");
+    expect(s.seriesCompletas[EX_ID]).not.toHaveProperty("s1");
   });
 
   test("NÃO chama db.ref() ao marcar série", () => {

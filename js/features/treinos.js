@@ -630,7 +630,7 @@ function renderExerciciosAluno(
       const descanso = parseInt(ex.descanso) || 0;
 
       const seriesPillsHtml = Array.from({ length: numSeries }, (_, i) => {
-        const sdone = !!exSeriesComp[`s${i}`];
+        const sdone = !!exSeriesComp[`s${i + 1}`];
         const repsLabel = ex.repeticoes
           ? `<span class="serie-reps">${sanitize(ex.repeticoes)}</span>`
           : "";
@@ -708,7 +708,7 @@ function toggleSerie(exId, alunoId, letra, serieIdx, totalSeries, descanso) {
 
   const sessao = _getSessaoLetra(letra);
   const exSeries = { ...(sessao.seriesCompletas[exId] || {}) };
-  const key = `s${serieIdx}`;
+  const key = `s${serieIdx + 1}`;
   const wasDone = !!exSeries[key];
 
   if (wasDone) delete exSeries[key];
@@ -851,6 +851,7 @@ async function finalizarTreino(alunoId) {
       exerciciosConcluidos,
       totalExercicios,
       timestamp: Date.now(),
+      letra,
     });
     // Marca esta letra como concluída hoje (permite ciclos: A→B→A)
     await db
@@ -975,9 +976,12 @@ async function loadHistoricoTreinos(alunoId, containerId, limite = 14) {
             : 0;
         const statusClass = h.completado ? "status-ok" : "status-partial";
         const statusText = h.completado ? "✅ Completo" : `${pct}% concluído`;
+        const letrasFeitas = h.letrasCompletas
+          ? Object.keys(h.letrasCompletas).sort().join("+")
+          : h.letra || "?";
         return `
           <div class="historico-item">
-            <div class="historico-letra">${sanitize(h.letra || "?")}</div>
+            <div class="historico-letra">${sanitize(letrasFeitas)}</div>
             <div class="historico-info">
               <div class="historico-data">${formatDate(data)}</div>
               <div class="historico-exs">${h.exerciciosConcluidos || 0} / ${h.totalExercicios || 0} exercícios</div>
