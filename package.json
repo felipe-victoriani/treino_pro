@@ -1,7 +1,9 @@
 {
   "scripts": {
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "predeploy": "node scripts/bump-cache.js",
+    "deploy": "vercel --prod"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

@@ -1,0 +1,32 @@
+name: Deploy para Vercel
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Atualizar CACHE_NAME no Service Worker
+        run: node scripts/bump-cache.js
+
+      - name: Commit do sw.js atualizado
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add sw.js
+          git diff --staged --quiet || git commit -m "chore: bump service worker cache [skip ci]"
+          git push
+
+      - name: Deploy no Vercel
+        run: npx vercel --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
