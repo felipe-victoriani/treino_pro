@@ -3,7 +3,7 @@
     "exercicios": {
       ".read": "auth != null",
       ".write": "root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
-      ".indexOn": ["musculo_principal"]
+      ".indexOn": ["musculo_principal", "ativo"]
     },
     "treinos": {
       "$uid": {

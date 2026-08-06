@@ -1,95 +1,96 @@
-﻿/* ============================================================
+/* ============================================================
    TREINO PRO - Estilos Principais
-   Tema: Dark fitness — preto e verde
+   Tema: Dark fitness — carvão quente e lima ácida
    ============================================================ */
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Manrope:wght@400;500;600;700;800&display=swap");
 
 /* ---- Variáveis CSS (Design Tokens) ---- */
 :root {
-  /* Escala de verde */
-  --green-900: #052e16;
-  --green-800: #14532d;
-  --green-700: #15803d;
-  --green-600: #16a34a;
-  --green-500: #22c55e;
-  --green-400: #4ade80;
-  --green-300: #86efac;
-  --green-200: #bbf7d0;
-  --green-100: #dcfce7;
+  /* Escala de lima (identidade própria — não é o verde padrão de template) */
+  --green-900: #14210b;
+  --green-800: #1f3712;
+  --green-700: #2f5219;
+  --green-600: #4c7a22;
+  --green-500: #8ac93a;
+  --green-400: #a9dc63;
+  --green-300: #c3e896;
+  --green-200: #dcf3c0;
+  --green-100: #eef8e0;
 
-  /* Aliases purple → green (compatibilidade com todo o CSS existente) */
-  --purple-900: #052e16;
-  --purple-800: #14532d;
-  --purple-700: #15803d;
-  --purple-600: #16a34a;
-  --purple-500: #22c55e;
-  --purple-400: #4ade80;
-  --purple-300: #86efac;
+  /* Aliases purple → lima (compatibilidade com todo o CSS existente) */
+  --purple-900: #14210b;
+  --purple-800: #1f3712;
+  --purple-700: #2f5219;
+  --purple-600: #4c7a22;
+  --purple-500: #8ac93a;
+  --purple-400: #a9dc63;
+  --purple-300: #c3e896;
 
-  /* Aliases blue → green */
-  --blue-900: #080808;
-  --blue-800: #111111;
-  --blue-700: #15803d;
-  --blue-600: #16a34a;
-  --blue-500: #22c55e;
-  --blue-400: #4ade80;
-  --blue-300: #86efac;
-  --blue-200: #bbf7d0;
-  --blue-100: #dcfce7;
+  /* Aliases blue → lima */
+  --blue-900: #0a0b08;
+  --blue-800: #13140f;
+  --blue-700: #2f5219;
+  --blue-600: #4c7a22;
+  --blue-500: #8ac93a;
+  --blue-400: #a9dc63;
+  --blue-300: #c3e896;
+  --blue-200: #dcf3c0;
+  --blue-100: #eef8e0;
 
-  /* Aliases cyan → verde claro */
-  --cyan-400: #4ade80;
-  --cyan-300: #86efac;
-  --cyan-200: #bbf7d0;
+  /* Aliases cyan → lima clara */
+  --cyan-400: #a9dc63;
+  --cyan-300: #c3e896;
+  --cyan-200: #dcf3c0;
 
   /* Cores de perigo (vermelho mantido para ações destrutivas) */
   --red-500: #ef4444;
   --red-400: #f87171;
   --red-300: #fca5a5;
 
-  /* Backgrounds — preto profundo */
-  --bg-app: #080808;
-  --bg-dark: #0d0d0d;
-  --bg-card: #111111;
-  --bg-card-2: #151515;
-  --bg-card-3: #1a1a1a;
-  --bg-input: #0d0d0d;
-  --bg-overlay: rgba(0, 0, 0, 0.88);
+  /* Backgrounds — carvão quente, não preto puro */
+  --bg-app: #0a0b08;
+  --bg-dark: #0e0f0a;
+  --bg-card: #13140f;
+  --bg-card-2: #171911;
+  --bg-card-3: #1c1e15;
+  --bg-input: #0e0f0a;
+  --bg-overlay: rgba(6, 7, 4, 0.88);
 
   /* Textos */
-  --text-white: #ffffff;
-  --text-primary: #e2e8f0;
-  --text-secondary: #86efac;
-  --text-muted: #64748b;
-  --text-accent: #4ade80;
+  --text-white: #fafaf6;
+  --text-primary: #e3e5da;
+  --text-secondary: #a9dc63;
+  --text-muted: #767c68;
+  --text-accent: #a9dc63;
 
   /* Bordas */
-  --border-blue: rgba(34, 197, 94, 0.35);
-  --border-cyan: rgba(74, 222, 128, 0.25);
+  --border-blue: rgba(138, 201, 58, 0.35);
+  --border-cyan: rgba(169, 220, 99, 0.25);
   --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-card: rgba(34, 197, 94, 0.18);
-  --border-purple: rgba(34, 197, 94, 0.3);
+  --border-card: rgba(138, 201, 58, 0.18);
+  --border-purple: rgba(138, 201, 58, 0.3);
 
   /* Gradientes */
-  --gradient-primary: linear-gradient(135deg, #16a34a 0%, #4ade80 100%);
-  --gradient-blue: linear-gradient(135deg, #14532d 0%, #16a34a 100%);
-  --gradient-cyan: linear-gradient(135deg, #22c55e 0%, #4ade80 100%);
-  --gradient-dark: linear-gradient(180deg, #0d0d0d 0%, #080808 100%);
-  --gradient-card: linear-gradient(145deg, #1a1a1a 0%, #0d0d0d 100%);
+  --gradient-primary: linear-gradient(135deg, #4c7a22 0%, #a9dc63 100%);
+  --gradient-blue: linear-gradient(135deg, #1f3712 0%, #4c7a22 100%);
+  --gradient-cyan: linear-gradient(135deg, #8ac93a 0%, #a9dc63 100%);
+  --gradient-dark: linear-gradient(180deg, #0e0f0a 0%, #0a0b08 100%);
+  --gradient-card: linear-gradient(145deg, #1c1e15 0%, #0e0f0a 100%);
   --gradient-hero: linear-gradient(
     135deg,
-    #080808 0%,
-    #14532d 50%,
-    #080808 100%
+    #14170e 0%,
+    #0e0f0a 55%,
+    #0a0b08 100%
   );
   --gradient-red: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
 
-  /* Sombras */
+  /* Sombras — glow mais discreto, não em tudo */
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
-  --shadow-blue: 0 0 24px rgba(34, 197, 94, 0.25);
-  --shadow-cyan: 0 0 24px rgba(74, 222, 128, 0.18);
-  --shadow-purple: 0 0 24px rgba(34, 197, 94, 0.3);
+  --shadow-blue: 0 0 18px rgba(138, 201, 58, 0.15);
+  --shadow-cyan: 0 0 18px rgba(169, 220, 99, 0.12);
+  --shadow-purple: 0 0 18px rgba(138, 201, 58, 0.16);
   --shadow-card:
     0 4px 20px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 
@@ -112,8 +113,9 @@
   --transition-base: all 0.25s ease;
   --transition-slow: all 0.4s ease;
 
-  /* Tipografia */
-  --font-main: "Segoe UI", "Inter", system-ui, -apple-system, sans-serif;
+  /* Tipografia — par com identidade própria em vez da pilha padrão do sistema */
+  --font-main: "Manrope", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-display: "Bricolage Grotesque", var(--font-main);
   --font-mono: "Cascadia Code", "Fira Code", monospace;
 }
 
@@ -147,6 +149,15 @@ body {
 img {
   max-width: 100%;
   display: block;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 a {
   color: var(--purple-400);
@@ -254,7 +265,7 @@ button {
   gap: 8px;
   padding: 12px 24px;
   border: none;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-md);
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
@@ -267,12 +278,12 @@ button {
 .btn-primary {
   background: var(--gradient-primary);
   color: #fff;
-  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+  box-shadow: 0 4px 15px rgba(138, 201, 58, 0.4);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(34, 197, 94, 0.5);
+  box-shadow: 0 8px 25px rgba(138, 201, 58, 0.5);
 }
 
 .btn-primary:active {
@@ -286,7 +297,7 @@ button {
 }
 
 .btn-secondary:hover {
-  background: rgba(34, 197, 94, 0.15);
+  background: rgba(138, 201, 58, 0.15);
   border-color: var(--purple-400);
 }
 
@@ -389,8 +400,8 @@ button:disabled,
 .form-select:focus {
   outline: none;
   border-color: var(--purple-500);
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
-  background: rgba(34, 197, 94, 0.05);
+  box-shadow: 0 0 0 3px rgba(138, 201, 58, 0.2);
+  background: rgba(138, 201, 58, 0.05);
 }
 
 .form-control::placeholder {
@@ -554,7 +565,7 @@ textarea.form-control {
   align-items: center;
   justify-content: center;
   margin: 0 auto 12px;
-  background: rgba(34, 197, 94, 0.15);
+  background: rgba(138, 201, 58, 0.15);
   color: var(--purple-400);
 }
 
@@ -596,9 +607,9 @@ textarea.form-control {
 }
 
 .badge-purple {
-  background: rgba(34, 197, 94, 0.2);
+  background: rgba(138, 201, 58, 0.2);
   color: var(--purple-400);
-  border: 1px solid rgba(34, 197, 94, 0.3);
+  border: 1px solid rgba(138, 201, 58, 0.3);
 }
 
 .badge-red {
@@ -797,7 +808,7 @@ textarea.form-control {
 .spinner {
   width: 48px;
   height: 48px;
-  border: 3px solid rgba(34, 197, 94, 0.2);
+  border: 3px solid rgba(138, 201, 58, 0.2);
   border-top-color: var(--purple-500);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
@@ -981,17 +992,11 @@ textarea.form-control {
   align-items: center;
   justify-content: center;
   background: var(--bg-dark);
-  background-image:
-    radial-gradient(
-      ellipse at 20% 50%,
-      rgba(34, 197, 94, 0.15) 0%,
-      transparent 60%
-    ),
-    radial-gradient(
-      ellipse at 80% 20%,
-      rgba(255, 23, 68, 0.1) 0%,
-      transparent 60%
-    );
+  background-image: radial-gradient(
+    ellipse at 50% 0%,
+    rgba(138, 201, 58, 0.06) 0%,
+    transparent 55%
+  );
   padding: 20px;
 }
 
@@ -1002,7 +1007,7 @@ textarea.form-control {
   padding: 40px 36px;
   width: 100%;
   max-width: 420px;
-  box-shadow: var(--shadow-purple), var(--shadow-lg);
+  box-shadow: var(--shadow-lg);
   animation: slideUp 0.3s ease;
 }
 
@@ -1173,7 +1178,7 @@ textarea.form-control {
 }
 
 .sidebar-nav-btn:hover {
-  background: rgba(34, 197, 94, 0.12);
+  background: rgba(138, 201, 58, 0.12);
   color: var(--text-white);
 }
 
@@ -1182,7 +1187,7 @@ textarea.form-control {
 }
 
 .sidebar-nav-btn.active {
-  background: rgba(34, 197, 94, 0.2);
+  background: rgba(138, 201, 58, 0.2);
   color: var(--purple-400);
   font-weight: 600;
 }
@@ -1729,7 +1734,7 @@ textarea.form-control {
   align-items: center;
   gap: 6px;
   padding: 6px 14px;
-  background: rgba(34, 197, 94, 0.15);
+  background: rgba(138, 201, 58, 0.15);
   border: 1px solid var(--border-purple);
   border-radius: var(--radius-pill);
   font-size: 0.82rem;
@@ -1817,7 +1822,7 @@ textarea.form-control {
 .exercise-obs {
   font-size: 0.82rem;
   color: var(--text-secondary);
-  background: rgba(34, 197, 94, 0.05);
+  background: rgba(138, 201, 58, 0.05);
   border-left: 3px solid var(--purple-700);
   padding: 8px 12px;
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
@@ -1994,7 +1999,7 @@ textarea.form-control {
   align-items: center;
   justify-content: space-between;
   padding: 14px 16px;
-  background: rgba(34, 197, 94, 0.1);
+  background: rgba(138, 201, 58, 0.1);
   border-bottom: 1px solid var(--border-card);
 }
 
@@ -2075,20 +2080,20 @@ textarea.form-control {
 }
 
 .diet-dia-btn.has-data {
-  border-color: #22c55e;
-  color: #22c55e;
+  border-color: #8ac93a;
+  color: #8ac93a;
 }
 
 .diet-dia-btn.active {
   background: var(--gradient-primary);
   border-color: transparent;
   color: #fff;
-  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.4);
+  box-shadow: 0 2px 8px rgba(138, 201, 58, 0.4);
 }
 
 .diet-dia-btn.has-data.active {
-  background: linear-gradient(135deg, #16a34a, #22c55e);
-  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.4);
+  background: linear-gradient(135deg, #4c7a22, #8ac93a);
+  box-shadow: 0 2px 8px rgba(138, 201, 58, 0.4);
 }
 
 .diet-dia-label {
@@ -2198,7 +2203,7 @@ textarea.form-control {
 .alimento-row input:focus {
   outline: none;
   border-color: var(--purple-500);
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+  box-shadow: 0 0 0 3px rgba(138, 201, 58, 0.2);
 }
 
 .alimento-row input::placeholder {
@@ -2271,7 +2276,7 @@ textarea.form-control {
   background: var(--gradient-primary);
   border-color: transparent;
   color: #fff;
-  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.4);
+  box-shadow: 0 2px 8px rgba(138, 201, 58, 0.4);
 }
 
 .diet-dia-btn-aluno.empty-day {
@@ -2279,15 +2284,15 @@ textarea.form-control {
 }
 
 .diet-dia-btn-aluno.has-data {
-  border-color: #22c55e;
-  color: #22c55e;
+  border-color: #8ac93a;
+  color: #8ac93a;
 }
 
 .diet-dia-btn-aluno.has-data.active {
-  background: linear-gradient(135deg, #16a34a, #22c55e);
+  background: linear-gradient(135deg, #4c7a22, #8ac93a);
   border-color: transparent;
   color: #fff;
-  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.4);
+  box-shadow: 0 2px 8px rgba(138, 201, 58, 0.4);
 }
 
 .hoje-badge {
@@ -2320,7 +2325,7 @@ textarea.form-control {
   align-items: center;
   justify-content: space-between;
   padding: 14px 16px;
-  background: rgba(34, 197, 94, 0.12);
+  background: rgba(138, 201, 58, 0.12);
   border-bottom: 1px solid var(--border-card);
 }
 
@@ -2404,7 +2409,7 @@ textarea.form-control {
   color: #fff;
   align-self: flex-end;
   border-bottom-right-radius: var(--radius-xs);
-  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+  box-shadow: 0 2px 8px rgba(138, 201, 58, 0.3);
 }
 
 .message-bubble.received {
@@ -2512,7 +2517,7 @@ textarea.form-control {
   flex: 14;
 } /* <18.5  → 14% dos 25 pts */
 .imc-seg-normal {
-  background: #22c55e;
+  background: #8ac93a;
   flex: 25;
 } /* 18.5–24.9 */
 .imc-seg-sobrepeso {
@@ -2652,7 +2657,7 @@ textarea.form-control {
 .empty-state-icon {
   width: 64px;
   height: 64px;
-  background: rgba(34, 197, 94, 0.1);
+  background: rgba(138, 201, 58, 0.1);
   border-radius: var(--radius-xl);
   display: flex;
   align-items: center;
@@ -2924,7 +2929,7 @@ textarea.form-control {
   font-size: 0.78rem;
   font-weight: 700;
   color: var(--purple-400);
-  background: rgba(34, 197, 94, 0.15);
+  background: rgba(138, 201, 58, 0.15);
   border-radius: var(--radius-pill);
   padding: 2px 8px;
   transition: var(--transition-fast);
@@ -2946,7 +2951,7 @@ textarea.form-control {
 }
 
 .workout-progress-fill.done {
-  background: linear-gradient(90deg, #16a34a, #22c55e);
+  background: linear-gradient(90deg, #4c7a22, #8ac93a);
 }
 
 .workout-progress-text {
@@ -2977,7 +2982,7 @@ textarea.form-control {
   font-weight: 700;
   cursor: pointer;
   width: 100%;
-  box-shadow: 0 4px 20px rgba(34, 197, 94, 0.45);
+  box-shadow: 0 4px 20px rgba(138, 201, 58, 0.45);
   transition: var(--transition-base);
   display: flex;
   align-items: center;
@@ -2988,7 +2993,7 @@ textarea.form-control {
 
 .finish-workout-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(34, 197, 94, 0.5);
+  box-shadow: 0 8px 30px rgba(138, 201, 58, 0.5);
 }
 
 .finish-workout-btn:active {
@@ -3092,7 +3097,7 @@ textarea.form-control {
   color: #ffb74d;
 }
 .text-faded {
-  color: rgba(34, 197, 94, 0.4);
+  color: rgba(138, 201, 58, 0.4);
 }
 
 .text-sm {
@@ -3119,7 +3124,7 @@ textarea.form-control {
    UTILIDADES — ÍCONE BACKGROUNDS (quick cards)
    ============================================================ */
 .icon-bg-purple {
-  background: rgba(34, 197, 94, 0.15);
+  background: rgba(138, 201, 58, 0.15);
 }
 .icon-bg-red {
   background: rgba(255, 23, 68, 0.15);
@@ -3202,8 +3207,8 @@ textarea.form-control {
   align-items: center;
   gap: 4px;
   background: transparent;
-  border: 1px solid #22c55e;
-  color: #22c55e;
+  border: 1px solid #8ac93a;
+  color: #8ac93a;
   border-radius: 8px;
   padding: 4px 10px;
   font-size: 0.8rem;
@@ -3212,7 +3217,7 @@ textarea.form-control {
   transition: background 0.2s;
 }
 .btn-editar:hover {
-  background: rgba(34, 197, 94, 0.1);
+  background: rgba(138, 201, 58, 0.1);
 }
 
 /* ============================================================
@@ -3388,7 +3393,7 @@ textarea.form-control {
     color 0.2s;
 }
 .tipo-btn.active {
-  background: linear-gradient(135deg, #16a34a, #22c55e);
+  background: linear-gradient(135deg, #4c7a22, #8ac93a);
   color: #fff;
   font-weight: 600;
 }
@@ -3471,8 +3476,8 @@ textarea.form-control {
   cursor: text;
 }
 .ts-wrapper.focus .ts-control {
-  border-color: var(--purple-500, #22c55e);
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+  border-color: var(--purple-500, #8ac93a);
+  box-shadow: 0 0 0 3px rgba(138, 201, 58, 0.2);
 }
 .ts-wrapper .ts-control input {
   color: var(--text-white, #fff);
@@ -3499,7 +3504,7 @@ textarea.form-control {
 }
 .ts-dropdown .ts-ex-option:hover,
 .ts-dropdown .option.active {
-  background: rgba(34, 197, 94, 0.15);
+  background: rgba(138, 201, 58, 0.15);
 }
 .ts-ex-name {
   font-weight: 600;
@@ -3520,7 +3525,7 @@ textarea.form-control {
   line-height: 1.4;
 }
 .ts-tag-muscle {
-  background: rgba(34, 197, 94, 0.2);
+  background: rgba(138, 201, 58, 0.2);
   color: var(--purple-400, #a78bfa);
 }
 .ts-tag-type {
@@ -3581,15 +3586,15 @@ textarea.form-control {
   color: var(--text-white, #fff);
 }
 .ex-filter-chip.active {
-  background: rgba(34, 197, 94, 0.2);
-  border-color: var(--purple-500, #22c55e);
+  background: rgba(138, 201, 58, 0.2);
+  border-color: var(--purple-500, #8ac93a);
   color: var(--purple-400, #a78bfa);
 }
 
 /* Painel de info do exercicio selecionado */
 .ex-info-panel {
-  background: rgba(34, 197, 94, 0.08);
-  border: 1px solid rgba(34, 197, 94, 0.25);
+  background: rgba(138, 201, 58, 0.08);
+  border: 1px solid rgba(138, 201, 58, 0.25);
   border-radius: var(--radius-md, 10px);
   padding: 14px;
   margin-top: 12px;
@@ -3619,7 +3624,7 @@ textarea.form-control {
   font-weight: 600;
 }
 .ex-tag-grupo {
-  background: rgba(34, 197, 94, 0.2);
+  background: rgba(138, 201, 58, 0.2);
   color: var(--purple-400, #a78bfa);
 }
 .ex-tag-tipo {
@@ -3706,7 +3711,7 @@ textarea.form-control {
   line-height: 1.4;
 }
 .ex-badge-muscle {
-  background: rgba(34, 197, 94, 0.18);
+  background: rgba(138, 201, 58, 0.18);
   color: var(--purple-400, #a78bfa);
 }
 .ex-badge-type {
@@ -3758,7 +3763,7 @@ textarea.form-control {
   height: 24px;
   padding: 0 7px;
   border-radius: 99px;
-  background: rgba(34, 197, 94, 0.25);
+  background: rgba(138, 201, 58, 0.25);
   color: var(--purple-400, #a78bfa);
   font-size: 0.78rem;
   font-weight: 700;
@@ -3819,7 +3824,7 @@ textarea.form-control {
   color: var(--purple-400, #a78bfa);
   margin-bottom: 8px;
   padding-bottom: 6px;
-  border-bottom: 1px solid rgba(34, 197, 94, 0.2);
+  border-bottom: 1px solid rgba(138, 201, 58, 0.2);
 }
 .admin-aluno-card {
   display: flex;
@@ -4084,9 +4089,9 @@ textarea.form-control {
   margin-bottom: 2px;
 }
 .exercise-check-card.completed {
-  border-color: #22c55e;
-  background: rgba(34, 197, 94, 0.06);
-  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.15);
+  border-color: #8ac93a;
+  background: rgba(138, 201, 58, 0.06);
+  box-shadow: 0 0 0 1px rgba(138, 201, 58, 0.15);
 }
 .exercise-check-card.completed .exercise-check-nome {
   color: rgba(255, 255, 255, 0.6);
@@ -4097,7 +4102,7 @@ textarea.form-control {
   }
   35% {
     transform: scale(1.025);
-    box-shadow: 0 0 22px rgba(34, 197, 94, 0.4);
+    box-shadow: 0 0 22px rgba(138, 201, 58, 0.4);
   }
   100% {
     transform: scale(1);
@@ -4153,7 +4158,7 @@ textarea.form-control {
 .ex-expand-area {
   padding: 10px 16px 12px;
   border-top: 1px solid var(--border-card);
-  background: rgba(34, 197, 94, 0.05);
+  background: rgba(138, 201, 58, 0.05);
 }
 .ex-expand-area.hidden {
   display: none;
@@ -4208,15 +4213,15 @@ textarea.form-control {
   transform: scale(0.92);
 }
 .serie-pill.serie-done {
-  background: rgba(34, 197, 94, 0.15);
-  border-color: #22c55e;
-  color: #22c55e;
+  background: rgba(138, 201, 58, 0.15);
+  border-color: #8ac93a;
+  color: #8ac93a;
 }
 .serie-pill.serie-done .serie-num::before {
   content: "✓ ";
 }
 .serie-pill.serie-done .serie-reps {
-  color: rgba(34, 197, 94, 0.7);
+  color: rgba(138, 201, 58, 0.7);
 }
 
 /* -- Anotação de carga -------------------------------------- */
@@ -4416,9 +4421,9 @@ textarea.form-control {
 }
 .sexo-btn.active {
   border-color: var(--purple-600);
-  background: rgba(34, 197, 94, 0.18);
+  background: rgba(138, 201, 58, 0.18);
   color: var(--purple-400);
-  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.25);
+  box-shadow: 0 0 0 2px rgba(138, 201, 58, 0.25);
 }
 
 /* Chips de objetivo */
@@ -4448,9 +4453,9 @@ textarea.form-control {
 }
 .objetivo-chip.active {
   border-color: var(--purple-600);
-  background: rgba(34, 197, 94, 0.18);
+  background: rgba(138, 201, 58, 0.18);
   color: var(--purple-400);
-  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.25);
+  box-shadow: 0 0 0 2px rgba(138, 201, 58, 0.25);
 }
 
 /* Badge de sexo no avatar do perfil */
@@ -4495,15 +4500,15 @@ textarea.form-control {
 .btn-video-ex:hover {
   border-color: var(--purple-600);
   color: var(--purple-400);
-  background: rgba(34, 197, 94, 0.1);
+  background: rgba(138, 201, 58, 0.1);
 }
 .btn-video-ex.has-video {
-  border-color: rgba(34, 197, 94, 0.5);
+  border-color: rgba(138, 201, 58, 0.5);
   color: var(--purple-400);
-  background: rgba(34, 197, 94, 0.12);
+  background: rgba(138, 201, 58, 0.12);
 }
 .btn-video-ex.has-video:hover {
-  background: rgba(34, 197, 94, 0.22);
+  background: rgba(138, 201, 58, 0.22);
 }
 
 /* Botão "Ver vídeo" no card do aluno */
@@ -4515,9 +4520,9 @@ textarea.form-control {
   width: 100%;
   padding: 9px 16px;
   margin-top: 10px;
-  border: 1px solid rgba(34, 197, 94, 0.4);
+  border: 1px solid rgba(138, 201, 58, 0.4);
   border-radius: var(--radius-md);
-  background: rgba(34, 197, 94, 0.1);
+  background: rgba(138, 201, 58, 0.1);
   color: var(--purple-400);
   font-size: 0.85rem;
   font-weight: 600;
@@ -4525,7 +4530,7 @@ textarea.form-control {
   transition: var(--transition-fast);
 }
 .btn-ver-video:hover {
-  background: rgba(34, 197, 94, 0.22);
+  background: rgba(138, 201, 58, 0.22);
   border-color: var(--purple-500);
 }
 .btn-ver-video svg {
@@ -4548,7 +4553,7 @@ textarea.form-control {
 }
 .video-upload-area:hover {
   border-color: var(--purple-500);
-  background: rgba(34, 197, 94, 0.08);
+  background: rgba(138, 201, 58, 0.08);
 }
 
 /* Área de upload inline no formulário */
@@ -4568,7 +4573,7 @@ textarea.form-control {
 }
 .video-upload-inline:hover {
   border-color: var(--purple-500);
-  background: rgba(34, 197, 94, 0.07);
+  background: rgba(138, 201, 58, 0.07);
 }
 .video-upload-inline.has-file {
   cursor: default;
@@ -4767,7 +4772,7 @@ textarea.form-control {
   font-size: 0.72rem;
   font-weight: 600;
   color: var(--purple-400);
-  background: rgba(34, 197, 94, 0.14);
+  background: rgba(138, 201, 58, 0.14);
   border-radius: var(--radius-pill);
   padding: 2px 8px;
   margin-left: 6px;
@@ -4817,8 +4822,8 @@ textarea.form-control {
   transition: transform 0.15s;
 }
 .conquista-item.earned {
-  background: rgba(34, 197, 94, 0.12);
-  border: 1px solid rgba(34, 197, 94, 0.22);
+  background: rgba(138, 201, 58, 0.12);
+  border: 1px solid rgba(138, 201, 58, 0.22);
 }
 .conquista-item.locked {
   background: rgba(255, 255, 255, 0.04);
@@ -4840,7 +4845,7 @@ textarea.form-control {
 }
 .conquista-nome {
   font-size: 0.7rem;
-  color: #6b7280;
+  color: #767c68;
   font-weight: 600;
   line-height: 1.2;
 }

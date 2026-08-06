@@ -10,9 +10,11 @@ functions/.env
 functions/.env.local
 
 # ── Chaves de conta de serviço (NUNCA commitar) ────────────
+serviceAccountKey.json
 *.json.key
 service-account*.json
 *-credentials.json
+scripts/.env
 
 # ── Build / cache ──────────────────────────────────────────
 .firebase/

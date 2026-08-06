@@ -450,6 +450,11 @@ async function loadTreinoSection() {
     .once("value");
   alunoState.treinoAtual = snap.val() || "A";
 
+  // Pré-carrega cache de exercícios para enriquecer cards com gifUrl
+  if (typeof ExerciciosService !== 'undefined') {
+    await ExerciciosService.getAll().catch(() => {});
+  }
+
   // Ajusta abas conforme tipo de plano
   if (alunoState.programaAtivo === "ia-custom" && alunoState.treinoGerado) {
     const letras = Object.keys(alunoState.treinoGerado.treinos || {}).sort();
@@ -553,7 +558,7 @@ async function mostrarTreino(letra) {
         }));
         // Sempre renderiza com estado vazio — checkboxes reiniciam a cada abertura
         exListEl.innerHTML = renderExerciciosPreDefinidos(
-          exercicios,
+          _enriquecerComGif(exercicios),
           {},
           letra,
         );
@@ -585,7 +590,7 @@ async function mostrarTreino(letra) {
       if (treinoPre && treinoPre.exercicios && treinoPre.exercicios.length) {
         // Sempre renderiza com estado vazio — checkboxes reiniciam a cada abertura
         exListEl.innerHTML = renderExerciciosPreDefinidos(
-          treinoPre.exercicios,
+          _enriquecerComGif(treinoPre.exercicios),
           {},
           letra,
         );
@@ -818,10 +823,10 @@ async function renderIMCChart() {
         datasets: [
           {
             data: imcs,
-            borderColor: "#6B35C3",
-            backgroundColor: "rgba(107,53,195,0.1)",
+            borderColor: "#8ac93a",
+            backgroundColor: "rgba(138,201,58,0.1)",
             borderWidth: 2,
-            pointBackgroundColor: "#6B35C3",
+            pointBackgroundColor: "#8ac93a",
             pointRadius: 4,
             fill: true,
             tension: 0.4,
@@ -1043,10 +1048,10 @@ async function renderCargaHistoricoChart(exId, alunoId) {
         datasets: [
           {
             data: entries.map((e) => parseFloat(e.carga) || null),
-            borderColor: "#6B35C3",
-            backgroundColor: "rgba(107,53,195,0.12)",
+            borderColor: "#8ac93a",
+            backgroundColor: "rgba(138,201,58,0.12)",
             borderWidth: 2,
-            pointBackgroundColor: "#6B35C3",
+            pointBackgroundColor: "#8ac93a",
             pointRadius: 5,
             fill: true,
             tension: 0.3,
@@ -1088,6 +1093,65 @@ async function renderCargaHistoricoChart(exId, alunoId) {
    Usa o mesmo layout exercise-check-card do fluxo de professor
    para UX consistente em todos os tipos de plano.
    ─────────────────────────────────────────────────────────── */
+/**
+ * Enriquece uma lista de exercícios com gifUrl buscado pelo nome no cache
+ * do ExerciciosService. Operação síncrona — usa _getCacheSync().
+ */
+function _normStr(str) {
+  return (str || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+function _buscarGifNoCache(cache, nome) {
+  if (!nome) return null;
+  const chave = _normStr(nome);
+  if (chave.length < 3) return null;
+  const entries = Object.values(cache)
+    .filter(ex => ex.gifUrl)
+    .map(ex => ({ nome: _normStr(ex.nome_original || ex.nome || ""), gifUrl: ex.gifUrl }))
+    .filter(e => e.nome.length >= 4);
+  // 1. Exact
+  const exact = entries.find(e => e.nome === chave);
+  if (exact) return exact.gifUrl;
+  // 2. Prefixo: catálogo começa com treino
+  const pref = entries.find(e => e.nome.startsWith(chave) && chave.length >= 4);
+  if (pref) return pref.gifUrl;
+  // 3. Prefixo reverso: treino começa com catálogo
+  const rpref = entries.find(e => chave.startsWith(e.nome) && e.nome.length >= 4);
+  if (rpref) return rpref.gifUrl;
+  // 4. Substring: catálogo contém nome do treino
+  const sub = entries.find(e => e.nome.includes(chave) && chave.length >= 5);
+  if (sub) return sub.gifUrl;
+  // 5. Substring reverso
+  const rsub = entries.find(e => chave.includes(e.nome) && e.nome.length >= 5);
+  if (rsub) return rsub.gifUrl;
+  // 6. Todas as palavras do treino estão no catálogo
+  const words = chave.split(/\s+/).filter(w => w.length >= 4);
+  if (words.length > 0) {
+    const all = entries.find(e => words.every(w => e.nome.includes(w)));
+    if (all) return all.gifUrl;
+  }
+  return null;
+}
+
+function _enriquecerComGif(exercicios) {
+  if (
+    typeof ExerciciosService === 'undefined' ||
+    typeof ExerciciosService._getCacheSync !== "function"
+  ) {
+    return exercicios;
+  }
+  const cache = ExerciciosService._getCacheSync();
+  return exercicios.map((ex) => {
+    if (ex.gifUrl) return ex;
+    const gifUrl = _buscarGifNoCache(cache, ex.nome);
+    return gifUrl ? { ...ex, gifUrl } : ex;
+  });
+}
+
 function renderExerciciosPreDefinidos(
   exercicios,
   historico = {},
@@ -1151,6 +1215,14 @@ function renderExerciciosPreDefinidos(
           <div class="series-pills-row" onclick="event.stopPropagation()">
             ${seriesPillsHtml}
           </div>
+          ${
+            ex.gifUrl
+              ? `<button class="btn-ver-video" data-video-url="${ex.gifUrl.replace(/"/g, "&quot;")}" data-video-nome="${sanitize(ex.nome)}" onclick="event.stopPropagation(); verVideoExercicio(this.dataset.videoUrl, this.dataset.videoNome)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            Ver como fazer
+          </button>`
+              : ""
+          }
         </div>`;
     })
     .join("");

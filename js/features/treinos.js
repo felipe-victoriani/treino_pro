@@ -234,6 +234,9 @@ async function salvarExercicio() {
       ordem = snap.exists() ? Object.keys(snap.val()).length : 0;
     }
 
+    const gifUrl =
+      document.getElementById("ex-gif-url")?.value.trim() || "";
+
     const exercicioData = {
       nome,
       exercicioId,
@@ -246,6 +249,7 @@ async function salvarExercicio() {
       descanso: descanso || "",
       observacoes: observacoes || "",
       videoLegenda,
+      gifUrl,
       ordem,
     };
 
@@ -492,6 +496,7 @@ function limparFormExercicio() {
     "ex-grupo-muscular",
     "ex-tipo",
     "ex-instrucoes",
+    "ex-gif-url",
   ].forEach((id) => {
     const el = document.getElementById(id);
     if (el) el.value = "";
@@ -587,9 +592,22 @@ async function loadTreinoAluno(
     // Reinicia estado local da sessão — checkboxes sempre começam vazios
     _sessaoLocal[letra] = { exerciciosCompletos: {}, seriesCompletas: {} };
     const cargasUsadas = historico.cargaUsada || {};
-    const exercicios = Object.entries(data.exercicios)
+    let exercicios = Object.entries(data.exercicios)
       .map(([id, ex]) => ({ id, ...ex }))
       .sort((a, b) => (a.ordem || 0) - (b.ordem || 0));
+
+    // Enriquece com gifUrl do cache de exercícios (para treinos salvos antes da correção)
+    if (typeof ExerciciosService !== 'undefined') {
+      try {
+        await ExerciciosService.getAll();
+        const cache = ExerciciosService._getCacheSync();
+        exercicios = exercicios.map((ex) => {
+          if (ex.gifUrl) return ex;
+          const gifUrl = _buscarGifNoCache(cache, ex.nome);
+          return gifUrl ? { ...ex, gifUrl } : ex;
+        });
+      } catch (_) {}
+    }
 
     renderExerciciosAluno(
       listEl,
@@ -606,6 +624,46 @@ async function loadTreinoAluno(
       '<div class="empty-state"><h3>Erro ao carregar treino</h3></div>';
     console.error(e);
   }
+}
+
+/**
+ * Normaliza string para matching: remove acentos e lowercase
+ */
+function _normStr(str) {
+  return (str || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+/**
+ * Busca gifUrl no cache de exercícios com fallback por prefixo/substring/acento
+ */
+function _buscarGifNoCache(cache, nome) {
+  if (!nome) return null;
+  const chave = _normStr(nome);
+  if (chave.length < 3) return null;
+  const entries = Object.values(cache)
+    .filter(ex => ex.gifUrl)
+    .map(ex => ({ nome: _normStr(ex.nome_original || ex.nome || ""), gifUrl: ex.gifUrl }))
+    .filter(e => e.nome.length >= 4);
+  const exact = entries.find(e => e.nome === chave);
+  if (exact) return exact.gifUrl;
+  const pref = entries.find(e => e.nome.startsWith(chave) && chave.length >= 4);
+  if (pref) return pref.gifUrl;
+  const rpref = entries.find(e => chave.startsWith(e.nome) && e.nome.length >= 4);
+  if (rpref) return rpref.gifUrl;
+  const sub = entries.find(e => e.nome.includes(chave) && chave.length >= 5);
+  if (sub) return sub.gifUrl;
+  const rsub = entries.find(e => chave.includes(e.nome) && e.nome.length >= 5);
+  if (rsub) return rsub.gifUrl;
+  const words = chave.split(/\s+/).filter(w => w.length >= 4);
+  if (words.length > 0) {
+    const all = entries.find(e => words.every(w => e.nome.includes(w)));
+    if (all) return all.gifUrl;
+  }
+  return null;
 }
 
 /**
@@ -674,11 +732,20 @@ function renderExerciciosAluno(
             onclick="event.stopPropagation(); verHistoricoCargas('${exIdSafe}','${sanitize(ex.nome)}','${sanitize(alunoId)}')">📊</button>
         </div>
         ${
-          ex.videoUrl
-            ? `<button class="btn-ver-video" data-video-url="${ex.videoUrl.replace(/"/g, "&quot;")}" data-video-nome="${sanitize(ex.nome)}" onclick="event.stopPropagation(); verVideoExercicio(this.dataset.videoUrl, this.dataset.videoNome)">
+          (ex.videoUrl || ex.gifUrl)
+            ? (() => {
+                const mediaUrl = (ex.videoUrl || ex.gifUrl).replace(/"/g, "&quot;");
+                const isGif = !ex.videoUrl && !!ex.gifUrl;
+                const label = ex.videoLegenda
+                  ? sanitize(ex.videoLegenda)
+                  : isGif
+                  ? "Ver como fazer"
+                  : "Ver vídeo do exercício";
+                return `<button class="btn-ver-video" data-video-url="${mediaUrl}" data-video-nome="${sanitize(ex.nome)}" onclick="event.stopPropagation(); verVideoExercicio(this.dataset.videoUrl, this.dataset.videoNome)">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-          ${ex.videoLegenda ? sanitize(ex.videoLegenda) : "Ver vídeo do exercício"}
-        </button>`
+          ${label}
+        </button>`;
+              })()
             : ""
         }
       </div>`;

@@ -209,6 +209,7 @@
     _setVal("ex-grupo-muscular", ex.grupoMuscular || "");
     _setVal("ex-tipo", ex.tipo || "");
     _setVal("ex-instrucoes", ex.instrucoes || "");
+    _setVal("ex-gif-url", ex.gifUrl || "");
   }
 
   function _clearHiddenFields() {

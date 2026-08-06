@@ -1,15 +1,16 @@
 ﻿/* ============================================================
    TREINO PRO — Splash Screen (index.html)
    ============================================================ */
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Manrope:wght@400;500;600;700;800&display=swap");
 
 body {
   margin: 0;
-  background: #080808;
+  background: #0a0b08;
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  font-family: system-ui, sans-serif;
+  font-family: "Manrope", system-ui, sans-serif;
   flex-direction: column;
   gap: 16px;
   color: #fff;
@@ -18,7 +19,7 @@ body {
 .splash-icon {
   width: 80px;
   height: 80px;
-  background: linear-gradient(135deg, #16a34a, #4ade80);
+  background: linear-gradient(135deg, #4c7a22, #a9dc63);
   border-radius: 20px;
   display: flex;
   align-items: center;
@@ -28,8 +29,8 @@ body {
 .spinner {
   width: 32px;
   height: 32px;
-  border: 3px solid rgba(37, 99, 235, 0.18);
-  border-top-color: #22c55e;
+  border: 3px solid rgba(138, 201, 58, 0.18);
+  border-top-color: #8ac93a;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -56,7 +57,7 @@ body {
 .splash-loading p {
   margin: 0;
   font-size: 0.9rem;
-  color: #6b7280;
+  color: #767c68;
   animation: pulse 2s ease-in-out infinite;
 }
 
@@ -97,7 +98,7 @@ body {
 .landing-icon {
   width: 80px;
   height: 80px;
-  background: linear-gradient(135deg, #16a34a, #4ade80);
+  background: linear-gradient(135deg, #4c7a22, #a9dc63);
   border-radius: 20px;
   display: flex;
   align-items: center;
@@ -106,10 +107,12 @@ body {
 }
 
 .landing-title {
-  font-size: 1.8rem;
+  font-family: "Bricolage Grotesque", "Manrope", system-ui, sans-serif;
+  font-size: 1.9rem;
   font-weight: 700;
+  letter-spacing: -0.01em;
   margin: 0;
-  background: linear-gradient(135deg, #22c55e, #4ade80);
+  background: linear-gradient(135deg, #8ac93a, #a9dc63);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -126,7 +129,7 @@ body {
   display: block;
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, #16a34a, #22c55e);
+  background: linear-gradient(135deg, #4c7a22, #8ac93a);
   color: #fff;
   font-size: 1rem;
   font-weight: 600;
@@ -157,7 +160,7 @@ body {
 }
 
 .btn-landing-outline:hover {
-  border-color: #16a34a;
+  border-color: #4c7a22;
   color: #fff;
 }
 
