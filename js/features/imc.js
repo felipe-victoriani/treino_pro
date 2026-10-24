@@ -77,12 +77,12 @@ function calcularIMC(peso, altura) {
  */
 function classificarIMC(imc) {
   if (imc < 18.5)
-    return { classe: "Abaixo do peso", cor: "#64B5F6", emoji: "⚠️" };
-  if (imc < 25) return { classe: "Peso normal", cor: "#81C784", emoji: "✅" };
-  if (imc < 30) return { classe: "Sobrepeso", cor: "#FFB74D", emoji: "⚠️" };
-  if (imc < 35) return { classe: "Obesidade I", cor: "#FF8A65", emoji: "🔴" };
-  if (imc < 40) return { classe: "Obesidade II", cor: "#FF5252", emoji: "🔴" };
-  return { classe: "Obesidade III", cor: "#FF1744", emoji: "🔴" };
+    return { classe: "Abaixo do peso", cor: "#1f6c9f", emoji: "" };
+  if (imc < 25) return { classe: "Peso normal", cor: "#346538", emoji: "" };
+  if (imc < 30) return { classe: "Sobrepeso", cor: "#956400", emoji: "" };
+  if (imc < 35) return { classe: "Obesidade I", cor: "#FF8A65", emoji: "" };
+  if (imc < 40) return { classe: "Obesidade II", cor: "#9f2f2d", emoji: "" };
+  return { classe: "Obesidade III", cor: "#9f2f2d", emoji: "" };
 }
 
 /**
@@ -151,10 +151,10 @@ function calcularPosicaoIMC(imc) {
  * Retorna a cor do valor numérico conforme categoria
  */
 function corValorIMC(imc) {
-  if (imc < 18.5) return "#60a5fa";
-  if (imc < 25) return "#22c55e";
-  if (imc < 30) return "#facc15";
-  return "#ef4444";
+  if (imc < 18.5) return "#1f6c9f";
+  if (imc < 25) return "#346538";
+  if (imc < 30) return "#956400";
+  return "#9f2f2d";
 }
 
 /**
@@ -195,10 +195,10 @@ function renderIMCPerfil(imc, peso, altura) {
           <div class="imc-bar-marker" style="left:${markerPos}%"></div>
         </div>
         <div class="imc-bar-labels">
-          <span style="color:#60a5fa;">Abaixo</span>
-          <span style="color:#22c55e;">Normal</span>
-          <span style="color:#facc15;">Sobrepeso</span>
-          <span style="color:#ef4444;">Obesidade</span>
+          <span style="color:#1f6c9f;">Abaixo</span>
+          <span style="color:#346538;">Normal</span>
+          <span style="color:#956400;">Sobrepeso</span>
+          <span style="color:#9f2f2d;">Obesidade</span>
         </div>
       </div>
 

@@ -23,14 +23,14 @@ function showToast(message, type = "info", duration = 3500) {
   toast.className = `toast toast-${type}`;
 
   const icons = {
-    success: "✅",
-    error: "❌",
-    info: "ℹ️",
-    warning: "⚠️",
+    success: iconeSvg("check", 18),
+    error: iconeSvg("erro", 18),
+    info: iconeSvg("info", 18),
+    warning: iconeSvg("alerta", 18),
   };
 
   toast.innerHTML = `
-    <span class="toast-icon">${icons[type] || "ℹ️"}</span>
+    <span class="toast-icon">${icons[type] || icons.info}</span>
     <span class="toast-message">${message}</span>
     <button class="toast-close" onclick="this.parentElement.remove()">×</button>
   `;
@@ -165,6 +165,43 @@ function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+/* ---- Ícones SVG (substituem emojis na interface) ----
+   Mesmo estilo dos SVGs já usados no app: preenchidos, viewBox 24,
+   cor herdada via currentColor. Paths fixos (sem dados de usuário). */
+const ICONES_SVG = {
+  check:
+    "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z",
+  erro: "M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z",
+  info: "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z",
+  alerta: "M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z",
+  editar:
+    "M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z",
+  copiar:
+    "M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z",
+  lixeira: "M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z",
+  trofeu:
+    "M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0 0 11 15.9V19H7v2h10v-2h-4v-3.1a5.01 5.01 0 0 0 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z",
+  cadeado:
+    "M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM9 8V6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9z",
+  cadeadoAberto:
+    "M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z",
+  grafico:
+    "M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z",
+  halter:
+    "M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z",
+};
+
+/**
+ * Retorna o markup de um ícone SVG da tabela ICONES_SVG
+ * @param {keyof ICONES_SVG} nome
+ * @param {number} [tamanho=20] - largura/altura em px
+ * @returns {string}
+ */
+function iconeSvg(nome, tamanho = 20) {
+  const d = ICONES_SVG[nome] || ICONES_SVG.info;
+  return `<svg width="${tamanho}" height="${tamanho}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${d}"/></svg>`;
+}
+
 /**
  * Sanitiza string para evitar XSS
  * @param {string} str
@@ -229,11 +266,11 @@ function getInitials(nome) {
  */
 function getAvatarColor(nome) {
   const colors = [
-    "#6B35C3",
-    "#FF1744",
+    "#111111",
+    "#9f2f2d",
     "#00BCD4",
-    "#4CAF50",
-    "#FF9800",
+    "#346538",
+    "#956400",
     "#E91E63",
   ];
   let hash = 0;

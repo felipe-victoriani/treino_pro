@@ -5,9 +5,9 @@
    ============================================================ */
 
 const NIVEL_LABELS = {
-  INICIANTE: { label: "Iniciante", icon: "🌱" },
-  INTERMEDIARIO: { label: "Intermediário", icon: "💪" },
-  AVANCADO: { label: "Experiente", icon: "🔥" },
+  INICIANTE: { label: "Iniciante", icon: "" },
+  INTERMEDIARIO: { label: "Intermediário", icon: "" },
+  AVANCADO: { label: "Experiente", icon: "" },
 };
 
 /* Divisão de treinos por número de dias → grupo muscular principal */
@@ -69,7 +69,7 @@ firebase.auth().onAuthStateChanged(async (user) => {
   const nivel = userData.nivel || "INICIANTE";
   const info = NIVEL_LABELS[nivel] || NIVEL_LABELS.INICIANTE;
   const badgeEl = document.getElementById("nivel-badge");
-  if (badgeEl) badgeEl.textContent = `${info.icon} ${info.label}`;
+  if (badgeEl) badgeEl.textContent = info.label;
 
   initPage(user, nivel);
 });
@@ -152,9 +152,9 @@ async function gerarTreino(user, nivel) {
 
   /* Montar steps dinâmicos baseados no split real */
   const stepLabels = [
-    "🤖 Analisando seu perfil...",
-    ...split.map((s) => `🏋️ Gerando Treino ${s.treino} — ${s.nome}...`),
-    "✅ Finalizando seu plano...",
+    "Analisando seu perfil...",
+    ...split.map((s) => `Gerando Treino ${s.treino} — ${s.nome}...`),
+    "Finalizando seu plano...",
   ];
   const stepsEl = document.getElementById("loading-steps");
   stepsEl.innerHTML = stepLabels
@@ -237,11 +237,11 @@ function mostrarPreview(planData, user, nivel, objetivo, dias, equipamentos) {
   /* Summary card */
   const summaryEl = document.getElementById("plan-summary");
   summaryEl.innerHTML = `
-    <h3>🤖 Seu Plano Personalizado</h3>
+    <h3>Seu Plano Personalizado</h3>
     <div class="plan-tags">
       <span class="plan-tag">${safe(planData.nivel || nivel)}</span>
-      <span class="plan-tag">🎯 ${safe(planData.objetivo || objetivo)}</span>
-      <span class="plan-tag">📅 ${planData.dias_por_semana || dias}x / semana</span>
+      <span class="plan-tag">${safe(planData.objetivo || objetivo)}</span>
+      <span class="plan-tag">${planData.dias_por_semana || dias}x / semana</span>
       <span class="plan-tag">Divisão ${safe(planData.divisao || "")}</span>
     </div>
   `;
@@ -266,7 +266,7 @@ function mostrarPreview(planData, user, nivel, objetivo, dias, equipamentos) {
             <div class="ex-row">
               <strong>${safe(ex.nome)}</strong>
               <span>${ex.series}x ${safe(ex.repeticoes)} · ${safe(ex.descanso)}</span>
-              ${ex.observacao ? `<span style="display:block;font-size:.75rem;color:#64748b;margin-top:2px">💡 ${safe(ex.observacao)}</span>` : ""}
+              ${ex.observacao ? `<span style="display:block;font-size:.75rem;color:#64748b;margin-top:2px">${safe(ex.observacao)}</span>` : ""}
             </div>`,
             )
             .join("")}
@@ -319,7 +319,7 @@ async function salvarESair(planData, user, nivel, equipamentos) {
     await db.ref().update(updates);
     window.location.replace("aluno.html");
   } catch (err) {
-    btn.textContent = "🚀 Começar a Treinar!";
+    btn.textContent = "Começar a Treinar!";
     btn.disabled = false;
     console.error("[MontarTreino] Erro ao salvar:", err);
     alert("Erro ao salvar o plano. Tente novamente.");

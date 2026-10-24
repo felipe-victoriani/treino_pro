@@ -1,107 +1,122 @@
 /* ============================================================
    TREINO PRO - Estilos Principais
-   Tema: Dark fitness — carvão quente e lima ácida
+   Tema: claro quente, monocromático; cor só para status
    ============================================================ */
-@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Manrope:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap");
 
 /* ---- Variáveis CSS (Design Tokens) ---- */
 :root {
-  /* Escala de lima (identidade própria — não é o verde padrão de template) */
-  --green-900: #14210b;
-  --green-800: #1f3712;
-  --green-700: #2f5219;
-  --green-600: #4c7a22;
-  --green-500: #8ac93a;
-  --green-400: #a9dc63;
-  --green-300: #c3e896;
-  --green-200: #dcf3c0;
-  --green-100: #eef8e0;
+  /* Escala neutra (carvão → osso). Base de todo o tema. */
+  --ink-900: #111111;
+  --ink-700: #2f3437;
+  --ink-500: #5f5e5b;
+  --ink-400: #787774;
+  --ink-300: #a5a49f;
+  --ink-200: #d9d8d4;
+  --ink-150: #eaeaea;
+  --ink-100: #f1f0ec;
+  --ink-50: #f7f6f3;
 
-  /* Aliases purple → lima (compatibilidade com todo o CSS existente) */
-  --purple-900: #14210b;
-  --purple-800: #1f3712;
-  --purple-700: #2f5219;
-  --purple-600: #4c7a22;
-  --purple-500: #8ac93a;
-  --purple-400: #a9dc63;
-  --purple-300: #c3e896;
+  /* Status (pastéis lavados; únicos usos de cor) */
+  --ok-bg: #edf3ec;
+  --ok-fg: #346538;
+  --warn-bg: #fbf3db;
+  --warn-fg: #956400;
+  --err-bg: #fdebec;
+  --err-fg: #9f2f2d;
+  --info-bg: #e1f3fe;
+  --info-fg: #1f6c9f;
 
-  /* Aliases blue → lima */
-  --blue-900: #0a0b08;
-  --blue-800: #13140f;
-  --blue-700: #2f5219;
-  --blue-600: #4c7a22;
-  --blue-500: #8ac93a;
-  --blue-400: #a9dc63;
-  --blue-300: #c3e896;
-  --blue-200: #dcf3c0;
-  --blue-100: #eef8e0;
+  /* Aliases legados (green/purple/blue/cyan) → escala neutra.
+     500/600 = destaque (preto), 400 = texto de destaque, 300 = secundário,
+     700 = trilho/scroll, 800/900 = superfícies de hover. */
+  --green-900: #f7f6f3;
+  --green-800: #f1f0ec;
+  --green-700: #d9d8d4;
+  --green-600: #111111;
+  --green-500: #111111;
+  --green-400: #2f3437;
+  --green-300: #787774;
+  --green-200: #eaeaea;
+  --green-100: #f1f0ec;
 
-  /* Aliases cyan → lima clara */
-  --cyan-400: #a9dc63;
-  --cyan-300: #c3e896;
-  --cyan-200: #dcf3c0;
+  --purple-900: #f7f6f3;
+  --purple-800: #f1f0ec;
+  --purple-700: #d9d8d4;
+  --purple-600: #111111;
+  --purple-500: #111111;
+  --purple-400: #2f3437;
+  --purple-300: #787774;
 
-  /* Cores de perigo (vermelho mantido para ações destrutivas) */
-  --red-500: #ef4444;
-  --red-400: #f87171;
-  --red-300: #fca5a5;
+  --blue-900: #f7f6f3;
+  --blue-800: #f1f0ec;
+  --blue-700: #d9d8d4;
+  --blue-600: #111111;
+  --blue-500: #111111;
+  --blue-400: #2f3437;
+  --blue-300: #787774;
+  --blue-200: #eaeaea;
+  --blue-100: #f1f0ec;
 
-  /* Backgrounds — carvão quente, não preto puro */
-  --bg-app: #0a0b08;
-  --bg-dark: #0e0f0a;
-  --bg-card: #13140f;
-  --bg-card-2: #171911;
-  --bg-card-3: #1c1e15;
-  --bg-input: #0e0f0a;
-  --bg-overlay: rgba(6, 7, 4, 0.88);
+  --cyan-400: #2f3437;
+  --cyan-300: #787774;
+  --cyan-200: #eaeaea;
 
-  /* Textos */
-  --text-white: #fafaf6;
-  --text-primary: #e3e5da;
-  --text-secondary: #a9dc63;
-  --text-muted: #767c68;
-  --text-accent: #a9dc63;
+  /* Perigo (sóbrio) */
+  --red-500: #9f2f2d;
+  --red-400: #9f2f2d;
+  --red-300: #b5524f;
+
+  /* Backgrounds */
+  --bg-app: #f7f6f3;
+  --bg-dark: #f7f6f3;
+  --bg-card: #ffffff;
+  --bg-card-2: #fbfbfa;
+  --bg-card-3: #f1f0ec;
+  --bg-input: #ffffff;
+  --bg-overlay: rgba(17, 17, 17, 0.32);
+
+  /* Textos (--text-white = texto mais forte; nome mantido por compatibilidade) */
+  --text-white: #111111;
+  --text-primary: #2f3437;
+  --text-secondary: #5f5e5b;
+  --text-muted: #787774;
+  --text-accent: #111111;
 
   /* Bordas */
-  --border-blue: rgba(138, 201, 58, 0.35);
-  --border-cyan: rgba(169, 220, 99, 0.25);
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-card: rgba(138, 201, 58, 0.18);
-  --border-purple: rgba(138, 201, 58, 0.3);
+  --border-blue: #d9d8d4;
+  --border-cyan: #eaeaea;
+  --border-subtle: rgba(0, 0, 0, 0.06);
+  --border-card: #eaeaea;
+  --border-purple: #d9d8d4;
 
-  /* Gradientes */
-  --gradient-primary: linear-gradient(135deg, #4c7a22 0%, #a9dc63 100%);
-  --gradient-blue: linear-gradient(135deg, #1f3712 0%, #4c7a22 100%);
-  --gradient-cyan: linear-gradient(135deg, #8ac93a 0%, #a9dc63 100%);
-  --gradient-dark: linear-gradient(180deg, #0e0f0a 0%, #0a0b08 100%);
-  --gradient-card: linear-gradient(145deg, #1c1e15 0%, #0e0f0a 100%);
-  --gradient-hero: linear-gradient(
-    135deg,
-    #14170e 0%,
-    #0e0f0a 55%,
-    #0a0b08 100%
-  );
-  --gradient-red: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+  /* "Gradientes" agora são cores sólidas; linear-gradient de uma cor só
+     funciona tanto em background quanto em background-clip: text. */
+  --gradient-primary: linear-gradient(#111111, #111111);
+  --gradient-blue: linear-gradient(#111111, #111111);
+  --gradient-cyan: linear-gradient(#111111, #111111);
+  --gradient-dark: linear-gradient(#f7f6f3, #f7f6f3);
+  --gradient-card: linear-gradient(#ffffff, #ffffff);
+  --gradient-hero: linear-gradient(#ffffff, #ffffff);
+  --gradient-red: linear-gradient(#9f2f2d, #9f2f2d);
 
-  /* Sombras — glow mais discreto, não em tudo */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
-  --shadow-blue: 0 0 18px rgba(138, 201, 58, 0.15);
-  --shadow-cyan: 0 0 18px rgba(169, 220, 99, 0.12);
-  --shadow-purple: 0 0 18px rgba(138, 201, 58, 0.16);
-  --shadow-card:
-    0 4px 20px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  /* Sombras quase inexistentes */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.05);
+  --shadow-blue: none;
+  --shadow-cyan: none;
+  --shadow-purple: none;
+  --shadow-card: none;
 
-  /* Raios de borda */
+  /* Raios de borda (máx. 12px em cards) */
   --radius-xs: 4px;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
-  --radius-2xl: 28px;
-  --radius-pill: 50px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-pill: 9999px;
 
   /* Layout */
   --sidebar-width: 260px;
@@ -109,14 +124,16 @@
   --bottom-nav-height: 70px;
 
   /* Transições */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --transition-fast: all 0.15s ease;
-  --transition-base: all 0.25s ease;
-  --transition-slow: all 0.4s ease;
+  --transition-base: all 0.2s ease;
+  --transition-slow: all 0.4s var(--ease-out);
 
-  /* Tipografia — par com identidade própria em vez da pilha padrão do sistema */
-  --font-main: "Manrope", "Segoe UI", system-ui, -apple-system, sans-serif;
-  --font-display: "Bricolage Grotesque", var(--font-main);
-  --font-mono: "Cascadia Code", "Fira Code", monospace;
+  /* Tipografia */
+  --font-main: "Geist", "Helvetica Neue", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Geist", "Helvetica Neue", system-ui, sans-serif;
+  --font-serif: "Newsreader", Georgia, serif;
+  --font-mono: "Geist Mono", "SF Mono", "Cascadia Code", monospace;
 }
 
 /* ============================================================
@@ -278,12 +295,12 @@ button {
 .btn-primary {
   background: var(--gradient-primary);
   color: #fff;
-  box-shadow: 0 4px 15px rgba(138, 201, 58, 0.4);
+  box-shadow: none;
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(138, 201, 58, 0.5);
+  box-shadow: none;
 }
 
 .btn-primary:active {
@@ -297,23 +314,23 @@ button {
 }
 
 .btn-secondary:hover {
-  background: rgba(138, 201, 58, 0.15);
+  background: rgba(17, 17, 17, 0.08);
   border-color: var(--purple-400);
 }
 
 .btn-danger {
   background: var(--gradient-red);
   color: #fff;
-  box-shadow: 0 4px 15px rgba(255, 23, 68, 0.3);
+  box-shadow: 0 4px 15px rgba(159, 47, 45, 0.3);
 }
 
 .btn-danger:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(255, 23, 68, 0.4);
+  box-shadow: 0 8px 25px rgba(159, 47, 45, 0.3);
 }
 
 .btn-ghost {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(17, 17, 17, 0.05);
   color: var(--text-secondary);
   border: 1px solid var(--border-subtle);
   padding: 8px 16px;
@@ -321,7 +338,7 @@ button {
 }
 
 .btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(17, 17, 17, 0.1);
   color: var(--text-white);
 }
 
@@ -342,7 +359,7 @@ button {
 }
 
 .btn-icon-ghost {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(17, 17, 17, 0.08);
   border-color: transparent;
 }
 
@@ -400,8 +417,8 @@ button:disabled,
 .form-select:focus {
   outline: none;
   border-color: var(--purple-500);
-  box-shadow: 0 0 0 3px rgba(138, 201, 58, 0.2);
-  background: rgba(138, 201, 58, 0.05);
+  box-shadow: none;
+  background: rgba(17, 17, 17, 0.03);
 }
 
 .form-control::placeholder {
@@ -565,12 +582,12 @@ textarea.form-control {
   align-items: center;
   justify-content: center;
   margin: 0 auto 12px;
-  background: rgba(138, 201, 58, 0.15);
+  background: rgba(17, 17, 17, 0.08);
   color: var(--purple-400);
 }
 
 .stat-icon.red {
-  background: rgba(255, 23, 68, 0.15);
+  background: var(--err-bg);
   color: var(--red-300);
 }
 
@@ -607,31 +624,31 @@ textarea.form-control {
 }
 
 .badge-purple {
-  background: rgba(138, 201, 58, 0.2);
+  background: rgba(17, 17, 17, 0.1);
   color: var(--purple-400);
-  border: 1px solid rgba(138, 201, 58, 0.3);
+  border: 1px solid rgba(17, 17, 17, 0.15);
 }
 
 .badge-red {
-  background: rgba(255, 23, 68, 0.2);
+  background: var(--err-bg);
   color: var(--red-300);
-  border: 1px solid rgba(255, 23, 68, 0.3);
+  border: 1px solid rgba(159, 47, 45, 0.3);
 }
 
 .badge-green {
-  background: rgba(76, 175, 80, 0.2);
-  color: #81c784;
-  border: 1px solid rgba(76, 175, 80, 0.3);
+  background: var(--ok-bg);
+  color: var(--ok-fg);
+  border: 1px solid rgba(52, 101, 56, 0.3);
 }
 
 .badge-yellow {
-  background: rgba(255, 152, 0, 0.2);
-  color: #ffb74d;
-  border: 1px solid rgba(255, 152, 0, 0.3);
+  background: var(--warn-bg);
+  color: var(--warn-fg);
+  border: 1px solid rgba(149, 100, 0, 0.3);
 }
 
 .badge-gray {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(17, 17, 17, 0.08);
   color: var(--text-secondary);
 }
 
@@ -649,7 +666,7 @@ textarea.form-control {
   font-weight: 800;
   color: #fff;
   flex-shrink: 0;
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(17, 17, 17, 0.1);
 }
 
 /* Badge de nome colorido nos cards de aluno */
@@ -736,7 +753,7 @@ textarea.form-control {
 }
 
 .toast-success {
-  border-left: 3px solid #4caf50;
+  border-left: 3px solid var(--ok-fg);
 }
 .toast-error {
   border-left: 3px solid var(--red-400);
@@ -745,7 +762,7 @@ textarea.form-control {
   border-left: 3px solid var(--purple-500);
 }
 .toast-warning {
-  border-left: 3px solid #ff9800;
+  border-left: 3px solid var(--warn-fg);
 }
 
 .toast-icon {
@@ -808,7 +825,7 @@ textarea.form-control {
 .spinner {
   width: 48px;
   height: 48px;
-  border: 3px solid rgba(138, 201, 58, 0.2);
+  border: 3px solid rgba(17, 17, 17, 0.1);
   border-top-color: var(--purple-500);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
@@ -877,7 +894,7 @@ textarea.form-control {
 }
 
 .modal-close {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(17, 17, 17, 0.08);
   border: none;
   color: var(--text-secondary);
   width: 34px;
@@ -892,7 +909,7 @@ textarea.form-control {
 }
 
 .modal-close:hover {
-  background: rgba(255, 23, 68, 0.2);
+  background: var(--err-bg);
   color: var(--red-400);
 }
 
@@ -994,7 +1011,7 @@ textarea.form-control {
   background: var(--bg-dark);
   background-image: radial-gradient(
     ellipse at 50% 0%,
-    rgba(138, 201, 58, 0.06) 0%,
+    rgba(17, 17, 17, 0.03) 0%,
     transparent 55%
   );
   padding: 20px;
@@ -1076,7 +1093,7 @@ textarea.form-control {
 }
 
 .login-link a:hover {
-  color: var(--purple-300, #c4b5fd);
+  color: var(--purple-300, #2f3437);
 }
 
 /* ============================================================
@@ -1178,7 +1195,7 @@ textarea.form-control {
 }
 
 .sidebar-nav-btn:hover {
-  background: rgba(138, 201, 58, 0.12);
+  background: rgba(17, 17, 17, 0.06);
   color: var(--text-white);
 }
 
@@ -1187,7 +1204,7 @@ textarea.form-control {
 }
 
 .sidebar-nav-btn.active {
-  background: rgba(138, 201, 58, 0.2);
+  background: rgba(17, 17, 17, 0.1);
   color: var(--purple-400);
   font-weight: 600;
 }
@@ -1233,7 +1250,7 @@ textarea.form-control {
   padding: 10px 12px;
   border-radius: var(--radius-md);
   margin-bottom: 8px;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(17, 17, 17, 0.03);
 }
 
 .sidebar-user-info .user-details {
@@ -1518,7 +1535,7 @@ textarea.form-control {
   position: absolute;
   top: 8px;
   right: 8px;
-  background: #ef4444;
+  background: var(--err-fg);
   color: #fff;
   font-size: 0.68rem;
   font-weight: 700;
@@ -1530,7 +1547,7 @@ textarea.form-control {
   align-items: center;
   justify-content: center;
   line-height: 1;
-  box-shadow: 0 1px 4px rgba(239, 68, 68, 0.5);
+  box-shadow: 0 1px 4px rgba(159, 47, 45, 0.3);
   z-index: 2;
 }
 
@@ -1734,7 +1751,7 @@ textarea.form-control {
   align-items: center;
   gap: 6px;
   padding: 6px 14px;
-  background: rgba(138, 201, 58, 0.15);
+  background: rgba(17, 17, 17, 0.08);
   border: 1px solid var(--border-purple);
   border-radius: var(--radius-pill);
   font-size: 0.82rem;
@@ -1799,7 +1816,7 @@ textarea.form-control {
 }
 
 .exercise-meta-item {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(17, 17, 17, 0.04);
   border-radius: var(--radius-sm);
   padding: 8px;
   text-align: center;
@@ -1822,7 +1839,7 @@ textarea.form-control {
 .exercise-obs {
   font-size: 0.82rem;
   color: var(--text-secondary);
-  background: rgba(138, 201, 58, 0.05);
+  background: rgba(17, 17, 17, 0.03);
   border-left: 3px solid var(--purple-700);
   padding: 8px 12px;
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
@@ -1899,7 +1916,7 @@ textarea.form-control {
   color: var(--purple-400);
   margin-top: 6px;
   padding: 6px 10px;
-  background: rgba(139, 92, 246, 0.08);
+  background: rgba(17, 17, 17, 0.08);
   border-radius: 8px;
   border-left: 2px solid var(--purple-600);
 }
@@ -1999,7 +2016,7 @@ textarea.form-control {
   align-items: center;
   justify-content: space-between;
   padding: 14px 16px;
-  background: rgba(138, 201, 58, 0.1);
+  background: rgba(17, 17, 17, 0.05);
   border-bottom: 1px solid var(--border-card);
 }
 
@@ -2080,20 +2097,20 @@ textarea.form-control {
 }
 
 .diet-dia-btn.has-data {
-  border-color: #8ac93a;
-  color: #8ac93a;
+  border-color: var(--ok-fg);
+  color: var(--ok-fg);
 }
 
 .diet-dia-btn.active {
   background: var(--gradient-primary);
   border-color: transparent;
   color: #fff;
-  box-shadow: 0 2px 8px rgba(138, 201, 58, 0.4);
+  box-shadow: none;
 }
 
 .diet-dia-btn.has-data.active {
-  background: linear-gradient(135deg, #4c7a22, #8ac93a);
-  box-shadow: 0 2px 8px rgba(138, 201, 58, 0.4);
+  background: var(--ok-fg);
+  box-shadow: none;
 }
 
 .diet-dia-label {
@@ -2203,7 +2220,7 @@ textarea.form-control {
 .alimento-row input:focus {
   outline: none;
   border-color: var(--purple-500);
-  box-shadow: 0 0 0 3px rgba(138, 201, 58, 0.2);
+  box-shadow: none;
 }
 
 .alimento-row input::placeholder {
@@ -2218,28 +2235,32 @@ textarea.form-control {
    VISUALIZADOR DE DIETA (aluno)
    ============================================================ */
 .dieta-meta-card {
-  background: var(--gradient-primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
   border-radius: var(--radius-lg);
   padding: 20px;
   margin-bottom: 16px;
 }
 
 .dieta-titulo {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #fff;
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--text-white);
   margin: 0 0 6px;
 }
 
 .dieta-objetivo {
   font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--text-secondary);
   margin: 0 0 4px;
 }
 
 .dieta-obs {
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--text-muted);
   margin: 0;
 }
 
@@ -2276,7 +2297,7 @@ textarea.form-control {
   background: var(--gradient-primary);
   border-color: transparent;
   color: #fff;
-  box-shadow: 0 2px 8px rgba(138, 201, 58, 0.4);
+  box-shadow: none;
 }
 
 .diet-dia-btn-aluno.empty-day {
@@ -2284,15 +2305,15 @@ textarea.form-control {
 }
 
 .diet-dia-btn-aluno.has-data {
-  border-color: #8ac93a;
-  color: #8ac93a;
+  border-color: var(--ok-fg);
+  color: var(--ok-fg);
 }
 
 .diet-dia-btn-aluno.has-data.active {
-  background: linear-gradient(135deg, #4c7a22, #8ac93a);
+  background: var(--ok-fg);
   border-color: transparent;
   color: #fff;
-  box-shadow: 0 2px 8px rgba(138, 201, 58, 0.4);
+  box-shadow: none;
 }
 
 .hoje-badge {
@@ -2325,7 +2346,7 @@ textarea.form-control {
   align-items: center;
   justify-content: space-between;
   padding: 14px 16px;
-  background: rgba(138, 201, 58, 0.12);
+  background: rgba(17, 17, 17, 0.06);
   border-bottom: 1px solid var(--border-card);
 }
 
@@ -2409,7 +2430,7 @@ textarea.form-control {
   color: #fff;
   align-self: flex-end;
   border-bottom-right-radius: var(--radius-xs);
-  box-shadow: 0 2px 8px rgba(138, 201, 58, 0.3);
+  box-shadow: none;
 }
 
 .message-bubble.received {
@@ -2513,19 +2534,19 @@ textarea.form-control {
 }
 
 .imc-seg-abaixo {
-  background: #60a5fa;
+  background: var(--info-fg);
   flex: 14;
 } /* <18.5  → 14% dos 25 pts */
 .imc-seg-normal {
-  background: #8ac93a;
+  background: #111111;
   flex: 25;
 } /* 18.5–24.9 */
 .imc-seg-sobrepeso {
-  background: #facc15;
+  background: var(--warn-fg);
   flex: 20;
 } /* 25–29.9 */
 .imc-seg-obesidade {
-  background: #ef4444;
+  background: var(--err-fg);
   flex: 41;
 } /* 30+ */
 
@@ -2537,7 +2558,7 @@ textarea.form-control {
   height: 14px;
   background: #fff;
   border-radius: 50%;
-  border: 2px solid rgba(0, 0, 0, 0.3);
+  border: 2px solid var(--ink-900);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
   z-index: 2;
   pointer-events: none;
@@ -2657,7 +2678,7 @@ textarea.form-control {
 .empty-state-icon {
   width: 64px;
   height: 64px;
-  background: rgba(138, 201, 58, 0.1);
+  background: rgba(17, 17, 17, 0.05);
   border-radius: var(--radius-xl);
   display: flex;
   align-items: center;
@@ -2929,7 +2950,7 @@ textarea.form-control {
   font-size: 0.78rem;
   font-weight: 700;
   color: var(--purple-400);
-  background: rgba(138, 201, 58, 0.15);
+  background: rgba(17, 17, 17, 0.08);
   border-radius: var(--radius-pill);
   padding: 2px 8px;
   transition: var(--transition-fast);
@@ -2951,7 +2972,7 @@ textarea.form-control {
 }
 
 .workout-progress-fill.done {
-  background: linear-gradient(90deg, #4c7a22, #8ac93a);
+  background: var(--ok-fg);
 }
 
 .workout-progress-text {
@@ -2982,7 +3003,7 @@ textarea.form-control {
   font-weight: 700;
   cursor: pointer;
   width: 100%;
-  box-shadow: 0 4px 20px rgba(138, 201, 58, 0.45);
+  box-shadow: none;
   transition: var(--transition-base);
   display: flex;
   align-items: center;
@@ -2993,7 +3014,7 @@ textarea.form-control {
 
 .finish-workout-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(138, 201, 58, 0.5);
+  box-shadow: none;
 }
 
 .finish-workout-btn:active {
@@ -3091,13 +3112,13 @@ textarea.form-control {
   color: var(--purple-500);
 }
 .text-green {
-  color: #81c784;
+  color: var(--ok-fg);
 }
 .text-orange {
-  color: #ffb74d;
+  color: var(--warn-fg);
 }
 .text-faded {
-  color: rgba(138, 201, 58, 0.4);
+  color: rgba(17, 17, 17, 0.2);
 }
 
 .text-sm {
@@ -3124,16 +3145,16 @@ textarea.form-control {
    UTILIDADES — ÍCONE BACKGROUNDS (quick cards)
    ============================================================ */
 .icon-bg-purple {
-  background: rgba(138, 201, 58, 0.15);
+  background: rgba(17, 17, 17, 0.08);
 }
 .icon-bg-red {
-  background: rgba(255, 23, 68, 0.15);
+  background: var(--err-bg);
 }
 .icon-bg-green {
-  background: rgba(76, 175, 80, 0.15);
+  background: var(--ok-bg);
 }
 .icon-bg-orange {
-  background: rgba(255, 152, 0, 0.15);
+  background: var(--warn-bg);
 }
 
 /* ============================================================
@@ -3207,8 +3228,8 @@ textarea.form-control {
   align-items: center;
   gap: 4px;
   background: transparent;
-  border: 1px solid #8ac93a;
-  color: #8ac93a;
+  border: 1px solid #111111;
+  color: #111111;
   border-radius: 8px;
   padding: 4px 10px;
   font-size: 0.8rem;
@@ -3217,7 +3238,7 @@ textarea.form-control {
   transition: background 0.2s;
 }
 .btn-editar:hover {
-  background: rgba(138, 201, 58, 0.1);
+  background: rgba(17, 17, 17, 0.05);
 }
 
 /* ============================================================
@@ -3373,8 +3394,8 @@ textarea.form-control {
 .tipo-conta-toggle {
   display: flex;
   gap: 8px;
-  background: var(--bg-card-3, #1e1e2e);
-  border: 1px solid var(--border-card, rgba(255, 255, 255, 0.08));
+  background: var(--bg-card-3, #f1f0ec);
+  border: 1px solid var(--border-card, rgba(17, 17, 17, 0.08));
   border-radius: 10px;
   padding: 4px;
 }
@@ -3384,7 +3405,7 @@ textarea.form-control {
   border: none;
   border-radius: 8px;
   background: transparent;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.55));
+  color: var(--text-secondary, rgba(17, 17, 17, 0.55));
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
@@ -3393,7 +3414,7 @@ textarea.form-control {
     color 0.2s;
 }
 .tipo-btn.active {
-  background: linear-gradient(135deg, #4c7a22, #8ac93a);
+  background: #111111;
   color: #fff;
   font-weight: 600;
 }
@@ -3467,8 +3488,8 @@ textarea.form-control {
 
 /* Tom Select - dark theme override */
 .ts-wrapper .ts-control {
-  background: var(--bg-card-3, #1e1e2e);
-  border: 1px solid var(--border-card, rgba(255, 255, 255, 0.1));
+  background: var(--bg-card-3, #f1f0ec);
+  border: 1px solid var(--border-card, rgba(17, 17, 17, 0.1));
   border-radius: var(--radius-md, 10px);
   color: var(--text-white, #fff);
   min-height: 44px;
@@ -3476,18 +3497,18 @@ textarea.form-control {
   cursor: text;
 }
 .ts-wrapper.focus .ts-control {
-  border-color: var(--purple-500, #8ac93a);
-  box-shadow: 0 0 0 3px rgba(138, 201, 58, 0.2);
+  border-color: var(--purple-500, #111111);
+  box-shadow: none;
 }
 .ts-wrapper .ts-control input {
   color: var(--text-white, #fff);
 }
 .ts-wrapper .ts-control input::placeholder {
-  color: var(--text-muted, rgba(255, 255, 255, 0.4));
+  color: var(--text-muted, rgba(17, 17, 17, 0.4));
 }
 .ts-dropdown {
-  background: var(--bg-card, #12121a);
-  border: 1px solid var(--border-card, rgba(255, 255, 255, 0.1));
+  background: var(--bg-card, #111111);
+  border: 1px solid var(--border-card, rgba(17, 17, 17, 0.1));
   border-radius: var(--radius-md, 10px);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   margin-top: 4px;
@@ -3496,7 +3517,7 @@ textarea.form-control {
 .ts-dropdown .ts-ex-option {
   padding: 10px 14px;
   cursor: pointer;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(17, 17, 17, 0.04);
   transition: background 0.15s;
 }
 .ts-dropdown .ts-ex-option:last-child {
@@ -3504,7 +3525,7 @@ textarea.form-control {
 }
 .ts-dropdown .ts-ex-option:hover,
 .ts-dropdown .option.active {
-  background: rgba(138, 201, 58, 0.15);
+  background: rgba(17, 17, 17, 0.08);
 }
 .ts-ex-name {
   font-weight: 600;
@@ -3525,29 +3546,29 @@ textarea.form-control {
   line-height: 1.4;
 }
 .ts-tag-muscle {
-  background: rgba(138, 201, 58, 0.2);
-  color: var(--purple-400, #a78bfa);
+  background: rgba(17, 17, 17, 0.1);
+  color: var(--purple-400, #2f3437);
 }
 .ts-tag-type {
-  background: rgba(255, 255, 255, 0.07);
-  color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+  background: rgba(17, 17, 17, 0.07);
+  color: var(--text-secondary, rgba(17, 17, 17, 0.6));
 }
 .ts-tag-level {
-  background: rgba(129, 199, 132, 0.15);
-  color: #81c784;
+  background: var(--ok-bg);
+  color: var(--ok-fg);
 }
 .ts-tag-custom {
-  background: rgba(255, 183, 77, 0.15);
-  color: #ffb74d;
+  background: var(--warn-bg);
+  color: var(--warn-fg);
 }
 .ts-tag-fav {
-  background: rgba(255, 183, 77, 0.2);
-  color: #ffd54f;
+  background: var(--warn-bg);
+  color: var(--warn-fg);
 }
 .ts-no-results {
   padding: 16px;
   text-align: center;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.5));
+  color: var(--text-secondary, rgba(17, 17, 17, 0.5));
   font-size: 0.85rem;
 }
 
@@ -3559,7 +3580,7 @@ textarea.form-control {
   display: block;
   margin-bottom: 8px;
   font-size: 0.82rem;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+  color: var(--text-secondary, rgba(17, 17, 17, 0.6));
 }
 .ex-filters-bar {
   display: flex;
@@ -3570,9 +3591,9 @@ textarea.form-control {
 .ex-filter-chip {
   padding: 4px 12px;
   border-radius: 99px;
-  border: 1px solid var(--border-card, rgba(255, 255, 255, 0.1));
-  background: var(--bg-card-3, #1e1e2e);
-  color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+  border: 1px solid var(--border-card, rgba(17, 17, 17, 0.1));
+  background: var(--bg-card-3, #f1f0ec);
+  color: var(--text-secondary, rgba(17, 17, 17, 0.6));
   font-size: 0.78rem;
   cursor: pointer;
   transition:
@@ -3582,19 +3603,19 @@ textarea.form-control {
   user-select: none;
 }
 .ex-filter-chip:hover {
-  border-color: var(--purple-600, #5b2da3);
+  border-color: var(--purple-600, #111111);
   color: var(--text-white, #fff);
 }
 .ex-filter-chip.active {
-  background: rgba(138, 201, 58, 0.2);
-  border-color: var(--purple-500, #8ac93a);
-  color: var(--purple-400, #a78bfa);
+  background: rgba(17, 17, 17, 0.1);
+  border-color: var(--purple-500, #111111);
+  color: var(--purple-400, #2f3437);
 }
 
 /* Painel de info do exercicio selecionado */
 .ex-info-panel {
-  background: rgba(138, 201, 58, 0.08);
-  border: 1px solid rgba(138, 201, 58, 0.25);
+  background: rgba(17, 17, 17, 0.04);
+  border: 1px solid rgba(17, 17, 17, 0.13);
   border-radius: var(--radius-md, 10px);
   padding: 14px;
   margin-top: 12px;
@@ -3624,20 +3645,20 @@ textarea.form-control {
   font-weight: 600;
 }
 .ex-tag-grupo {
-  background: rgba(138, 201, 58, 0.2);
-  color: var(--purple-400, #a78bfa);
+  background: rgba(17, 17, 17, 0.1);
+  color: var(--purple-400, #2f3437);
 }
 .ex-tag-tipo {
-  background: rgba(255, 255, 255, 0.07);
-  color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+  background: rgba(17, 17, 17, 0.07);
+  color: var(--text-secondary, rgba(17, 17, 17, 0.6));
 }
 .ex-tag-nivel {
-  background: rgba(129, 199, 132, 0.15);
-  color: #81c784;
+  background: var(--ok-bg);
+  color: var(--ok-fg);
 }
 .ex-info-instrucoes {
   font-size: 0.82rem;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+  color: var(--text-secondary, rgba(17, 17, 17, 0.6));
   line-height: 1.5;
 }
 .ex-fav-btn {
@@ -3645,7 +3666,7 @@ textarea.form-control {
   border: none;
   font-size: 1.4rem;
   cursor: pointer;
-  color: var(--text-muted, rgba(255, 255, 255, 0.3));
+  color: var(--text-muted, rgba(17, 17, 17, 0.3));
   padding: 4px;
   transition: color 0.2s;
   flex-shrink: 0;
@@ -3653,14 +3674,14 @@ textarea.form-control {
 }
 .ex-fav-btn:hover,
 .ex-fav-btn.is-fav {
-  color: #ffd54f;
+  color: var(--warn-fg);
 }
 
 /* Dica de exercicio customizado */
 .ex-custom-hint {
   margin-top: 10px;
   font-size: 0.82rem;
-  color: var(--text-muted, rgba(255, 255, 255, 0.3));
+  color: var(--text-muted, rgba(17, 17, 17, 0.3));
   display: flex;
   gap: 6px;
   align-items: center;
@@ -3671,7 +3692,7 @@ textarea.form-control {
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--purple-400, #a78bfa);
+  color: var(--purple-400, #2f3437);
   text-decoration: underline;
 }
 
@@ -3685,14 +3706,14 @@ textarea.form-control {
   gap: 12px;
   margin-bottom: 14px;
   font-size: 0.82rem;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+  color: var(--text-secondary, rgba(17, 17, 17, 0.6));
   font-weight: 600;
 }
 .ex-params-divider::after {
   content: "";
   flex: 1;
   height: 1px;
-  background: var(--border-subtle, rgba(255, 255, 255, 0.06));
+  background: var(--border-subtle, rgba(17, 17, 17, 0.06));
 }
 
 /* Badges nos cards de exercicio do professor */
@@ -3711,19 +3732,19 @@ textarea.form-control {
   line-height: 1.4;
 }
 .ex-badge-muscle {
-  background: rgba(138, 201, 58, 0.18);
-  color: var(--purple-400, #a78bfa);
+  background: rgba(17, 17, 17, 0.09);
+  color: var(--purple-400, #2f3437);
 }
 .ex-badge-type {
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--text-muted, rgba(255, 255, 255, 0.4));
+  background: rgba(17, 17, 17, 0.06);
+  color: var(--text-muted, rgba(17, 17, 17, 0.4));
 }
 
 /* Modal overlay - exercicio customizado */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.72);
+  background: var(--bg-overlay);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -3752,7 +3773,7 @@ textarea.form-control {
 .admin-prof-email,
 .admin-prof-tel {
   font-size: 0.82rem;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.55));
+  color: var(--text-secondary, rgba(17, 17, 17, 0.55));
   margin-top: 2px;
 }
 .badge-count {
@@ -3763,8 +3784,8 @@ textarea.form-control {
   height: 24px;
   padding: 0 7px;
   border-radius: 99px;
-  background: rgba(138, 201, 58, 0.25);
-  color: var(--purple-400, #a78bfa);
+  background: rgba(17, 17, 17, 0.13);
+  color: var(--purple-400, #2f3437);
   font-size: 0.78rem;
   font-weight: 700;
 }
@@ -3776,7 +3797,7 @@ textarea.form-control {
   display: flex;
   gap: 8px;
   margin-bottom: 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(17, 17, 17, 0.08);
   padding-bottom: 0;
 }
 .admin-tab {
@@ -3786,7 +3807,7 @@ textarea.form-control {
   padding: 10px 20px;
   border: none;
   background: transparent;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.55));
+  color: var(--text-secondary, rgba(17, 17, 17, 0.55));
   font-size: 0.9rem;
   font-weight: 500;
   border-bottom: 2px solid transparent;
@@ -3800,8 +3821,8 @@ textarea.form-control {
   color: var(--text-white, #fff);
 }
 .admin-tab.active {
-  color: var(--purple-400, #a78bfa);
-  border-bottom-color: var(--purple-400, #a78bfa);
+  color: var(--purple-400, #2f3437);
+  border-bottom-color: var(--purple-400, #2f3437);
 }
 
 /* ============================================================
@@ -3821,10 +3842,10 @@ textarea.form-control {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--purple-400, #a78bfa);
+  color: var(--purple-400, #2f3437);
   margin-bottom: 8px;
   padding-bottom: 6px;
-  border-bottom: 1px solid rgba(138, 201, 58, 0.2);
+  border-bottom: 1px solid rgba(17, 17, 17, 0.1);
 }
 .admin-aluno-card {
   display: flex;
@@ -3850,11 +3871,11 @@ textarea.form-control {
   gap: 4px;
   background: linear-gradient(
     135deg,
-    rgba(255, 107, 53, 0.25),
-    rgba(247, 197, 159, 0.1)
+    rgba(149, 100, 0, 0.3),
+    var(--warn-bg)
   );
-  border: 1px solid rgba(255, 107, 53, 0.4);
-  color: #ff6b35;
+  border: 1px solid rgba(149, 100, 0, 0.3);
+  color: var(--warn-fg);
   padding: 5px 14px;
   border-radius: var(--radius-pill);
   font-size: 0.82rem;
@@ -3900,10 +3921,10 @@ textarea.form-control {
 .alerta-inativos-header {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #ffb74d;
+  color: var(--warn-fg);
   margin-bottom: 10px;
   padding-bottom: 8px;
-  border-bottom: 1px solid rgba(255, 183, 77, 0.2);
+  border-bottom: 1px solid var(--warn-bg);
 }
 
 .alerta-inativo-item {
@@ -4019,7 +4040,7 @@ textarea.form-control {
   background: linear-gradient(
     90deg,
     var(--bg-input) 25%,
-    rgba(255, 255, 255, 0.06) 50%,
+    rgba(17, 17, 17, 0.06) 50%,
     var(--bg-input) 75%
   );
   background-size: 800px 100%;
@@ -4046,7 +4067,7 @@ textarea.form-control {
   background: linear-gradient(
     90deg,
     var(--bg-input) 25%,
-    rgba(255, 255, 255, 0.06) 50%,
+    rgba(17, 17, 17, 0.06) 50%,
     var(--bg-input) 75%
   );
   background-size: 800px 100%;
@@ -4066,7 +4087,7 @@ textarea.form-control {
   background: linear-gradient(
     90deg,
     var(--bg-input) 25%,
-    rgba(255, 255, 255, 0.06) 50%,
+    rgba(17, 17, 17, 0.06) 50%,
     var(--bg-input) 75%
   );
   background-size: 800px 100%;
@@ -4077,7 +4098,7 @@ textarea.form-control {
 /* -- Exercise check card (layout novo) ---------------------- */
 .exercise-check-card {
   background: var(--bg-card-2);
-  border: 2px solid rgba(239, 68, 68, 0.25);
+  border: 2px solid rgba(159, 47, 45, 0.3);
   border-radius: var(--radius-lg);
   overflow: hidden;
   transition:
@@ -4089,12 +4110,12 @@ textarea.form-control {
   margin-bottom: 2px;
 }
 .exercise-check-card.completed {
-  border-color: #8ac93a;
-  background: rgba(138, 201, 58, 0.06);
-  box-shadow: 0 0 0 1px rgba(138, 201, 58, 0.15);
+  border-color: var(--ok-fg);
+  background: rgba(52, 101, 56, 0.04);
+  box-shadow: none;
 }
 .exercise-check-card.completed .exercise-check-nome {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(17, 17, 17, 0.6);
 }
 @keyframes cardComplete {
   0% {
@@ -4102,7 +4123,7 @@ textarea.form-control {
   }
   35% {
     transform: scale(1.025);
-    box-shadow: 0 0 22px rgba(138, 201, 58, 0.4);
+    box-shadow: none;
   }
   100% {
     transform: scale(1);
@@ -4121,7 +4142,7 @@ textarea.form-control {
   -webkit-tap-highlight-color: transparent;
 }
 .ex-check-main:active {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(17, 17, 17, 0.04);
 }
 .exercise-check-info {
   flex: 1;
@@ -4158,7 +4179,7 @@ textarea.form-control {
 .ex-expand-area {
   padding: 10px 16px 12px;
   border-top: 1px solid var(--border-card);
-  background: rgba(138, 201, 58, 0.05);
+  background: rgba(17, 17, 17, 0.03);
 }
 .ex-expand-area.hidden {
   display: none;
@@ -4213,15 +4234,15 @@ textarea.form-control {
   transform: scale(0.92);
 }
 .serie-pill.serie-done {
-  background: rgba(138, 201, 58, 0.15);
-  border-color: #8ac93a;
-  color: #8ac93a;
+  background: rgba(52, 101, 56, 0.09);
+  border-color: var(--ok-fg);
+  color: var(--ok-fg);
 }
 .serie-pill.serie-done .serie-num::before {
   content: "✓ ";
 }
 .serie-pill.serie-done .serie-reps {
-  color: rgba(138, 201, 58, 0.7);
+  color: rgba(52, 101, 56, 0.42);
 }
 
 /* -- Anotação de carga -------------------------------------- */
@@ -4421,9 +4442,9 @@ textarea.form-control {
 }
 .sexo-btn.active {
   border-color: var(--purple-600);
-  background: rgba(138, 201, 58, 0.18);
+  background: rgba(17, 17, 17, 0.09);
   color: var(--purple-400);
-  box-shadow: 0 0 0 2px rgba(138, 201, 58, 0.25);
+  box-shadow: none;
 }
 
 /* Chips de objetivo */
@@ -4453,9 +4474,9 @@ textarea.form-control {
 }
 .objetivo-chip.active {
   border-color: var(--purple-600);
-  background: rgba(138, 201, 58, 0.18);
+  background: rgba(17, 17, 17, 0.09);
   color: var(--purple-400);
-  box-shadow: 0 0 0 2px rgba(138, 201, 58, 0.25);
+  box-shadow: none;
 }
 
 /* Badge de sexo no avatar do perfil */
@@ -4500,15 +4521,15 @@ textarea.form-control {
 .btn-video-ex:hover {
   border-color: var(--purple-600);
   color: var(--purple-400);
-  background: rgba(138, 201, 58, 0.1);
+  background: rgba(17, 17, 17, 0.05);
 }
 .btn-video-ex.has-video {
-  border-color: rgba(138, 201, 58, 0.5);
+  border-color: rgba(17, 17, 17, 0.25);
   color: var(--purple-400);
-  background: rgba(138, 201, 58, 0.12);
+  background: rgba(17, 17, 17, 0.06);
 }
 .btn-video-ex.has-video:hover {
-  background: rgba(138, 201, 58, 0.22);
+  background: rgba(17, 17, 17, 0.11);
 }
 
 /* Botão "Ver vídeo" no card do aluno */
@@ -4520,9 +4541,9 @@ textarea.form-control {
   width: 100%;
   padding: 9px 16px;
   margin-top: 10px;
-  border: 1px solid rgba(138, 201, 58, 0.4);
+  border: 1px solid rgba(17, 17, 17, 0.2);
   border-radius: var(--radius-md);
-  background: rgba(138, 201, 58, 0.1);
+  background: rgba(17, 17, 17, 0.05);
   color: var(--purple-400);
   font-size: 0.85rem;
   font-weight: 600;
@@ -4530,7 +4551,7 @@ textarea.form-control {
   transition: var(--transition-fast);
 }
 .btn-ver-video:hover {
-  background: rgba(138, 201, 58, 0.22);
+  background: rgba(17, 17, 17, 0.11);
   border-color: var(--purple-500);
 }
 .btn-ver-video svg {
@@ -4553,7 +4574,7 @@ textarea.form-control {
 }
 .video-upload-area:hover {
   border-color: var(--purple-500);
-  background: rgba(138, 201, 58, 0.08);
+  background: rgba(17, 17, 17, 0.04);
 }
 
 /* Área de upload inline no formulário */
@@ -4573,7 +4594,7 @@ textarea.form-control {
 }
 .video-upload-inline:hover {
   border-color: var(--purple-500);
-  background: rgba(138, 201, 58, 0.07);
+  background: rgba(17, 17, 17, 0.04);
 }
 .video-upload-inline.has-file {
   cursor: default;
@@ -4634,7 +4655,7 @@ textarea.form-control {
   width: 36px;
   height: 4px;
   border-radius: var(--radius-pill);
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--ink-200);
 }
 
 .video-player-title {
@@ -4650,7 +4671,7 @@ textarea.form-control {
 
 .video-player-close {
   flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(17, 17, 17, 0.08);
   border: none;
   color: var(--text-secondary);
   width: 32px;
@@ -4664,7 +4685,7 @@ textarea.form-control {
   margin-top: 6px;
 }
 .video-player-close:hover {
-  background: rgba(255, 23, 68, 0.18);
+  background: var(--err-bg);
   color: var(--red-400);
 }
 
@@ -4772,7 +4793,7 @@ textarea.form-control {
   font-size: 0.72rem;
   font-weight: 600;
   color: var(--purple-400);
-  background: rgba(138, 201, 58, 0.14);
+  background: rgba(17, 17, 17, 0.07);
   border-radius: var(--radius-pill);
   padding: 2px 8px;
   margin-left: 6px;
@@ -4796,7 +4817,7 @@ textarea.form-control {
 }
 .progresso-fase-track {
   height: 8px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(17, 17, 17, 0.08);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -4822,18 +4843,18 @@ textarea.form-control {
   transition: transform 0.15s;
 }
 .conquista-item.earned {
-  background: rgba(138, 201, 58, 0.12);
-  border: 1px solid rgba(138, 201, 58, 0.22);
+  background: rgba(17, 17, 17, 0.06);
+  border: 1px solid rgba(17, 17, 17, 0.11);
 }
 .conquista-item.locked {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(17, 17, 17, 0.04);
+  border: 1px solid rgba(17, 17, 17, 0.07);
   opacity: 0.45;
 }
 
 .conquistas-hint {
   font-size: 0.75rem;
-  color: #4b5563;
+  color: #787774;
   margin-top: 4px;
   text-align: center;
   padding: 0 8px;
@@ -4845,7 +4866,7 @@ textarea.form-control {
 }
 .conquista-nome {
   font-size: 0.7rem;
-  color: #767c68;
+  color: #787774;
   font-weight: 600;
   line-height: 1.2;
 }
@@ -4853,7 +4874,7 @@ textarea.form-control {
   color: var(--text-primary);
 }
 .fase-unlock-changes {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(17, 17, 17, 0.04);
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 4px;
@@ -4864,7 +4885,7 @@ textarea.form-control {
   align-items: center;
   gap: 10px;
   padding: 8px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(17, 17, 17, 0.06);
   font-size: 0.88rem;
 }
 .fase-change-item:last-child {
@@ -4874,4 +4895,359 @@ textarea.form-control {
   font-size: 1.2rem;
   min-width: 24px;
   text-align: center;
+}
+
+/* ============================================================
+   REFINAMENTO CLEAN
+   Camada final do tema claro: tipografia editorial, superfícies
+   planas, foco acessível e micro-interações discretas. Fica no fim
+   do arquivo para sobrescrever estilos legados sem reescrevê-los.
+   ============================================================ */
+
+::selection {
+  background: var(--ink-150);
+  color: var(--ink-900);
+}
+
+/* Tipografia: títulos firmes e compactos; números alinhados */
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-white);
+}
+
+.page-title,
+.welcome-banner h2,
+.aluno-detail-info h2,
+.diet-header-card h2,
+.profile-name,
+.workout-title,
+.login-logo h1 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.page-title {
+  font-size: 1.9rem;
+}
+
+.stat-val,
+.stat-card h3,
+.imc-value,
+.imc-info-card .value,
+.history-letter,
+.exercise-order,
+.exercise-number {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Texto que usava gradiente vira tinta sólida */
+.stat-card h3,
+.imc-value,
+.login-logo h1,
+.page-404 .error-code {
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  color: var(--text-white);
+}
+
+.stat-card h3 {
+  font-weight: 600;
+}
+
+/* Foco visível e consistente (teclado) */
+:focus-visible {
+  outline: 2px solid var(--ink-900);
+  outline-offset: 2px;
+}
+
+/* Botões: planos, cantos discretos, resposta tátil curta */
+.btn-primary,
+.btn-secondary,
+.btn-danger,
+.btn-ghost,
+.finish-workout-btn,
+.pwa-install-btn,
+.btn-landing {
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+}
+
+.btn-primary:hover,
+.finish-workout-btn:hover,
+.pwa-install-btn:hover {
+  background: #333333;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-primary:active,
+.btn-secondary:active,
+.btn-danger:active,
+.btn-ghost:active,
+.finish-workout-btn:active {
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  background: var(--bg-card);
+  color: var(--text-white);
+  border: 1px solid var(--ink-200);
+}
+
+.btn-secondary:hover {
+  background: var(--ink-100);
+  border-color: var(--ink-200);
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border-card);
+}
+
+.btn-ghost:hover {
+  background: var(--ink-100);
+}
+
+.btn-danger:hover {
+  background: #842826;
+}
+
+/* Cards: borda de 1px, sem brilho; hover só com sombra quase invisível */
+.card,
+.stat-card,
+.quick-card,
+.student-card,
+.onboarding-card,
+.exercise-check-card,
+.imc-info-card,
+.login-card {
+  box-shadow: none;
+  border-color: var(--border-card);
+}
+
+.card:hover,
+.quick-card:hover,
+.student-card:hover {
+  border-color: var(--ink-200);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transform: none;
+}
+
+.stat-card::before,
+.student-card::after {
+  display: none;
+}
+
+/* Cabeçalhos "hero" viram superfícies brancas com divisória */
+.aluno-header,
+.welcome-banner,
+.aluno-detail-header,
+.diet-header-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  box-shadow: none;
+}
+
+.aluno-header {
+  border-width: 0 0 1px;
+  backdrop-filter: saturate(180%) blur(12px);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+  background: rgba(255, 255, 255, 0.86);
+}
+
+/* Login sem halo radial */
+.login-page {
+  background-image: none;
+}
+
+.login-card {
+  border-radius: var(--radius-lg);
+}
+
+/* Formulários: borda fina, foco escuro com anel suave */
+.form-control,
+.form-select,
+.carga-nota-input {
+  border-width: 1px;
+  border-color: var(--ink-200);
+  border-radius: var(--radius-sm);
+}
+
+.form-control:focus,
+.form-select:focus,
+.carga-nota-input:focus {
+  border-color: var(--ink-900);
+  background: var(--bg-input);
+  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.06);
+}
+
+.form-label {
+  color: var(--text-secondary);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* Badges: pílula pequena, caixa alta espaçada, pastel */
+.badge {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border: none;
+}
+
+.badge-purple,
+.badge-gray {
+  background: var(--ink-100);
+  color: var(--text-secondary);
+}
+
+.badge-red {
+  color: var(--err-fg);
+}
+
+/* Navegação: estado ativo por tinta, não por cor */
+.nav-item.active,
+.sidebar-nav-btn.active {
+  color: var(--ink-900);
+}
+
+.sidebar-nav-btn.active {
+  background: var(--ink-100);
+}
+
+.nav-item.active::before {
+  height: 2px;
+}
+
+.bottom-nav,
+.sidebar {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: var(--border-card);
+  box-shadow: none;
+}
+
+/* Abas e chips: pílulas discretas; ativo = preto */
+.workout-tab-btn,
+.sub-tab-btn,
+.focus-chip,
+.diet-dia-btn,
+.diet-dia-btn-aluno,
+.ex-filter-chip,
+.objetivo-chip,
+.sexo-btn {
+  border-width: 1px;
+  letter-spacing: 0;
+  font-weight: 500;
+  box-shadow: none;
+}
+
+.workout-tab-btn.active,
+.sub-tab-btn.active,
+.focus-chip.selected {
+  box-shadow: none;
+}
+
+/* Treino concluído: verde de status em vez de lima */
+.exercise-check-card.completed {
+  background: var(--ok-bg);
+}
+
+.workout-progress-fill.done {
+  background: var(--ok-fg);
+}
+
+/* Modais e sheets: superfície branca, sombra difusa */
+.modal-content,
+.video-player-sheet {
+  background: var(--bg-card);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border-card);
+}
+
+/* Scrollbar neutra */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Entrada suave de conteúdo (respeita preferência de movimento) */
+@media (prefers-reduced-motion: no-preference) {
+  .card,
+  .stat-card,
+  .quick-card,
+  .student-card {
+    animation: entradaSuave 0.6s var(--ease-out) both;
+  }
+}
+
+@keyframes entradaSuave {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---- Ícones SVG que substituíram emojis ---- */
+/* Número da fase (card de progressão) */
+.fase-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  background: var(--ink-100);
+  color: var(--ink-900);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.toast-icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+.toast-success .toast-icon {
+  color: var(--ok-fg);
+}
+.toast-error .toast-icon {
+  color: var(--err-fg);
+}
+.toast-warning .toast-icon {
+  color: var(--warn-fg);
+}
+.toast-info .toast-icon {
+  color: var(--info-fg);
+}
+
+/* Conquistas: troféu em tinta, cadeado apagado */
+.conquista-emoji {
+  display: inline-flex;
+  color: var(--ink-900);
+}
+.conquista-item.locked .conquista-emoji {
+  color: var(--ink-300);
+}
+
+/* Ícones grandes de modais (celebração, fase desbloqueada) */
+#celebracao-emoji,
+#fase-unlock-icone {
+  display: flex;
+  justify-content: center;
+  color: var(--ink-900);
+}
+
+.btn-icon svg,
+.btn-carga-chart svg {
+  display: block;
 }

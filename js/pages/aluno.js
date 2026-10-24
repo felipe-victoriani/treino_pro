@@ -5,7 +5,7 @@
 
 /* -- Frases Motivacionais ------------------------------------ */
 const FRASES_MASCULINAS = [
-  "Bora, guerreiro! Aquele shape não vai aparecer sozinho. 💪",
+  "Bora, guerreiro! Aquele shape não vai aparecer sozinho.",
   "Menos desculpa, mais barra.",
   "O cara no espelho amanhã agradece o esforço de hoje.",
   "Endorfina é o melhor pré-treino.",
@@ -23,13 +23,13 @@ const FRASES_MASCULINAS = [
 ];
 
 const FRASES_FEMININAS = [
-  "Bora, guerreira! Seu corpo é sua obra-prima. 🌟",
+  "Bora, guerreira! Seu corpo é sua obra-prima.",
   "Você é forte, linda e ainda está ficando melhor.",
   "Cada treino é um presente que você dá a si mesma.",
   "Não é sobre ser magra. É sobre ser poderosa.",
   "Sua maior competição é quem você era ontem.",
   "Mulher que levanta peso, levanta a vida também.",
-  "Suor hoje, brilho amanhã. ✨",
+  "Suor hoje, brilho amanhã.",
   "Seu esforço é silencioso. Seus resultados, barulhentos.",
   "Força não tem gênero — mas o seu é incrível.",
   "Consistência bate motivação todo dia.",
@@ -41,7 +41,7 @@ const FRASES_FEMININAS = [
 ];
 
 const FRASES_GENERICAS = [
-  "Cada rep te aproxima do seu melhor. 💪",
+  "Cada rep te aproxima do seu melhor.",
   "O único treino ruim é o que não aconteceu.",
   "Consistência bate motivação todo dia.",
   "Dói agora, orgulho depois.",
@@ -168,7 +168,7 @@ async function loadInicio() {
 
     // Boas-vindas
     const welcomeEl = document.getElementById("welcome-name");
-    if (welcomeEl) welcomeEl.textContent = "Ola, " + alunoState.nome + "! 💪";
+    if (welcomeEl) welcomeEl.textContent = "Ola, " + alunoState.nome + "!";
 
     // Treino do dia na badge
     const treinoDia = document.getElementById("treino-dia-letra");
@@ -201,13 +201,13 @@ async function loadInicio() {
           alunoState.treinoGerado.treinos?.[alunoState.treinoAtual];
         if (treinoIA && treinoIA.exercicios) {
           const lista = treinoIA.exercicios.slice(0, 3);
-          const foco = `<p style="color:var(--blue-400);margin-bottom:8px;font-size:0.85rem;">🤖 ${sanitize(treinoIA.nome)}</p>`;
+          const foco = `<p style="color:var(--blue-400);margin-bottom:8px;font-size:0.85rem;">${sanitize(treinoIA.nome)}</p>`;
           previewEl.innerHTML =
             foco +
             lista
               .map(
                 (ex) =>
-                  `<div style="padding:6px 0;border-bottom:1px solid var(--border-subtle);font-size:0.88rem;">💪 <strong>${sanitize(ex.nome)}</strong> — ${ex.series}x ${sanitize(ex.repeticoes)}</div>`,
+                  `<div style="padding:6px 0;border-bottom:1px solid var(--border-subtle);font-size:0.88rem;"><strong>${sanitize(ex.nome)}</strong> — ${ex.series}x ${sanitize(ex.repeticoes)}</div>`,
               )
               .join("");
           if (treinoIA.exercicios.length > 3) {
@@ -223,14 +223,14 @@ async function loadInicio() {
         if (treinoPre && treinoPre.exercicios) {
           const lista = treinoPre.exercicios.slice(0, 3);
           const foco = treinoPre.foco
-            ? `<p style="color:var(--blue-400);margin-bottom:8px;font-size:0.85rem;">🎯 ${sanitize(treinoPre.foco)}</p>`
+            ? `<p style="color:var(--blue-400);margin-bottom:8px;font-size:0.85rem;">${sanitize(treinoPre.foco)}</p>`
             : "";
           previewEl.innerHTML =
             foco +
             lista
               .map(
                 (ex) =>
-                  `<div style="padding:6px 0;border-bottom:1px solid var(--border-subtle);font-size:0.88rem;">💪 <strong>${sanitize(ex.nome)}</strong> — ${ex.series}x ${sanitize(ex.reps)}</div>`,
+                  `<div style="padding:6px 0;border-bottom:1px solid var(--border-subtle);font-size:0.88rem;"><strong>${sanitize(ex.nome)}</strong> — ${ex.series}x ${sanitize(ex.reps)}</div>`,
               )
               .join("");
           if (treinoPre.exercicios.length > 3) {
@@ -249,14 +249,14 @@ async function loadInicio() {
             .sort((a, b) => (a.ordem || 0) - (b.ordem || 0))
             .slice(0, 3);
           const foco = treinoData.foco
-            ? `<p style="color:var(--blue-400);margin-bottom:8px;">🎯 ${sanitize(treinoData.foco)}</p>`
+            ? `<p style="color:var(--blue-400);margin-bottom:8px;">${sanitize(treinoData.foco)}</p>`
             : "";
           previewEl.innerHTML =
             foco +
             lista
               .map(
                 (ex) =>
-                  `<div style="padding:6px 0;border-bottom:1px solid var(--border-subtle);font-size:0.9rem;">💪 <strong>${sanitize(ex.nome)}</strong> — ${sanitize(ex.series)}x${sanitize(ex.repeticoes)}</div>`,
+                  `<div style="padding:6px 0;border-bottom:1px solid var(--border-subtle);font-size:0.9rem;"><strong>${sanitize(ex.nome)}</strong> — ${sanitize(ex.series)}x${sanitize(ex.repeticoes)}</div>`,
               )
               .join("");
           if (Object.keys(exs).length > 3) {
@@ -273,12 +273,12 @@ async function loadInicio() {
     const profInfoEl = document.getElementById("header-professor-info");
     if (alunoState.programaAtivo === "ia-custom" && alunoState.treinoGerado) {
       if (profInfoEl) {
-        profInfoEl.textContent = `🤖 Treino IA · ${sanitize(alunoState.treinoGerado.objetivo || "Personalizado")}`;
+        profInfoEl.textContent = `Treino IA · ${sanitize(alunoState.treinoGerado.objetivo || "Personalizado")}`;
       }
     } else if (alunoState.programaAtivo && !alunoState.professorId) {
       const prog = getProgramaById(alunoState.programaAtivo);
       if (profInfoEl && prog) {
-        profInfoEl.textContent = "📋 " + prog.nome;
+        profInfoEl.textContent = "" + prog.nome;
       }
     } else if (alunoState.professorId) {
       const profSnap = await db
@@ -365,10 +365,10 @@ async function renderSemanaChart() {
       const entry = historico[key];
       if (!entry) {
         valores.push(0);
-        cores.push("rgba(107,53,195,0.15)");
+        cores.push("rgba(17, 17, 17, 0.15)");
       } else if (entry.completado) {
         valores.push(100);
-        cores.push("rgba(107,53,195,0.9)");
+        cores.push("rgba(17, 17, 17, 0.9)");
       } else {
         const pct =
           entry.totalExercicios > 0
@@ -377,7 +377,7 @@ async function renderSemanaChart() {
               )
             : 0;
         valores.push(pct);
-        cores.push("rgba(107,53,195,0.45)");
+        cores.push("rgba(17, 17, 17, 0.45)");
       }
     }
 
@@ -416,7 +416,7 @@ async function renderSemanaChart() {
           tooltip: {
             callbacks: {
               label: (ctx) =>
-                ctx.raw === 100 ? "✅ Completo" : ctx.raw + "% feito",
+                ctx.raw === 100 ? "Completo" : ctx.raw + "% feito",
             },
           },
         },
@@ -426,13 +426,13 @@ async function renderSemanaChart() {
             max: 100,
             ticks: {
               callback: (v) => v + "%",
-              color: "#8888aa",
+              color: "#787774",
               font: { size: 10 },
             },
-            grid: { color: "#ffffff11" },
+            grid: { color: "rgba(0,0,0,0.05)" },
           },
           x: {
-            ticks: { color: "#8888aa", font: { size: 11 } },
+            ticks: { color: "#787774", font: { size: 11 } },
             grid: { display: false },
           },
         },
@@ -480,7 +480,7 @@ function ajustarAbasTreino(letras) {
       const prog = getProgramaById(alunoState.programaAtivo);
       const treino = prog?.treinos[letra];
       return `<button class="workout-tab-btn${i === 0 ? " active" : ""}" data-letra="${letra}">
-        ${treino ? treino.icone + " " : ""}Treino ${letra}
+        Treino ${letra}
       </button>`;
     })
     .join("");
@@ -492,7 +492,7 @@ function ajustarAbasTreinoIA(letras) {
     .map(
       (letra, i) =>
         `<button class="workout-tab-btn${i === 0 ? " active" : ""}" data-letra="${letra}">
-          🤖 Treino ${letra}
+          Treino ${letra}
         </button>`,
     )
     .join("");
@@ -543,7 +543,7 @@ async function mostrarTreino(letra) {
     const treinoIA = alunoState.treinoGerado.treinos?.[letra];
     if (focoInfoEl) {
       focoInfoEl.textContent = treinoIA
-        ? "🤖 " + sanitize(treinoIA.nome)
+        ? "" + sanitize(treinoIA.nome)
         : "Treino " + letra;
     }
     const exListEl = document.getElementById("aluno-exercise-list");
@@ -582,7 +582,7 @@ async function mostrarTreino(letra) {
         : treinoBase;
     if (focoInfoEl) {
       focoInfoEl.textContent = treinoPre
-        ? "🎯 " + treinoPre.foco
+        ? "" + treinoPre.foco
         : "Treino " + letra;
     }
     const exListEl = document.getElementById("aluno-exercise-list");
@@ -607,7 +607,7 @@ async function mostrarTreino(letra) {
         .ref("treinos/" + alunoState.uid + "/" + letra + "/foco")
         .once("value");
       focoInfoEl.textContent = focoSnap.val()
-        ? "🎯 Foco: " + sanitize(focoSnap.val())
+        ? "Foco: " + sanitize(focoSnap.val())
         : letra === alunoState.treinoAtual
           ? "Seu treino de hoje"
           : "Treino " + letra;
@@ -648,7 +648,7 @@ async function mostrarTreino(letra) {
   if (btnFinalizar) {
     const total = document.querySelectorAll('[id^="excard-"]').length;
     const jaFeito = letraCompletadaHoje
-      ? "↪️ Refazer Treino "
+      ? "Refazer Treino "
       : '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg> ';
     btnFinalizar.innerHTML = jaFeito + "Finalizar Treino";
     btnFinalizar.disabled = total === 0;
@@ -731,7 +731,7 @@ async function loadPerfilSection() {
     if (sexoBadge) {
       const s = data.sexo || alunoState.sexo;
       if (s) {
-        sexoBadge.textContent = s === "masculino" ? "♂" : "♀";
+        sexoBadge.textContent = s === "masculino" ? "M" : "F";
         sexoBadge.classList.remove("hidden");
       } else {
         sexoBadge.classList.add("hidden");
@@ -766,13 +766,13 @@ async function loadPerfilSection() {
               profEl.style.color = "";
             } else {
               profEl.textContent = "Sem professor vinculado";
-              profEl.style.color = "#4b5563";
+              profEl.style.color = "#787774";
             }
           }
         });
     } else if (profEl) {
       profEl.textContent = "Sem professor vinculado";
-      profEl.style.color = "#4b5563";
+      profEl.style.color = "#787774";
     }
     // Objetivo
     const objetivoRow = document.getElementById("perfil-objetivo-row");
@@ -824,10 +824,10 @@ async function renderIMCChart() {
         datasets: [
           {
             data: imcs,
-            borderColor: "#8ac93a",
-            backgroundColor: "rgba(138,201,58,0.1)",
+            borderColor: "#111111",
+            backgroundColor: "rgba(17,17,17,0.06)",
             borderWidth: 2,
-            pointBackgroundColor: "#8ac93a",
+            pointBackgroundColor: "#111111",
             pointRadius: 4,
             fill: true,
             tension: 0.4,
@@ -839,11 +839,11 @@ async function renderIMCChart() {
         plugins: { legend: { display: false } },
         scales: {
           y: {
-            ticks: { color: "#8888aa", font: { size: 10 } },
-            grid: { color: "#ffffff11" },
+            ticks: { color: "#787774", font: { size: 10 } },
+            grid: { color: "rgba(0,0,0,0.05)" },
           },
           x: {
-            ticks: { color: "#8888aa", font: { size: 10 } },
+            ticks: { color: "#787774", font: { size: 10 } },
             grid: { display: false },
           },
         },
@@ -858,30 +858,30 @@ async function renderIMCChart() {
 async function mostrarCelebracao(letra, proxLetra, feitos, total) {
   const modal = document.getElementById("modal-celebracao");
   if (!modal) {
-    showToast("Treino " + letra + " finalizado! 🎉", "success");
+    showToast("Treino " + letra + " finalizado!", "success");
     return;
   }
   const pct = total > 0 ? Math.round((feitos / total) * 100) : 100;
-  let emoji = "🎉",
+  let icone = "check",
     titulo = "Treino Concluído!",
     msg = "";
   if (pct === 100) {
-    emoji = "🏆";
+    icone = "trofeu";
     titulo = "Treino 100% Completo!";
     msg = "Você arrasou! Todos os " + total + " exercícios feitos.";
   } else if (pct >= 80) {
-    emoji = "💪";
+    icone = "check";
     titulo = "Ótimo Treino!";
     msg = feitos + " de " + total + " exercícios — quase perfeito!";
   } else {
-    emoji = "✅";
+    icone = "check";
     titulo = "Treino Finalizado!";
     msg = feitos + " de " + total + " exercícios concluídos.";
   }
   if (proxLetra && proxLetra !== letra) {
     msg += " Próximo treino: <strong>" + proxLetra + "</strong>.";
   }
-  document.getElementById("celebracao-emoji").textContent = emoji;
+  document.getElementById("celebracao-emoji").innerHTML = iconeSvg(icone, 48);
   document.getElementById("celebracao-title").textContent = titulo;
   document.getElementById("celebracao-msg").innerHTML = msg;
 
@@ -994,7 +994,7 @@ async function verHistoricoCargas(exId, exNome, alunoId) {
   const overlay = document.getElementById("modal-cargas-overlay");
   const titleEl = document.getElementById("modal-cargas-title");
   if (!overlay) return;
-  if (titleEl) titleEl.textContent = "📊 " + exNome;
+  if (titleEl) titleEl.textContent = "" + exNome;
   overlay.classList.remove("hidden");
   await renderCargaHistoricoChart(exId, alunoId);
 }
@@ -1049,10 +1049,10 @@ async function renderCargaHistoricoChart(exId, alunoId) {
         datasets: [
           {
             data: entries.map((e) => parseFloat(e.carga) || null),
-            borderColor: "#8ac93a",
-            backgroundColor: "rgba(138,201,58,0.12)",
+            borderColor: "#111111",
+            backgroundColor: "rgba(17,17,17,0.06)",
             borderWidth: 2,
-            pointBackgroundColor: "#8ac93a",
+            pointBackgroundColor: "#111111",
             pointRadius: 5,
             fill: true,
             tension: 0.3,
@@ -1073,11 +1073,11 @@ async function renderCargaHistoricoChart(exId, alunoId) {
         },
         scales: {
           y: {
-            ticks: { color: "#8888aa", font: { size: 10 } },
-            grid: { color: "#ffffff11" },
+            ticks: { color: "#787774", font: { size: 10 } },
+            grid: { color: "rgba(0,0,0,0.05)" },
           },
           x: {
-            ticks: { color: "#8888aa", font: { size: 10 } },
+            ticks: { color: "#787774", font: { size: 10 } },
             grid: { display: false },
           },
         },
@@ -1189,7 +1189,7 @@ function renderExerciciosPreDefinidos(
 
       const expandArea = ex.dica
         ? `<div class="ex-expand-area hidden" id="expand-${exId}">
-            <p class="ex-instrucoes-text">💡 <strong>Dica:</strong> ${sanitize(ex.dica)}</p>
+            <p class="ex-instrucoes-text"><strong>Dica:</strong> ${sanitize(ex.dica)}</p>
           </div>`
         : "";
 
@@ -1206,7 +1206,7 @@ function renderExerciciosPreDefinidos(
             <div class="exercise-check-info">
               <div class="exercise-check-nome">${sanitize(ex.nome)}</div>
               <div class="exercise-check-meta">${metaPartes}</div>
-              ${ex.grupoMuscular ? `<div class="exercise-check-obs">💪 ${sanitize(ex.grupoMuscular)}</div>` : ""}
+              ${ex.grupoMuscular ? `<div class="exercise-check-obs">${sanitize(ex.grupoMuscular)}</div>` : ""}
             </div>
             <svg class="ex-expand-chevron${ex.dica ? "" : " invisible"}" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
               <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
@@ -1357,7 +1357,7 @@ async function loadProgressaoInicio() {
       const proxInfo = FASES_INFO[progresso.proxima];
       card.innerHTML = `
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-          <span style="font-size:1.9rem;line-height:1;">${faseInfo.icone}</span>
+          <span class="fase-num">${progresso.fase}</span>
           <div style="flex:1;min-width:0;">
             <div style="font-weight:700;font-size:0.93rem;">${sanitize(faseInfo.desc)}</div>
             <div style="font-size:0.78rem;color:var(--text-muted);">${total} treino${total !== 1 ? "s" : ""} completo${total !== 1 ? "s" : ""}</div>
@@ -1371,16 +1371,16 @@ async function loadProgressaoInicio() {
           <div class="progresso-fase-fill" style="width:${pct}%;background:${faseInfo.cor};"></div>
         </div>
         <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:0.73rem;color:var(--text-muted);">
-          <span>${faseInfo.icone} Fase ${progresso.fase}</span>
-          <span>${proxInfo.icone} Fase ${progresso.proxima} em ${FASE_THRESHOLDS[progresso.proxima - 1]} treinos</span>
+          <span>Fase ${progresso.fase}</span>
+          <span>Fase ${progresso.proxima} em ${FASE_THRESHOLDS[progresso.proxima - 1]} treinos</span>
         </div>`;
     } else {
       card.innerHTML = `
         <div style="display:flex;align-items:center;gap:12px;">
-          <span style="font-size:2.2rem;line-height:1;">⚡</span>
+          <span class="fase-num">${iconeSvg("trofeu", 20)}</span>
           <div>
             <div style="font-weight:700;font-size:0.95rem;">Nível Máximo Alcançado!</div>
-            <div style="font-size:0.82rem;color:var(--text-muted);">${total} treinos — você é elite! 👑</div>
+            <div style="font-size:0.82rem;color:var(--text-muted);">${total} treinos — você é elite!</div>
           </div>
         </div>`;
     }
@@ -1401,7 +1401,7 @@ function _renderGridConquistas(ganhas) {
     const earned = ganhas.includes(c.id);
     return `
       <div class="conquista-item ${earned ? "earned" : "locked"}" title="${sanitize(c.desc)}">
-        <span class="conquista-emoji">${earned ? c.emoji : "🔒"}</span>
+        <span class="conquista-emoji">${iconeSvg(earned ? "trofeu" : "cadeado", 22)}</span>
         <span class="conquista-nome">${sanitize(c.nome)}</span>
       </div>`;
   }).join("");
@@ -1544,7 +1544,7 @@ async function verificarProgressaoAposTreino() {
       setTimeout(
         () =>
           showToast(
-            c.emoji + " Conquista desbloqueada: " + c.nome + "!",
+            "Conquista desbloqueada: " + c.nome + "!",
             "success",
             4000,
           ),
@@ -1569,7 +1569,7 @@ function mostrarFaseDesbloqueada(fase) {
   const descEl = document.getElementById("fase-unlock-desc");
   const infoEl = document.getElementById("fase-unlock-info");
 
-  if (iconeEl) iconeEl.textContent = info.icone;
+  if (iconeEl) iconeEl.innerHTML = iconeSvg("cadeadoAberto", 48);
   if (badgeEl) {
     badgeEl.textContent = "Fase " + fase + " — " + info.nome;
     badgeEl.style.cssText +=
@@ -1581,7 +1581,7 @@ function mostrarFaseDesbloqueada(fase) {
       info.cor +
       "55;";
   }
-  if (tituloEl) tituloEl.textContent = "Fase " + fase + " Desbloqueada! 🎉";
+  if (tituloEl) tituloEl.textContent = "Fase " + fase + " Desbloqueada!";
   if (descEl) descEl.textContent = info.desc + " — seu treino evoluiu!";
 
   if (infoEl) {
@@ -1589,9 +1589,9 @@ function mostrarFaseDesbloqueada(fase) {
     if (mod) {
       infoEl.innerHTML = `
         <div class="fase-unlock-changes">
-          <div class="fase-change-item"><span class="fase-change-icon">➕</span><span>${mod.seriesBonus} série extra por exercício</span></div>
-          <div class="fase-change-item"><span class="fase-change-icon">⏱️</span><span>${mod.restReducao}s a menos de descanso entre séries</span></div>
-          <div class="fase-change-item"><span class="fase-change-icon">💪</span><span>Exercício bônus desbloqueado por dia de treino</span></div>
+          <div class="fase-change-item"><span class="fase-change-icon">+</span><span>${mod.seriesBonus} série extra por exercício</span></div>
+          <div class="fase-change-item"><span class="fase-change-icon">−</span><span>${mod.restReducao}s a menos de descanso entre séries</span></div>
+          <div class="fase-change-item"><span class="fase-change-icon">+</span><span>Exercício bônus desbloqueado por dia de treino</span></div>
         </div>`;
     }
   }
@@ -1678,7 +1678,7 @@ async function salvarEdicaoPerfil() {
     const welcomeEl = document.getElementById("welcome-name");
     if (nomeEl) nomeEl.textContent = nome;
     if (welcomeEl)
-      welcomeEl.textContent = "Olá, " + nome.split(" ")[0] + "! 💪";
+      welcomeEl.textContent = "Olá, " + nome.split(" ")[0] + "!";
 
     // Atualiza avatar com nova inicial/cor
     const avatarEl = document.getElementById("perfil-avatar");

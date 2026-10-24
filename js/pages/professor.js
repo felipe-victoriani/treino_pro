@@ -32,7 +32,7 @@ document.addEventListener("userReady", async function (e) {
   // Header de boas-vindas
   var welcomeEl = document.getElementById("dashboard-welcome");
   if (welcomeEl)
-    welcomeEl.textContent = "Ola, " + sanitize(profState.nome) + "! 👋";
+    welcomeEl.textContent = "Ola, " + sanitize(profState.nome) + "!";
   setupNavigation();
   setupLogout();
   if (typeof initVideoUploadListeners === "function")
@@ -233,7 +233,7 @@ async function renderAlunosInativos(alunosData) {
   }
   container.classList.remove("hidden");
   container.innerHTML =
-    '<div class="alerta-inativos-header">⚠️ Alunos sem treinar há ' +
+    '<div class="alerta-inativos-header">Alunos sem treinar há ' +
     LIMITE_DIAS +
     "+ dias</div>" +
     inativos
@@ -316,9 +316,9 @@ async function renderRelatorioSemanal(alunosData) {
     .slice(0, 3);
 
   container.classList.remove("hidden");
-  const medalhas = ["🥇", "🥈", "🥉"];
+  const medalhas = ["1º", "2º", "3º"];
   container.innerHTML =
-    '<div class="relatorio-header">📊 Relatório da Semana</div>' +
+    '<div class="relatorio-header">Relatório da Semana</div>' +
     '<div class="relatorio-total">' +
     '<span class="relatorio-num">' +
     totalSemana +
@@ -330,7 +330,7 @@ async function renderRelatorioSemanal(alunosData) {
     " pelos alunos</span>" +
     "</div>" +
     (topAlunos.length > 0
-      ? '<div class="relatorio-top"><p class="relatorio-top-label">🏆 Destaque da semana</p>' +
+      ? '<div class="relatorio-top"><p class="relatorio-top-label">Destaque da semana</p>' +
         topAlunos
           .map(
             (a, i) =>

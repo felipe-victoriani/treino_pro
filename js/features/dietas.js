@@ -151,8 +151,8 @@ function adicionarRefeicaoCard(refeicao = null) {
   card.dataset.id = id;
   card.innerHTML = `
     <div class="refeicao-edit-header">
-      <h4>🍽 Refeição ${idx}</h4>
-      <button class="btn-icon btn-danger-icon" onclick="removerRefeicaoCard(this)" title="Remover">🗑️</button>
+      <h4>Refeição ${idx}</h4>
+      <button class="btn-icon btn-danger-icon" onclick="removerRefeicaoCard(this)" title="Remover" aria-label="Remover refeição">${iconeSvg("lixeira", 16)}</button>
     </div>
     <div class="refeicao-edit-fields">
       <div class="form-group">
@@ -369,7 +369,6 @@ async function loadDietaAluno(alunoId, containerId) {
     if (!data || !data.dias) {
       el.innerHTML = `
         <div class="empty-state">
-          <div class="empty-state-icon">🥗</div>
           <h3>Dieta ainda não configurada</h3>
           <p>Seu professor ainda não cadastrou sua dieta. Aguarde!</p>
         </div>`;
@@ -398,8 +397,8 @@ async function loadDietaAluno(alunoId, containerId) {
         ? `
       <div class="dieta-meta-card">
         ${data.titulo ? `<h2 class="dieta-titulo">${sanitize(data.titulo)}</h2>` : ""}
-        ${data.objetivo ? `<p class="dieta-objetivo">🎯 ${sanitize(data.objetivo)}</p>` : ""}
-        ${data.obs ? `<p class="dieta-obs">💡 ${sanitize(data.obs)}</p>` : ""}
+        ${data.objetivo ? `<p class="dieta-objetivo">${sanitize(data.objetivo)}</p>` : ""}
+        ${data.obs ? `<p class="dieta-obs">${sanitize(data.obs)}</p>` : ""}
       </div>`
         : "";
 
@@ -438,7 +437,6 @@ function _renderRefeicoesAluno(dias, diaKey) {
   if (!refeicoesDia || Object.keys(refeicoesDia).length === 0) {
     container.innerHTML = `
       <div class="empty-state" style="margin-top:24px">
-        <div class="empty-state-icon">🍽</div>
         <p>Sem refeições cadastradas para este dia.</p>
       </div>`;
     return;
@@ -462,8 +460,8 @@ function _renderRefeicoesAluno(dias, diaKey) {
       return `
       <div class="refeicao-card-aluno">
         <div class="refeicao-card-header">
-          <span class="refeicao-card-nome">🍽 ${sanitize(r.nome || "Refeição")}</span>
-          ${r.horario ? `<span class="refeicao-card-hora">🕐 ${sanitize(r.horario)}</span>` : ""}
+          <span class="refeicao-card-nome">${sanitize(r.nome || "Refeição")}</span>
+          ${r.horario ? `<span class="refeicao-card-hora">${sanitize(r.horario)}</span>` : ""}
         </div>
         <div class="refeicao-card-alimentos">${alimentosHtml}</div>
       </div>`;

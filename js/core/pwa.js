@@ -57,7 +57,7 @@ window.addEventListener("appinstalled", () => {
   console.log("[PWA] App instalado com sucesso!");
   deferredPrompt = null;
   hideInstallButton();
-  showToast("Treino Pro instalado com sucesso! 🎉", "success", 5000);
+  showToast("Treino Pro instalado com sucesso!", "success", 5000);
 });
 
 /**

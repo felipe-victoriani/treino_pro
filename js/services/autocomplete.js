@@ -141,7 +141,7 @@
       ? '<span class="ts-tag ts-tag-fav">★</span>'
       : "";
     const cust = data.customizado
-      ? '<span class="ts-tag ts-tag-custom">✨ Custom</span>'
+      ? '<span class="ts-tag ts-tag-custom">Custom</span>'
       : "";
     return `
       <div class="ts-ex-option">

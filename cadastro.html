@@ -10,7 +10,7 @@
     />
     <title>Cadastro — Treino Pro</title>
     <link rel="manifest" href="manifest.json" />
-    <meta name="theme-color" content="#0a0b08" />
+    <meta name="theme-color" content="#f7f6f3" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
     <link rel="stylesheet" href="css/style.css" />
@@ -28,9 +28,9 @@
         align-items: center;
         gap: 4px;
         padding: 14px 8px;
-        border: 2px solid var(--border-color, #2a2a3e);
+        border: 2px solid var(--border-color, #eaeaea);
         border-radius: 14px;
-        background: var(--bg-card, #1a1a2e);
+        background: var(--bg-card, #ffffff);
         cursor: pointer;
         transition: all 0.2s;
         color: var(--text-primary, #fff);
@@ -47,25 +47,25 @@
       }
       .nivel-card small {
         font-size: 0.7rem;
-        color: var(--text-muted, #888);
+        color: var(--text-muted, #787774);
         display: block;
       }
       .nivel-card.active {
-        border-color: #2563eb;
-        background: rgba(37, 99, 235, 0.12);
+        border-color: #111111;
+        background: rgba(17, 17, 17, 0.06);
       }
       .nivel-card.active strong {
-        color: #60a5fa;
+        color: #111111;
       }
       .nivel-card.active small {
-        color: #60a5fa;
+        color: #111111;
       }
 
       /* ── Modal aviso professor ───────────────────── */
       .aviso-prof-overlay {
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, 0.72);
+        background: rgba(17, 17, 17, 0.32);
         z-index: 3000;
         display: flex;
         align-items: flex-end;
@@ -80,7 +80,7 @@
         pointer-events: auto;
       }
       .aviso-prof-sheet {
-        background: var(--bg-card-2, #1a1a2e);
+        background: var(--bg-card-2, #ffffff);
         border-radius: 24px 24px 0 0;
         width: 100%;
         max-width: 520px;
@@ -95,15 +95,15 @@
         width: 40px;
         height: 4px;
         border-radius: 2px;
-        background: rgba(255, 255, 255, 0.15);
+        background: rgba(17, 17, 17, 0.15);
         margin: 12px auto 24px;
       }
       .aviso-prof-icon {
         width: 64px;
         height: 64px;
         border-radius: 50%;
-        background: rgba(234, 179, 8, 0.15);
-        border: 2px solid rgba(234, 179, 8, 0.4);
+        background: #fbf3db;
+        border: 2px solid rgba(149, 100, 0, 0.3);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -113,26 +113,26 @@
       .aviso-prof-titulo {
         font-size: 1.15rem;
         font-weight: 800;
-        color: #fff;
+        color: #111111;
         text-align: center;
         margin: 0 0 12px;
         line-height: 1.3;
       }
       .aviso-prof-texto {
         font-size: 0.88rem;
-        color: rgba(255, 255, 255, 0.65);
+        color: rgba(17, 17, 17, 0.6);
         line-height: 1.65;
         text-align: center;
         margin: 0;
       }
       .aviso-prof-destaque {
-        background: rgba(234, 179, 8, 0.08);
-        border: 1px solid rgba(234, 179, 8, 0.28);
+        background: #fbf3db;
+        border: 1px solid rgba(149, 100, 0, 0.3);
         border-radius: 12px;
         padding: 12px 16px;
         margin: 16px 0 24px;
         font-size: 0.82rem;
-        color: rgba(234, 179, 8, 0.9);
+        color: #956400;
         line-height: 1.55;
       }
       .aviso-prof-destaque ul {
@@ -149,7 +149,7 @@
         margin-top: 24px;
       }
       .btn-aviso-ok {
-        background: linear-gradient(135deg, #4c7a22, #8ac93a);
+        background: linear-gradient(135deg, #111111, #111111);
         color: #fff;
         border: none;
         border-radius: 12px;
@@ -165,8 +165,8 @@
       }
       .btn-aviso-fechar {
         background: transparent;
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        color: rgba(255, 255, 255, 0.5);
+        border: 1px solid rgba(17, 17, 17, 0.15);
+        color: rgba(17, 17, 17, 0.5);
         border-radius: 50px;
         padding: 14px;
         font-size: 0.9rem;
@@ -176,7 +176,7 @@
         transition: background 0.2s;
       }
       .btn-aviso-fechar:active {
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(17, 17, 17, 0.05);
       }
     </style>
   </head>
@@ -305,7 +305,7 @@
               data-value="independente"
               id="modo-independente"
             >
-              🏋️ Por conta própria
+              Por conta própria
             </button>
             <button
               type="button"
@@ -313,7 +313,7 @@
               data-value="professor"
               id="modo-professor"
             >
-              👤 Com professor
+              Com professor
             </button>
           </div>
           <input type="hidden" id="modo-treino" value="independente" />
@@ -336,10 +336,10 @@
           >
           <div class="sexo-selector" id="sexo-selector">
             <button type="button" class="sexo-btn" data-value="masculino">
-              ♂ Masculino
+              Masculino
             </button>
             <button type="button" class="sexo-btn" data-value="feminino">
-              ♀ Feminino
+              Feminino
             </button>
           </div>
           <input type="hidden" id="sexo" value="" />
@@ -354,17 +354,14 @@
               class="nivel-card active"
               data-value="INICIANTE"
             >
-              <span class="nivel-icon">🌱</span>
               <strong>Iniciante</strong>
               <small>0 – 6 meses</small>
             </button>
             <button type="button" class="nivel-card" data-value="INTERMEDIARIO">
-              <span class="nivel-icon">💪</span>
               <strong>Intermediário</strong>
               <small>6m – 2 anos</small>
             </button>
             <button type="button" class="nivel-card" data-value="AVANCADO">
-              <span class="nivel-icon">🔥</span>
               <strong>Experiente</strong>
               <small>2+ anos</small>
             </button>
@@ -438,14 +435,13 @@
     >
       <div class="aviso-prof-sheet">
         <div class="aviso-prof-handle"></div>
-        <div class="aviso-prof-icon">🎓</div>
         <h2 class="aviso-prof-titulo">Importante antes de começar!</h2>
         <p class="aviso-prof-texto">
           Você vai treinar de forma <strong>independente</strong>, sem
           acompanhamento de um professor de Educação Física.
         </p>
         <div class="aviso-prof-destaque">
-          <strong>⚠️ Por que o acompanhamento profissional importa?</strong>
+          <strong>Por que o acompanhamento profissional importa?</strong>
           <ul>
             <li>Previne lesões corrigindo a execução dos exercícios</li>
             <li>Ajusta cargas e séries ao seu nível real</li>
@@ -455,7 +451,7 @@
         </div>
         <p
           class="aviso-prof-texto"
-          style="font-size: 0.8rem; color: rgba(255, 255, 255, 0.4)"
+          style="font-size: 0.8rem; color: rgba(17, 17, 17, 0.4)"
         >
           Se possível, consulte um profissional. O app é um ótimo auxílio — mas
           não substitui a orientação especializada.

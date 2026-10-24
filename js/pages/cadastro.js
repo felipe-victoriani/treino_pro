@@ -243,7 +243,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       if (modo === "independente") {
         // Já está logado — vai montar o treino com IA
-        showToast("Conta criada! Vamos montar seu treino 🤖", "success", 2000);
+        showToast("Conta criada! Vamos montar seu treino", "success", 2000);
         setTimeout(() => window.location.replace("montar-treino.html"), 1500);
       } else {
         // Com professor — faz login normalmente

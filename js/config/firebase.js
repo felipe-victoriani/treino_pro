@@ -49,7 +49,7 @@ db.ref(".info/connected").on("value", (snap) => {
   if (snap.val() === true) {
     console.log(
       "%c[Firebase] ✅ Conectado ao Realtime Database",
-      "color: #4ade80; font-weight: bold",
+      "color: #346538; font-weight: bold",
     );
   } else {
     console.warn("[Firebase] ⚠️ Desconectado do Realtime Database");

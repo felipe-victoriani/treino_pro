@@ -9,14 +9,14 @@
     />
     <title>Monte seu Treino — Treino Pro</title>
     <link rel="manifest" href="manifest.json" />
-    <meta name="theme-color" content="#4c7a22" />
+    <meta name="theme-color" content="#f7f6f3" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/responsive.css" />
     <style>
       body {
-        background: var(--bg-app, #0a0a14);
+        background: var(--bg-app, #f7f6f3);
       }
 
       /* ── Page ───────────────────────────────────────────── */
@@ -43,7 +43,7 @@
       }
       .mt-header p {
         font-size: 0.88rem;
-        color: var(--text-muted, #888);
+        color: var(--text-muted, #787774);
         margin: 0;
       }
 
@@ -52,12 +52,12 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        background: rgba(37, 99, 235, 0.12);
-        border: 1px solid rgba(37, 99, 235, 0.35);
+        background: rgba(17, 17, 17, 0.06);
+        border: 1px solid rgba(17, 17, 17, 0.18);
         border-radius: 20px;
         padding: 6px 16px;
         font-size: 0.85rem;
-        color: #60a5fa;
+        color: #111111;
         margin-bottom: 28px;
       }
 
@@ -87,9 +87,9 @@
         align-items: center;
         gap: 5px;
         padding: 14px 8px;
-        border: 2px solid var(--border-color, #2a2a3e);
+        border: 2px solid var(--border-color, #eaeaea);
         border-radius: 14px;
-        background: var(--bg-card, #131326);
+        background: var(--bg-card, #ffffff);
         cursor: pointer;
         transition: all 0.18s;
         color: var(--text-primary, #fff);
@@ -103,9 +103,9 @@
         font-size: 1.5rem;
       }
       .opt-card.active {
-        border-color: #2563eb;
-        background: rgba(37, 99, 235, 0.12);
-        color: #60a5fa;
+        border-color: #111111;
+        background: rgba(17, 17, 17, 0.06);
+        color: #111111;
       }
 
       /* ── Dias selector ──────────────────────────────────── */
@@ -122,8 +122,8 @@
         width: 46px;
         height: 46px;
         border-radius: 50%;
-        border: 2px solid var(--border-color, #2a2a3e);
-        background: var(--bg-card, #131326);
+        border: 2px solid var(--border-color, #eaeaea);
+        background: var(--bg-card, #ffffff);
         color: var(--text-primary, #fff);
         font-size: 1.6rem;
         cursor: pointer;
@@ -133,17 +133,17 @@
         transition: border-color 0.15s;
       }
       .dias-btn:hover {
-        border-color: #2563eb;
+        border-color: #111111;
       }
       .dias-value {
         font-size: 2.4rem;
         font-weight: 800;
-        color: #60a5fa;
+        color: #111111;
         min-width: 52px;
       }
       .dias-sub {
         font-size: 0.78rem;
-        color: var(--text-muted, #888);
+        color: var(--text-muted, #787774);
         margin-top: 4px;
       }
 
@@ -153,7 +153,7 @@
         padding: 17px;
         border-radius: 14px;
         border: none;
-        background: linear-gradient(135deg, #2563eb, #38bdf8);
+        background: linear-gradient(135deg, #111111, #111111);
         color: #fff;
         font-size: 1.05rem;
         font-weight: 700;
@@ -187,8 +187,8 @@
       .ia-spinner {
         width: 76px;
         height: 76px;
-        border: 5px solid rgba(37, 99, 235, 0.2);
-        border-top-color: #2563eb;
+        border: 5px solid rgba(17, 17, 17, 0.1);
+        border-top-color: #111111;
         border-radius: 50%;
         animation: spin 0.75s linear infinite;
       }
@@ -205,12 +205,12 @@
       }
       .loading-step {
         font-size: 0.88rem;
-        color: var(--text-muted, #888);
+        color: var(--text-muted, #787774);
         padding: 4px 0;
         transition: color 0.3s;
       }
       .loading-step.current {
-        color: #60a5fa;
+        color: #111111;
         font-weight: 600;
       }
 
@@ -236,22 +236,22 @@
       }
       .plan-header p {
         font-size: 0.85rem;
-        color: var(--text-muted, #888);
+        color: var(--text-muted, #787774);
         margin: 0;
       }
       .plan-summary-card {
         background: linear-gradient(
           135deg,
-          rgba(37, 99, 235, 0.15),
-          rgba(56, 189, 248, 0.08)
+          rgba(17, 17, 17, 0.08),
+          rgba(17, 17, 17, 0.04)
         );
-        border: 1px solid rgba(37, 99, 235, 0.3);
+        border: 1px solid rgba(17, 17, 17, 0.15);
         border-radius: 14px;
         padding: 16px;
         margin-bottom: 20px;
       }
       .plan-summary-card h3 {
-        color: #60a5fa;
+        color: #111111;
         font-size: 0.95rem;
         margin: 0 0 12px;
       }
@@ -261,18 +261,18 @@
         gap: 8px;
       }
       .plan-tag {
-        background: rgba(255, 255, 255, 0.07);
+        background: rgba(17, 17, 17, 0.07);
         border-radius: 20px;
         padding: 4px 12px;
         font-size: 0.78rem;
-        color: var(--text-secondary, #ccc);
+        color: var(--text-secondary, #a5a49f);
       }
       .treino-card {
-        border: 1px solid var(--border-color, #2a2a3e);
+        border: 1px solid var(--border-color, #eaeaea);
         border-radius: 12px;
         overflow: hidden;
         margin-bottom: 10px;
-        background: var(--bg-card, #131326);
+        background: var(--bg-card, #ffffff);
       }
       .treino-card-header {
         padding: 13px 16px;
@@ -286,8 +286,8 @@
         font-size: 0.9rem;
       }
       .treino-badge {
-        background: rgba(37, 99, 235, 0.2);
-        color: #60a5fa;
+        background: rgba(17, 17, 17, 0.1);
+        color: #111111;
         border-radius: 20px;
         padding: 2px 10px;
         font-size: 0.75rem;
@@ -302,7 +302,7 @@
       }
       .ex-row {
         padding: 7px 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        border-bottom: 1px solid rgba(17, 17, 17, 0.05);
         font-size: 0.82rem;
       }
       .ex-row:last-child {
@@ -314,14 +314,14 @@
         margin-bottom: 2px;
       }
       .ex-row span {
-        color: var(--text-muted, #888);
+        color: var(--text-muted, #787774);
       }
       .btn-comecar {
         width: 100%;
         padding: 17px;
         border-radius: 14px;
         border: none;
-        background: linear-gradient(135deg, #4c7a22, #8ac93a);
+        background: linear-gradient(135deg, #111111, #111111);
         color: #fff;
         font-size: 1.05rem;
         font-weight: 700;
@@ -339,42 +339,42 @@
     <!-- ══ Estado: Formulário ══════════════════════════════════ -->
     <div id="form-state" class="mt-page">
       <div class="mt-header">
-        <div class="ia-icon">🤖</div>
+        <div class="ia-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/></svg></div>
         <h1>Seu Treino Personalizado</h1>
         <p>Responda 3 perguntas e a IA monta seu plano</p>
       </div>
 
       <div style="text-align: center">
-        <div class="nivel-badge" id="nivel-badge">⏳ Carregando...</div>
+        <div class="nivel-badge" id="nivel-badge">Carregando...</div>
       </div>
 
       <!-- Objetivo -->
       <div class="mt-section">
-        <span class="mt-label">🎯 Qual é o seu objetivo?</span>
+        <span class="mt-label">Qual é o seu objetivo?</span>
         <div class="opt-grid opt-grid-2">
           <button
             class="opt-card active"
             data-group="objetivo"
             data-value="Hipertrofia"
           >
-            <span class="opt-icon">💪</span>Ganhar músculo
+Ganhar músculo
           </button>
           <button
             class="opt-card"
             data-group="objetivo"
             data-value="Emagrecimento"
           >
-            <span class="opt-icon">🔥</span>Emagrecer
+Emagrecer
           </button>
           <button class="opt-card" data-group="objetivo" data-value="Força">
-            <span class="opt-icon">🏋️</span>Ganhar força
+Ganhar força
           </button>
           <button
             class="opt-card"
             data-group="objetivo"
             data-value="Resistência"
           >
-            <span class="opt-icon">⚡</span>Resistência
+Resistência
           </button>
         </div>
         <input type="hidden" id="objetivo-val" value="Hipertrofia" />
@@ -382,7 +382,7 @@
 
       <!-- Dias por semana -->
       <div class="mt-section">
-        <span class="mt-label">📅 Quantos dias por semana?</span>
+        <span class="mt-label">Quantos dias por semana?</span>
         <div class="dias-wrap">
           <div class="dias-selector">
             <button class="dias-btn" id="dias-minus" type="button">−</button>
@@ -398,7 +398,7 @@
 
       <!-- Equipamentos -->
       <div class="mt-section">
-        <span class="mt-label">🏟️ Que equipamentos você tem?</span>
+        <span class="mt-label">Que equipamentos você tem?</span>
         <div class="opt-grid">
           <button
             class="opt-card active"
@@ -406,7 +406,7 @@
             data-value="Academia completa"
             style="flex-direction: row; justify-content: center; gap: 10px"
           >
-            <span class="opt-icon">🏋️</span>Academia completa
+Academia completa
           </button>
           <button
             class="opt-card"
@@ -414,7 +414,7 @@
             data-value="Halteres"
             style="flex-direction: row; justify-content: center; gap: 10px"
           >
-            <span class="opt-icon">🪀</span>Apenas halteres
+Apenas halteres
           </button>
           <button
             class="opt-card"
@@ -422,14 +422,14 @@
             data-value="Sem equipamento"
             style="flex-direction: row; justify-content: center; gap: 10px"
           >
-            <span class="opt-icon">🤸</span>Sem equipamento (calistenia)
+Sem equipamento (calistenia)
           </button>
         </div>
         <input type="hidden" id="equip-val" value="Academia completa" />
       </div>
 
       <button class="btn-gerar" id="btn-gerar" type="button">
-        ✨ Gerar Meu Treino com IA
+        Gerar Meu Treino com IA
       </button>
     </div>
 
@@ -440,16 +440,16 @@
         <p class="loading-title">Seu personal trainer IA está trabalhando...</p>
         <div id="loading-steps">
           <p class="loading-step current" id="step-0">
-            🤖 Analisando seu perfil...
+            Analisando seu perfil...
           </p>
           <p class="loading-step" id="step-1">
-            📊 Calculando volume e frequência...
+            Calculando volume e frequência...
           </p>
           <p class="loading-step" id="step-2">
-            🏋️ Selecionando os exercícios ideais...
+            Selecionando os exercícios ideais...
           </p>
           <p class="loading-step" id="step-3">
-            ✅ Montando a divisão de treinos...
+            Montando a divisão de treinos...
           </p>
         </div>
       </div>
@@ -458,14 +458,14 @@
     <!-- ══ Estado: Resultado ══════════════════════════════════ -->
     <div id="result-state" class="mt-page" style="padding-top: 20px">
       <div class="plan-header">
-        <div class="check-icon">✅</div>
+        <div class="check-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
         <h2>Treino Pronto!</h2>
         <p>Personalizado com base no seu perfil</p>
       </div>
       <div class="plan-summary-card" id="plan-summary"></div>
       <div id="treinos-preview"></div>
       <button class="btn-comecar" id="btn-comecar" type="button">
-        🚀 Começar a Treinar!
+        Começar a Treinar!
       </button>
     </div>
 

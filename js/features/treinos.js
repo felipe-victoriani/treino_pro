@@ -112,15 +112,15 @@ function renderTreinoEditor(letra, data) {
           ${ex.observacoes ? `<span class="exercise-obs">${sanitize(ex.observacoes)}</span>` : ""}
         </div>
         <div class="exercise-actions-top">
-          <button class="btn-icon" onclick="editarExercicio('${sanitize(ex.id)}')" title="Editar exercício">✏️</button>
-          <button class="btn-icon" onclick="duplicarExercicio('${sanitize(ex.id)}')" title="Duplicar">📋</button>
-          <button class="btn-icon btn-danger-icon" onclick="removerExercicio('${sanitize(ex.id)}')" title="Remover">🗑️</button>
+          <button class="btn-icon" onclick="editarExercicio('${sanitize(ex.id)}')" title="Editar exercício" aria-label="Editar exercício">${iconeSvg("editar", 16)}</button>
+          <button class="btn-icon" onclick="duplicarExercicio('${sanitize(ex.id)}')" title="Duplicar" aria-label="Duplicar exercício">${iconeSvg("copiar", 16)}</button>
+          <button class="btn-icon btn-danger-icon" onclick="removerExercicio('${sanitize(ex.id)}')" title="Remover" aria-label="Remover exercício">${iconeSvg("lixeira", 16)}</button>
         </div>
       </div>
       <div class="exercise-card-prof-footer">
         <button class="btn-video-ex${temVideo ? " has-video" : ""}" onclick="abrirUploadVideo('${sanitize(ex.id)}')">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
-          ${temVideo ? "🎬 Alterar vídeo" : "📹 Adicionar vídeo"}
+          ${temVideo ? "Alterar vídeo" : "Adicionar vídeo"}
         </button>
       </div>
     </div>`;
@@ -420,13 +420,13 @@ async function editarExercicio(exId) {
   if (titleEl) titleEl.textContent = "Editar exercício";
 
   const saveBtn = document.getElementById("save-exercise-btn");
-  if (saveBtn) saveBtn.textContent = "✅ Atualizar exercício";
+  if (saveBtn) saveBtn.textContent = "Atualizar exercício";
 
   /* Scroll suave até o formulário */
   setTimeout(() => {
     formEl?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, 100);
-  showToast("✏️ Edite os campos abaixo e clique em Atualizar", "info");
+  showToast("Edite os campos abaixo e clique em Atualizar", "info");
 }
 
 /**
@@ -568,7 +568,7 @@ async function loadTreinoAluno(
     if (!data || !data.exercicios) {
       listEl.innerHTML = `
         <div class="onboarding-card">
-          <div class="onboarding-icon">🏋️</div>
+          <div class="onboarding-icon">${iconeSvg("halter", 36)}</div>
           <h3>Treino ${sanitize(letra)} aguardando!</h3>
           <p>Seu professor ainda não adicionou exercícios aqui.</p>
           <div class="onboarding-steps">
@@ -699,7 +699,7 @@ function renderExerciciosAluno(
 
       const expandArea = ex.instrucoes
         ? `<div class="ex-expand-area hidden" id="expand-${exIdSafe}">
-            <p class="ex-instrucoes-text">💡 <strong>Como fazer:</strong> ${sanitize(ex.instrucoes)}</p>
+            <p class="ex-instrucoes-text"><strong>Como fazer:</strong> ${sanitize(ex.instrucoes)}</p>
           </div>`
         : "";
 
@@ -713,7 +713,7 @@ function renderExerciciosAluno(
             <div class="exercise-check-meta">
               ${sanitize(ex.series)} séries × ${sanitize(ex.repeticoes)}${ex.descanso ? " · " + sanitize(ex.descanso) + "s descanso" : ""}
             </div>
-            ${ex.observacoes ? `<div class="exercise-check-obs">📌 ${sanitize(ex.observacoes)}</div>` : ""}
+            ${ex.observacoes ? `<div class="exercise-check-obs">${sanitize(ex.observacoes)}</div>` : ""}
           </div>
           <svg class="ex-expand-chevron${hasInstrucoes ? "" : " invisible"}" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
             <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
@@ -729,7 +729,7 @@ function renderExerciciosAluno(
             value="${sanitize(cargaUsada)}"
             onchange="salvarCargaUsada('${exIdSafe}','${sanitize(alunoId)}',this.value)">
           <button class="btn-carga-chart" title="Histórico de cargas"
-            onclick="event.stopPropagation(); verHistoricoCargas('${exIdSafe}','${sanitize(ex.nome)}','${sanitize(alunoId)}')">📊</button>
+            onclick="event.stopPropagation(); verHistoricoCargas('${exIdSafe}','${sanitize(ex.nome)}','${sanitize(alunoId)}')" aria-label="Histórico de cargas">${iconeSvg("grafico", 16)}</button>
         </div>
         ${
           (ex.videoUrl || ex.gifUrl)
@@ -969,7 +969,7 @@ async function finalizarTreino(alunoId) {
       );
     } else {
       showToast(
-        `Treino ${letra} finalizado! 🎉 Próximo: ${proxLetra || letra}`,
+        `Treino ${letra} finalizado! Próximo: ${proxLetra || letra}`,
         "success",
       );
     }
@@ -977,7 +977,7 @@ async function finalizarTreino(alunoId) {
     // Exibe botão desabilitado
     const btnFinalizar = document.getElementById("finish-workout-btn");
     if (btnFinalizar) {
-      btnFinalizar.innerHTML = "✅ Treino Concluído Hoje!";
+      btnFinalizar.innerHTML = "Treino Concluído Hoje!";
       btnFinalizar.disabled = true;
     }
   } catch (e) {
@@ -1042,7 +1042,7 @@ async function loadHistoricoTreinos(alunoId, containerId, limite = 14) {
               )
             : 0;
         const statusClass = h.completado ? "status-ok" : "status-partial";
-        const statusText = h.completado ? "✅ Completo" : `${pct}% concluído`;
+        const statusText = h.completado ? "Completo" : `${pct}% concluído`;
         const letrasFeitas = h.letrasCompletas
           ? Object.keys(h.letrasCompletas).sort().join("+")
           : h.letra || "?";
@@ -1292,7 +1292,7 @@ async function confirmarUploadVideo() {
             `treinos/${treinoAlunoAtual}/${treinoLetraAtual}/exercicios/${_videoUploadExId}`,
           )
           .update({ videoUrl: downloadUrl });
-        showToast("Vídeo salvo! 🎬 O aluno já pode visualizar.", "success");
+        showToast("Vídeo salvo! O aluno já pode visualizar.", "success");
         fecharUploadVideoModal();
         loadTreinoProfessor(treinoAlunoAtual, treinoLetraAtual);
       } catch (e) {
@@ -1450,7 +1450,7 @@ function initVideoUploadListeners() {
       if (isVideo) {
         const ok = await _validarDuracaoVideo(file);
         if (!ok) {
-          showToast("O vídeo deve ter no máximo 15 segundos ⏱️", "error");
+          showToast("O vídeo deve ter no máximo 15 segundos", "error");
           this.value = "";
           return;
         }
@@ -1528,7 +1528,7 @@ function initVideoUploadListeners() {
     if (isVideo) {
       const duracaoOk = await _validarDuracaoVideo(file);
       if (!duracaoOk) {
-        showToast("O vídeo deve ter no máximo 15 segundos ⏱️", "error");
+        showToast("O vídeo deve ter no máximo 15 segundos", "error");
         this.value = "";
         return;
       }

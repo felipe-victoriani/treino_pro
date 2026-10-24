@@ -40,7 +40,7 @@ const PROGRAMAS_PREDEFINIDOS = [
     treinos: {
       A: {
         foco: "Peito e Tríceps",
-        icone: "💪",
+        icone: "",
         orientacao:
           "Comece pelos exercícios compostos (supino) antes dos isoladores (tríceps). Descanse o tempo indicado entre as séries.",
         exercicios: [
@@ -96,7 +96,7 @@ const PROGRAMAS_PREDEFINIDOS = [
       },
       B: {
         foco: "Costas e Bíceps",
-        icone: "🔙",
+        icone: "",
         orientacao:
           "Foque em sentir o dorsal trabalhando nas puxadas. Nos exercícios de bíceps, controle a descida — não solte o peso.",
         exercicios: [
@@ -152,7 +152,7 @@ const PROGRAMAS_PREDEFINIDOS = [
       },
       C: {
         foco: "Pernas e Ombros",
-        icone: "🦵",
+        icone: "",
         orientacao:
           "Treine pernas primeiro quando estiver mais disposto. Ombros no final, pois eles já foram solicitados nos treinos A e B.",
         exercicios: [
@@ -236,7 +236,7 @@ const PROGRAMAS_PREDEFINIDOS = [
     treinos: {
       A: {
         foco: "Full Body — Sessão 1",
-        icone: "🏋️",
+        icone: "",
         orientacao:
           "Descanse 60 segundos entre as séries. O objetivo agora é aprender o movimento, não o peso.",
         exercicios: [
@@ -300,7 +300,7 @@ const PROGRAMAS_PREDEFINIDOS = [
       },
       B: {
         foco: "Full Body — Sessão 2",
-        icone: "⚡",
+        icone: "",
         orientacao:
           "Sessão alternada da sessão A. Variação dos exercícios para estimular músculos de formas diferentes.",
         exercicios: [
@@ -364,7 +364,7 @@ const PROGRAMAS_PREDEFINIDOS = [
       },
       C: {
         foco: "Full Body — Sessão 3",
-        icone: "🔥",
+        icone: "",
         orientacao:
           "Terceira sessão da semana. Foque em sentir cada músculo trabalhando — mente-músculo faz diferença.",
         exercicios: [
@@ -448,7 +448,7 @@ const PROGRAMAS_PREDEFINIDOS = [
     treinos: {
       A: {
         foco: "Superior — Circuito Intenso",
-        icone: "🔥",
+        icone: "",
         orientacao:
           "Execute os exercícios em pares (A1+A2, B1+B2, C1+C2) sem descanso entre eles. Descanse 60s depois do par.",
         exercicios: [
@@ -504,7 +504,7 @@ const PROGRAMAS_PREDEFINIDOS = [
       },
       B: {
         foco: "Inferior — Pernas e Glúteos",
-        icone: "🦵",
+        icone: "",
         orientacao:
           "Pernas queimam muito mais calorias por serem o maior grupo muscular. Invista aqui!",
         exercicios: [
@@ -560,7 +560,7 @@ const PROGRAMAS_PREDEFINIDOS = [
       },
       C: {
         foco: "Full Body — Alta Intensidade",
-        icone: "⚡",
+        icone: "",
         orientacao:
           "Sessão de finalização da semana. Circuito completo com todos os grupos musculares. Menos descanso!",
         exercicios: [
@@ -644,7 +644,7 @@ const PROGRAMAS_PREDEFINIDOS = [
     treinos: {
       A: {
         foco: "Glúteos e Isquiotibiais",
-        icone: "🍑",
+        icone: "",
         orientacao:
           "Treino principal de glúteos. Ative bem o glúteo antes de começar (glute bridge no aquecimento). Sinta cada repetição.",
         exercicios: [
@@ -700,7 +700,7 @@ const PROGRAMAS_PREDEFINIDOS = [
       },
       B: {
         foco: "Superior — Peito, Costas e Ombros",
-        icone: "💃",
+        icone: "",
         orientacao:
           "Treino superior para equilíbrio do corpo. Um físico harmonioso combina parte inferior desenvolvida com superior definida.",
         exercicios: [
@@ -756,7 +756,7 @@ const PROGRAMAS_PREDEFINIDOS = [
       },
       C: {
         foco: "Quadríceps e Panturrilha",
-        icone: "🦵",
+        icone: "",
         orientacao:
           "Foco nos quadríceps e panturrilha para definir a frente das pernas e o shape das panturrilhas.",
         exercicios: [
@@ -812,7 +812,7 @@ const PROGRAMAS_PREDEFINIDOS = [
       },
       D: {
         foco: "Bíceps, Tríceps e Core",
-        icone: "💪",
+        icone: "",
         orientacao:
           "Treino de braços e abdominal para a semana completa. Braços tonificados e core forte completam o físico.",
         exercicios: [
@@ -888,7 +888,7 @@ const PROGRAMAS_PREDEFINIDOS = [
     treinos: {
       A: {
         foco: "Peito e Tríceps",
-        icone: "💪",
+        icone: "",
         orientacao:
           "Sessão dedicada ao peito. Maior volume que o programa iniciante. Execute os compostos primeiro, finalize com isoladores.",
         exercicios: [
@@ -952,7 +952,7 @@ const PROGRAMAS_PREDEFINIDOS = [
       },
       B: {
         foco: "Costas e Bíceps",
-        icone: "🔙",
+        icone: "",
         orientacao:
           "Sessão de costas com volume alto. Foque na conexão mente-músculo — sinta o latíssimo em cada repetição.",
         exercicios: [
@@ -1016,7 +1016,7 @@ const PROGRAMAS_PREDEFINIDOS = [
       },
       C: {
         foco: "Pernas Completo",
-        icone: "🦵",
+        icone: "",
         orientacao:
           "Sessão dedicada às pernas. Sessão mais difícil da semana. Não pule o dia de pernas!",
         exercicios: [
@@ -1080,7 +1080,7 @@ const PROGRAMAS_PREDEFINIDOS = [
       },
       D: {
         foco: "Ombros",
-        icone: "🏆",
+        icone: "",
         orientacao:
           "Sessão dedicada aos ombros — o músculo que mais muda a silhueta. Trabalha os três deltoides.",
         exercicios: [

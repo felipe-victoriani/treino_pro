@@ -2,7 +2,7 @@
    TREINO PRO - Firebase Cloud Messaging (FCM)
    Gerencia permissão, token e notificações em primeiro plano.
 
-   ⚠️ ANTES DE USAR:
+   ANTES DE USAR:
    1. Acesse Firebase Console > Project Settings > Cloud Messaging
    2. Em "Web Push certificates", clique em "Gerar par de chaves"
    3. Copie a "Chave pública" e substitua o valor de VAPID_KEY abaixo

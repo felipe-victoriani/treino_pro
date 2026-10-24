@@ -100,9 +100,9 @@ function renderCardPrograma(programa) {
     programa.nivel === "iniciante" ? "Iniciante" : "Intermediário";
   const objetivoLabel =
     {
-      hipertrofia: "💪 Hipertrofia",
-      emagrecimento: "🔥 Emagrecimento",
-      condicionamento: "⚡ Condicionamento",
+      hipertrofia: "Hipertrofia",
+      emagrecimento: "Emagrecimento",
+      condicionamento: "Condicionamento",
     }[programa.objetivo] || programa.objetivo;
 
   const treinosPills = treinos
@@ -110,13 +110,13 @@ function renderCardPrograma(programa) {
       ([letra, t]) => `
       <div class="treino-pill">
         <span class="treino-pill-letra">${sanitize(letra)}</span>
-        ${sanitize(t.icone)} ${sanitize(t.foco)}
+        ${sanitize(t.foco)}
       </div>`,
     )
     .join("");
 
   const badgeHtml = programa.destaque
-    ? `<span class="programa-card-badge">⭐ Popular</span>`
+    ? `<span class="programa-card-badge">Popular</span>`
     : "";
 
   const selecionado =
@@ -126,7 +126,7 @@ function renderCardPrograma(programa) {
     <div class="programa-card${selecionado}" data-id="${sanitize(programa.id)}" role="button" tabindex="0" aria-label="Selecionar ${sanitize(programa.nome)}">
       ${badgeHtml}
       <div class="programa-card-header">
-        <div class="programa-card-icone">${sanitize(treinos[0][1].icone)}</div>
+        <div class="programa-card-icone">${iconeSvg("halter", 22)}</div>
         <div class="programa-card-titulo">
           <h3>${sanitize(programa.nome)}</h3>
           <p>${sanitize(programa.descricao)}</p>
@@ -153,7 +153,7 @@ function renderCardPrograma(programa) {
         font-weight: 600;
         cursor: pointer;
         transition: all 0.2s;
-      " onmouseover="this.style.background='rgba(37,99,235,0.1)'"
+      " onmouseover="this.style.background='#e1f3fe'"
          onmouseout="this.style.background='transparent'">
         Ver exercícios →
       </button>
@@ -302,7 +302,6 @@ function abrirDetalhes(id) {
       return `
         <div class="detalhe-treino">
           <div class="detalhe-treino-header">
-            <span style="font-size:1.4rem">${sanitize(treino.icone)}</span>
             <h4>Treino ${sanitize(letra)} — ${sanitize(treino.foco)}</h4>
           </div>
           ${exerciciosHtml}
