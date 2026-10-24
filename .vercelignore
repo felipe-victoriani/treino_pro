@@ -3,3 +3,13 @@ node_modules
 README.md
 assets/icons/generate-icons.html
 assets/icons/generate-icons.css
+
+# Paginas de debug/manutencao (nao publicar)
+teste-treino.html
+corrigir-exercicios.html
+# Testes e configs de desenvolvimento
+tests
+jest.config.js
+jest.rules.config.js
+functions
+scripts
