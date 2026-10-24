@@ -228,7 +228,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       };
 
       if (profId) {
-        const profSnap = await db.ref(`professores/${profId}`).once("value");
+        const profSnap = await db
+          .ref(`professoresPublico/${profId}`)
+          .once("value");
         alunoData.professorId = profId;
         alunoData.professorNome = profSnap.val()?.nome || "Professor";
       }
@@ -259,7 +261,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   async function loadProfessores() {
     try {
-      const snap = await db.ref("professores").once("value");
+      // Lista pública só com nomes (professores/* exige login e vínculo)
+      const snap = await db.ref("professoresPublico").once("value");
       const data = snap.val();
 
       profSelect.innerHTML =

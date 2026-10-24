@@ -756,7 +756,8 @@ async function loadPerfilSection() {
     var pid = data.professorId || alunoState.professorId;
     var profEl = document.getElementById("perfil-professor");
     if (pid) {
-      db.ref("users/" + pid)
+      // Aluno não lê users/{professor}; o nome vem do espelho público
+      db.ref("professoresPublico/" + pid)
         .once("value")
         .then(function (s) {
           if (profEl) {

@@ -107,6 +107,8 @@ async function initAdmin(adminUid) {
           telefone: tel || "",
           createdAt: timestamp,
         };
+        // Espelho público (só o nome) usado no cadastro de alunos
+        updates[`professoresPublico/${uid}`] = { nome };
 
         console.log("[Admin] Gravando no DB:", updates);
         await db.ref().update(updates);
@@ -129,6 +131,34 @@ async function initAdmin(adminUid) {
     });
 }
 
+/* ---- Espelho público de professores ----
+   O cadastro de aluno roda sem login e só pode ler professoresPublico
+   (apenas nomes). Aqui o admin mantém o espelho igual a /professores:
+   cria/atualiza nomes e remove entradas de professores que não existem mais. */
+async function sincronizarProfessoresPublico(professores) {
+  try {
+    const snap = await db.ref("professoresPublico").once("value");
+    const atual = snap.val() || {};
+    const updates = {};
+
+    Object.entries(professores || {}).forEach(([id, p]) => {
+      const nome = (p?.nome || "Professor").slice(0, 100);
+      if (atual[id]?.nome !== nome) {
+        updates[`professoresPublico/${id}`] = { nome };
+      }
+    });
+    Object.keys(atual).forEach((id) => {
+      if (!professores?.[id]) updates[`professoresPublico/${id}`] = null;
+    });
+
+    if (Object.keys(updates).length > 0) {
+      await db.ref().update(updates);
+    }
+  } catch (err) {
+    console.error("[Admin] Falha ao sincronizar professoresPublico:", err);
+  }
+}
+
 /* ---- Carregar lista de professores ---- */
 async function carregarProfessores() {
   const lista = document.getElementById("lista-professores");
@@ -139,7 +169,7 @@ async function carregarProfessores() {
   try {
     const snap = await db.ref("professores").once("value");
     const data = snap.val();
-    console.log("[Admin] professores lidos do DB:", data);
+    sincronizarProfessoresPublico(data);
 
     if (!data) {
       lista.innerHTML =
@@ -477,6 +507,7 @@ async function salvarEditarProf() {
     const updates = {};
     updates[`professores/${id}/nome`] = nome;
     updates[`professores/${id}/telefone`] = telefone;
+    updates[`professoresPublico/${id}/nome`] = nome;
     updates[`users/${id}/nome`] = nome;
     updates[`users/${id}/telefone`] = telefone;
     await db.ref().update(updates);

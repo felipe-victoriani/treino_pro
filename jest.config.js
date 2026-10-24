@@ -10,4 +10,6 @@ module.exports = {
   // Roda antes de cada arquivo de teste (no contexto jsdom)
   setupFiles: ["./tests/setup.js"],
   testMatch: ["**/tests/**/*.test.js"],
+  // Testes de regras rodam em config própria, com emulador (npm run test:rules)
+  testPathIgnorePatterns: ["/node_modules/", "/tests/rules/"],
 };

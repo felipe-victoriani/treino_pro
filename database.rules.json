@@ -2,102 +2,161 @@
   "rules": {
     "exercicios": {
       ".read": "auth != null",
-      ".write": "root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
+      ".write": "auth != null && root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
       ".indexOn": ["musculo_principal", "ativo"]
     },
-    "treinos": {
+
+    "users": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
       "$uid": {
-        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
-        ".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'"
+        ".read": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin' || (root.child('users').child(auth.uid).child('tipo').val() === 'professor' && root.child('alunos').child($uid).child('professorId').val() === auth.uid))",
+        ".write": "auth != null && ((auth.uid === $uid && newData.exists()) || root.child('users').child(auth.uid).child('tipo').val() === 'admin')",
+        ".validate": "newData.hasChild('tipo')",
+        "tipo": {
+          ".validate": "newData.isString() && (newData.val() === data.val() || (!data.exists() && newData.val() === 'aluno') || root.child('users').child(auth.uid).child('tipo').val() === 'admin')"
+        }
       }
     },
+
+    "alunos": {
+      ".read": "auth != null && (root.child('users').child(auth.uid).child('tipo').val() === 'admin' || (root.child('users').child(auth.uid).child('tipo').val() === 'professor' && query.orderByChild === 'professorId' && query.equalTo === auth.uid))",
+      ".indexOn": ["professorId"],
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin' || (root.child('users').child(auth.uid).child('tipo').val() === 'professor' && data.child('professorId').val() === auth.uid))",
+        ".write": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin' || (root.child('users').child(auth.uid).child('tipo').val() === 'professor' && data.child('professorId').val() === auth.uid))",
+        "professorId": {
+          ".validate": "newData.isString() && root.child('users').child(newData.val()).child('tipo').val() === 'professor'"
+        }
+      }
+    },
+
+    "professores": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
+      ".write": "auth != null && root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin' || root.child('alunos').child(auth.uid).child('professorId').val() === $uid)",
+        ".write": "auth != null && ((auth.uid === $uid && newData.exists()) || root.child('users').child(auth.uid).child('tipo').val() === 'admin')"
+      }
+    },
+
+    "professoresPublico": {
+      ".read": true,
+      "$uid": {
+        ".write": "auth != null && root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
+        ".validate": "newData.hasChildren(['nome'])",
+        "nome": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 100"
+        },
+        "$campo": {
+          ".validate": false
+        }
+      }
+    },
+
+    "treinos": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin' || (root.child('users').child(auth.uid).child('tipo').val() === 'professor' && root.child('alunos').child($uid).child('professorId').val() === auth.uid))",
+        ".write": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin' || (root.child('users').child(auth.uid).child('tipo').val() === 'professor' && root.child('alunos').child($uid).child('professorId').val() === auth.uid))"
+      }
+    },
+
+    "historicoTreinos": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin' || (root.child('users').child(auth.uid).child('tipo').val() === 'professor' && root.child('alunos').child($uid).child('professorId').val() === auth.uid))",
+        ".write": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin' || (root.child('users').child(auth.uid).child('tipo').val() === 'professor' && root.child('alunos').child($uid).child('professorId').val() === auth.uid))"
+      }
+    },
+
+    "historicoIMC": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin' || (root.child('users').child(auth.uid).child('tipo').val() === 'professor' && root.child('alunos').child($uid).child('professorId').val() === auth.uid))",
+        ".write": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin' || (root.child('users').child(auth.uid).child('tipo').val() === 'professor' && root.child('alunos').child($uid).child('professorId').val() === auth.uid))"
+      }
+    },
+
+    "dietas": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin' || (root.child('users').child(auth.uid).child('tipo').val() === 'professor' && root.child('alunos').child($uid).child('professorId').val() === auth.uid))",
+        ".write": "auth != null && (root.child('users').child(auth.uid).child('tipo').val() === 'admin' || (root.child('users').child(auth.uid).child('tipo').val() === 'professor' && root.child('alunos').child($uid).child('professorId').val() === auth.uid))"
+      }
+    },
+
+    "mensagens": {
+      "$alunoId": {
+        ".read": "auth != null && (auth.uid === $alunoId || root.child('users').child(auth.uid).child('tipo').val() === 'admin' || (root.child('users').child(auth.uid).child('tipo').val() === 'professor' && root.child('alunos').child($alunoId).child('professorId').val() === auth.uid))",
+        ".indexOn": ["lida"],
+        "$msgId": {
+          ".write": "auth != null && !data.exists() && newData.child('deUid').val() === auth.uid && (auth.uid === $alunoId || root.child('users').child(auth.uid).child('tipo').val() === 'admin' || (root.child('users').child(auth.uid).child('tipo').val() === 'professor' && root.child('alunos').child($alunoId).child('professorId').val() === auth.uid))",
+          ".validate": "newData.hasChildren(['texto', 'de', 'deUid', 'timestamp', 'lida'])",
+          "texto": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 1000"
+          },
+          "de": {
+            ".validate": "newData.val() === root.child('users').child(auth.uid).child('tipo').val()"
+          },
+          "deUid": {
+            ".validate": "newData.val() === auth.uid"
+          },
+          "deNome": {
+            ".validate": "newData.isString() && newData.val().length <= 100"
+          },
+          "timestamp": {
+            ".validate": "newData.isNumber()"
+          },
+          "paraUid": {
+            ".validate": "newData.isString() && (newData.val() === $alunoId || newData.val() === root.child('alunos').child($alunoId).child('professorId').val() || newData.val() === root.child('config').child('adminUid').val())"
+          },
+          "lida": {
+            ".write": "auth != null && data.exists() && newData.val() === true && (auth.uid === $alunoId || root.child('users').child(auth.uid).child('tipo').val() === 'admin' || (root.child('users').child(auth.uid).child('tipo').val() === 'professor' && root.child('alunos').child($alunoId).child('professorId').val() === auth.uid))",
+            ".validate": "newData.isBoolean()"
+          },
+          "$campo": {
+            ".validate": false
+          }
+        }
+      }
+    },
+
+    "conquistas": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin' || (root.child('users').child(auth.uid).child('tipo').val() === 'professor' && root.child('alunos').child($uid).child('professorId').val() === auth.uid))",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+
     "rateLimits": {
       "$uid": {
-        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
+        ".read": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin')",
         ".write": false
       }
     },
-    "users": {
-      ".read": "root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
-      "$uid": {
-        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
-        ".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin'"
-      }
-    },
-    "alunos": {
-      ".read": "root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
-      ".write": "root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
-      "$uid": {
-        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
-        ".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'"
-      }
-    },
-    "professores": {
-      ".read": true,
-      ".write": "root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
-      "$uid": {
-        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
-        ".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin'"
-      }
-    },
-    "historicoTreinos": {
-      "$uid": {
-        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
-        ".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'"
-      }
-    },
-    "mensagens": {
-      "$uid": {
-        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
-        ".write": "auth != null",
-        ".indexOn": ["lida"]
-      }
-    },
-    "usuarios": {
-      "$uid": {
-        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
-        ".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin'"
-      }
-    },
-    "historicoIMC": {
-      "$uid": {
-        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
-        ".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'"
-      }
-    },
-    "conquistas": {
-      "$uid": {
-        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
-        ".write": "$uid === auth.uid"
-      }
-    },
+
     "favoritosProfessor": {
       "$uid": {
-        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
-        ".write": "$uid === auth.uid"
+        ".read": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin')",
+        ".write": "auth != null && auth.uid === $uid"
       }
     },
+
     "recentesProfessor": {
       "$uid": {
-        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
-        ".write": "$uid === auth.uid"
+        ".read": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin')",
+        ".write": "auth != null && auth.uid === $uid"
       }
     },
+
     "exerciciosCustom": {
       "$uid": {
-        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin'",
-        ".write": "$uid === auth.uid"
+        ".read": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('tipo').val() === 'admin')",
+        ".write": "auth != null && auth.uid === $uid"
       }
     },
+
     "config": {
       "adminUid": {
         ".read": "auth != null",
-        ".write": "root.child('users').child(auth.uid).child('tipo').val() === 'admin'"
+        ".write": "auth != null && root.child('users').child(auth.uid).child('tipo').val() === 'admin'"
       }
-    },
-    "$other": {
-      ".read": "auth != null && (root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin')",
-      ".write": "auth != null && (root.child('users').child(auth.uid).child('tipo').val() === 'professor' || root.child('users').child(auth.uid).child('tipo').val() === 'admin')"
     }
   }
 }

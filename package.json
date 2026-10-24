@@ -2,6 +2,7 @@
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
+    "test:rules": "firebase emulators:exec --only database --project demo-treino \"jest -c jest.rules.config.js\"",
     "predeploy": "node scripts/bump-cache.js",
     "deploy": "vercel --prod"
   },
@@ -12,6 +13,7 @@
     "firebase-admin": "^14.0.0"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1"
   }

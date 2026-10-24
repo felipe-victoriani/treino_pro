@@ -8,6 +8,21 @@ const claudeApiKey = defineSecret("CLAUDE_API_KEY");
 admin.initializeApp();
 const db = admin.database();
 
+// ── Helper: garante que quem chama é admin ────────────────
+// O papel vem do banco (users/{uid}/tipo), protegido pelas regras
+// contra autoalteração. Lança HttpsError se não for admin.
+async function exigirAdmin(request) {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Usuário não autenticado");
+  }
+  const tipoSnap = await db
+    .ref(`users/${request.auth.uid}/tipo`)
+    .once("value");
+  if (tipoSnap.val() !== "admin") {
+    throw new HttpsError("permission-denied", "Apenas administradores");
+  }
+}
+
 // ── Função: Notificar nova mensagem via FCM ──────────────
 exports.notificarNovaMensagem = onValueCreated(
   "mensagens/{alunoId}/{msgId}",
@@ -57,13 +72,11 @@ exports.notificarNovaMensagem = onValueCreated(
 
 // ── Função: Deletar Professor (limpeza completa) ──────────────
 exports.deletarProfessor = onCall(async (request) => {
-  // Verifica autenticação
-  if (!request.auth) {
-    throw new HttpsError("unauthenticated", "Usuário não autenticado");
-  }
+  // Verifica autenticação e papel de admin
+  await exigirAdmin(request);
 
   const { professorId } = request.data;
-  if (!professorId) {
+  if (!professorId || typeof professorId !== "string") {
     throw new HttpsError("invalid-argument", "professorId é obrigatório");
   }
 
@@ -74,6 +87,7 @@ exports.deletarProfessor = onCall(async (request) => {
     const updates = {};
     updates[`users/${professorId}`] = null;
     updates[`professores/${professorId}`] = null;
+    updates[`professoresPublico/${professorId}`] = null;
 
     await db.ref().update(updates);
     console.log(`[Delete] Dados do database removidos para: ${professorId}`);
@@ -110,13 +124,11 @@ exports.deletarProfessor = onCall(async (request) => {
 
 // ── Função: Deletar Aluno (limpeza completa) ──────────────
 exports.deletarAluno = onCall(async (request) => {
-  // Verifica autenticação
-  if (!request.auth) {
-    throw new HttpsError("unauthenticated", "Usuário não autenticado");
-  }
+  // Verifica autenticação e papel de admin
+  await exigirAdmin(request);
 
   const { alunoId } = request.data;
-  if (!alunoId) {
+  if (!alunoId || typeof alunoId !== "string") {
     throw new HttpsError("invalid-argument", "alunoId é obrigatório");
   }
 
@@ -132,6 +144,7 @@ exports.deletarAluno = onCall(async (request) => {
     updates[`mensagens/${alunoId}`] = null;
     updates[`historicoTreinos/${alunoId}`] = null;
     updates[`historicoIMC/${alunoId}`] = null;
+    updates[`conquistas/${alunoId}`] = null;
 
     await db.ref().update(updates);
     console.log(`[Delete] Dados do database removidos para: ${alunoId}`);
