@@ -596,16 +596,11 @@ async function loadTreinoAluno(
       .map(([id, ex]) => ({ id, ...ex }))
       .sort((a, b) => (a.ordem || 0) - (b.ordem || 0));
 
-    // Enriquece com gifUrl do cache de exercícios (para treinos salvos antes da correção)
+    // Preenche gifUrl pelo catálogo (id do exercício, apelido ou nome exato)
     if (typeof ExerciciosService !== 'undefined') {
       try {
         await ExerciciosService.getAll();
-        const cache = ExerciciosService._getCacheSync();
-        exercicios = exercicios.map((ex) => {
-          if (ex.gifUrl) return ex;
-          const gifUrl = _buscarGifNoCache(cache, ex.nome);
-          return gifUrl ? { ...ex, gifUrl } : ex;
-        });
+        exercicios = ExerciciosService.enriquecerComMidia(exercicios);
       } catch (_) {}
     }
 
@@ -624,46 +619,6 @@ async function loadTreinoAluno(
       '<div class="empty-state"><h3>Erro ao carregar treino</h3></div>';
     console.error(e);
   }
-}
-
-/**
- * Normaliza string para matching: remove acentos e lowercase
- */
-function _normStr(str) {
-  return (str || "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .trim();
-}
-
-/**
- * Busca gifUrl no cache de exercícios com fallback por prefixo/substring/acento
- */
-function _buscarGifNoCache(cache, nome) {
-  if (!nome) return null;
-  const chave = _normStr(nome);
-  if (chave.length < 3) return null;
-  const entries = Object.values(cache)
-    .filter(ex => ex.gifUrl)
-    .map(ex => ({ nome: _normStr(ex.nome_original || ex.nome || ""), gifUrl: ex.gifUrl }))
-    .filter(e => e.nome.length >= 4);
-  const exact = entries.find(e => e.nome === chave);
-  if (exact) return exact.gifUrl;
-  const pref = entries.find(e => e.nome.startsWith(chave) && chave.length >= 4);
-  if (pref) return pref.gifUrl;
-  const rpref = entries.find(e => chave.startsWith(e.nome) && e.nome.length >= 4);
-  if (rpref) return rpref.gifUrl;
-  const sub = entries.find(e => e.nome.includes(chave) && chave.length >= 5);
-  if (sub) return sub.gifUrl;
-  const rsub = entries.find(e => chave.includes(e.nome) && e.nome.length >= 5);
-  if (rsub) return rsub.gifUrl;
-  const words = chave.split(/\s+/).filter(w => w.length >= 4);
-  if (words.length > 0) {
-    const all = entries.find(e => words.every(w => e.nome.includes(w)));
-    if (all) return all.gifUrl;
-  }
-  return null;
 }
 
 /**

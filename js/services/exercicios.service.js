@@ -11,7 +11,8 @@
 
 const ExerciciosService = (() => {
   /* ── Estado privado ────────────────────────────────────────── */
-  let _cache = null; // { id: {...exercicio} }  — populado após _load()
+  let _cache = null; // { id: {...exercicio} } ativos + custom — seletor/busca
+  let _todos = null; // { id: {...exercicio} } catálogo inteiro — só p/ resolver mídia
   let _loading = null; // Promise em andamento (evita chamadas paralelas)
 
   /* ── Carregar exercícios do Firebase ───────────────────────── */
@@ -20,15 +21,19 @@ const ExerciciosService = (() => {
     if (_cache) return Promise.resolve(_cache);
     if (_loading) return _loading;
 
+    // Lê o catálogo inteiro: os itens inativos (import em inglês do
+    // free-exercise-db) ficam fora do seletor, mas a mídia deles é usada
+    // por treinos que guardam o id do catálogo.
     _loading = db
       .ref("exercicios")
-      .orderByChild("ativo")
-      .equalTo(true)
       .once("value")
       .then(async (snap) => {
         _cache = {};
+        _todos = {};
         snap.forEach((child) => {
-          _cache[child.key] = { id: child.key, ...child.val() };
+          const ex = { id: child.key, ...child.val() };
+          _todos[child.key] = ex;
+          if (ex.ativo === true) _cache[child.key] = ex;
         });
         // Carregar também exercícios customizados do professor logado
         try {
@@ -38,7 +43,9 @@ const ExerciciosService = (() => {
               .ref("exerciciosCustom/" + uid)
               .once("value");
             custSnap.forEach((child) => {
-              _cache[child.key] = { id: child.key, ...child.val() };
+              const ex = { id: child.key, ...child.val() };
+              _cache[child.key] = ex;
+              _todos[child.key] = ex;
             });
           }
         } catch (_) {}
@@ -49,6 +56,7 @@ const ExerciciosService = (() => {
         _loading = null;
         console.error("[ExerciciosService] Erro ao carregar:", err);
         _cache = {};
+        _todos = {};
         return _cache;
       });
 
@@ -210,6 +218,7 @@ const ExerciciosService = (() => {
 
   function invalidateCache() {
     _cache = null;
+    _todos = null;
     _loading = null;
   }
 
@@ -217,6 +226,83 @@ const ExerciciosService = (() => {
 
   function _getCacheSync() {
     return _cache || {};
+  }
+
+  /* ── Mídia (GIF/foto) de um exercício de treino ────────────────
+     Ordem de busca, da mais confiável para a menos:
+       1. mídia própria do exercício (vídeo do professor ou gifUrl salvo)
+       2. id do catálogo (exercicioId / id) — treinos da IA e do professor
+       3. apelido PT → catálogo (EXERCICIOS_ALIAS) — programas prontos
+       4. nome exato no catálogo (nome PT ou nome_original)
+     Sem busca aproximada: mídia de outro exercício é pior que nenhuma. */
+
+  let _indiceMidia = null; // { cacheRef, porNome: { nomeNormalizado: url } }
+
+  function _normNome(str) {
+    return (str || "")
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .toLowerCase()
+      .trim();
+  }
+
+  function _indice() {
+    const cache = _todos || {};
+    if (_indiceMidia && _indiceMidia.cacheRef === cache) return _indiceMidia;
+    const porNome = {};
+    Object.values(cache).forEach((e) => {
+      if (!e.gifUrl) return;
+      [e.nome, e.nome_original].forEach((n) => {
+        const k = _normNome(n);
+        if (k && !porNome[k]) porNome[k] = e.gifUrl;
+      });
+    });
+    _indiceMidia = { cacheRef: cache, porNome };
+    return _indiceMidia;
+  }
+
+  /**
+   * Retorna a URL de mídia de um exercício de treino, ou null.
+   * Síncrono: requer getAll() já resolvido.
+   * @param {{nome?: string, id?: string, exercicioId?: string, gifUrl?: string}} ex
+   * @returns {string|null}
+   */
+  function resolverMidia(ex) {
+    if (!ex) return null;
+    if (ex.gifUrl) return ex.gifUrl;
+
+    const cache = _todos || {};
+    for (const id of [ex.exercicioId, ex.id]) {
+      if (id && cache[id]?.gifUrl) return cache[id].gifUrl;
+    }
+
+    const { porNome } = _indice();
+    const chave = _normNome(ex.nome);
+    if (!chave) return null;
+
+    if (typeof EXERCICIOS_ALIAS !== "undefined") {
+      const alvo = Object.keys(EXERCICIOS_ALIAS).find(
+        (k) => _normNome(k) === chave,
+      );
+      if (alvo && porNome[_normNome(EXERCICIOS_ALIAS[alvo])]) {
+        return porNome[_normNome(EXERCICIOS_ALIAS[alvo])];
+      }
+    }
+
+    return porNome[chave] || null;
+  }
+
+  /**
+   * Devolve a lista com gifUrl preenchido onde houver mídia resolvível.
+   * @param {Array<object>} exercicios
+   * @returns {Array<object>}
+   */
+  function enriquecerComMidia(exercicios) {
+    return (exercicios || []).map((ex) => {
+      if (ex.gifUrl || ex.videoUrl) return ex;
+      const gifUrl = resolverMidia(ex);
+      return gifUrl ? { ...ex, gifUrl } : ex;
+    });
   }
 
   /* ── API Pública ───────────────────────────────────────────── */
@@ -229,6 +315,8 @@ const ExerciciosService = (() => {
     registrarRecente,
     criarCustomizado,
     invalidateCache,
+    resolverMidia,
+    enriquecerComMidia,
     _getCacheSync,
   };
 })();

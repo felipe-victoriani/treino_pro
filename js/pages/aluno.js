@@ -1095,62 +1095,12 @@ async function renderCargaHistoricoChart(exId, alunoId) {
    para UX consistente em todos os tipos de plano.
    ─────────────────────────────────────────────────────────── */
 /**
- * Enriquece uma lista de exercícios com gifUrl buscado pelo nome no cache
- * do ExerciciosService. Operação síncrona — usa _getCacheSync().
+ * Preenche gifUrl dos exercícios pelo catálogo (id, apelido PT ou nome exato).
+ * Síncrono: o cache do ExerciciosService já foi carregado em loadTreinoSection().
  */
-function _normStr(str) {
-  return (str || "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .trim();
-}
-
-function _buscarGifNoCache(cache, nome) {
-  if (!nome) return null;
-  const chave = _normStr(nome);
-  if (chave.length < 3) return null;
-  const entries = Object.values(cache)
-    .filter(ex => ex.gifUrl)
-    .map(ex => ({ nome: _normStr(ex.nome_original || ex.nome || ""), gifUrl: ex.gifUrl }))
-    .filter(e => e.nome.length >= 4);
-  // 1. Exact
-  const exact = entries.find(e => e.nome === chave);
-  if (exact) return exact.gifUrl;
-  // 2. Prefixo: catálogo começa com treino
-  const pref = entries.find(e => e.nome.startsWith(chave) && chave.length >= 4);
-  if (pref) return pref.gifUrl;
-  // 3. Prefixo reverso: treino começa com catálogo
-  const rpref = entries.find(e => chave.startsWith(e.nome) && e.nome.length >= 4);
-  if (rpref) return rpref.gifUrl;
-  // 4. Substring: catálogo contém nome do treino
-  const sub = entries.find(e => e.nome.includes(chave) && chave.length >= 5);
-  if (sub) return sub.gifUrl;
-  // 5. Substring reverso
-  const rsub = entries.find(e => chave.includes(e.nome) && e.nome.length >= 5);
-  if (rsub) return rsub.gifUrl;
-  // 6. Todas as palavras do treino estão no catálogo
-  const words = chave.split(/\s+/).filter(w => w.length >= 4);
-  if (words.length > 0) {
-    const all = entries.find(e => words.every(w => e.nome.includes(w)));
-    if (all) return all.gifUrl;
-  }
-  return null;
-}
-
 function _enriquecerComGif(exercicios) {
-  if (
-    typeof ExerciciosService === 'undefined' ||
-    typeof ExerciciosService._getCacheSync !== "function"
-  ) {
-    return exercicios;
-  }
-  const cache = ExerciciosService._getCacheSync();
-  return exercicios.map((ex) => {
-    if (ex.gifUrl) return ex;
-    const gifUrl = _buscarGifNoCache(cache, ex.nome);
-    return gifUrl ? { ...ex, gifUrl } : ex;
-  });
+  if (typeof ExerciciosService === "undefined") return exercicios;
+  return ExerciciosService.enriquecerComMidia(exercicios);
 }
 
 function renderExerciciosPreDefinidos(

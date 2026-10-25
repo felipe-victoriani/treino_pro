@@ -195,6 +195,8 @@ async function gerarTreino(user, nivel) {
         treino: day.treino,
         nome: day.nome,
         exercicios: (treinoIA.exercicios || []).map((ex) => ({
+          // id do catálogo: permite achar a mídia sem depender do nome traduzido
+          ...(ex.id ? { id: ex.id } : {}),
           nome: ex.nome,
           series: ex.series,
           repeticoes: ex.repeticoes,

@@ -1,0 +1,176 @@
+/* ============================================================
+   TREINO PRO - Apelidos de exercícios (PT → catálogo)
+   Usado para achar a mídia (GIF/foto) de exercícios que não guardam
+   o id do catálogo: programas prontos (programas.service.js) e o
+   gerador offline (plano-generator.js).
+
+   Chave: nome em português como aparece nos treinos.
+   Valor: nome exato de um exercício COM mídia em /exercicios
+          (campo nome ou nome_original).
+
+   Regra: só mapear quando for o MESMO movimento. Sem equivalente
+   confiável, deixar de fora — mídia errada é pior que nenhuma.
+   Comparação ignora acentos e maiúsculas.
+   ============================================================ */
+
+const EXERCICIOS_ALIAS = {
+  // ── Nomes genéricos usados em treinos de professor/IA ──
+  "Agachamento": "Agachamento Livre",
+  "Crucifixo": "Crucifixo com Halteres",
+  "Remada Sentada na Polia": "Seated Cable Rows",
+  "Puxada com Triângulo": "V-Bar Pulldown",
+  "Tríceps Polia Alta com Corda": "Triceps Pushdown - Rope Attachment",
+  "Tríceps Kickback com Haltere": "Kick-back com Haltere",
+  "Tríceps Corda no Pulley": "Triceps Pushdown - Rope Attachment",
+  "Crossover no Cabo (Baixo para Cima)": "Low Cable Crossover",
+  "Remada com Haltere no Cabo": "Seated One-arm Cable Pulley Rows",
+  "Rosca 21 com Barra": "Barbell Curl",
+  "Abdominal na Máquina": "Ab Crunch Machine",
+
+  // ── Peitoral ──
+  "Supino Reto com Halteres": "Dumbbell Bench Press",
+  "Supino Inclinado com Barra": "Barbell Incline Bench Press - Medium Grip",
+  "Supino Inclinado com Halteres": "Incline Dumbbell Press",
+  "Supino Declinado com Barra": "Decline Barbell Bench Press",
+  "Supino Declinado com Halteres": "Decline Dumbbell Bench Press",
+  "Chest Press na Máquina": "Leverage Chest Press",
+  "Crossover no Cabo": "Cable Crossover",
+  "Crossover no Cabo (Cable Fly)": "Cable Crossover",
+  "Crucifixo no Cabo Baixo": "Low Cable Crossover",
+  "Pec Deck (Voador)": "Butterfly",
+  "Peck Deck (Voador na Máquina)": "Butterfly",
+  "Pullover com Haltere": "Pull Over com Haltere",
+  "Flexão de Braço": "Pushups",
+  "Flexão Diamante": "Push-Ups - Close Triceps Position",
+  "Flexão com Explosão": "Plyo Push-up",
+  "Flexão Declinada (Mãos Elevadas)": "Incline Push-Up",
+  "Flexão Inclinada (Pés Elevados)": "Push-Ups With Feet Elevated",
+
+  // ── Costas ──
+  "Puxada Frontal (Lat Pulldown)": "Puxada Frontal no Pulley",
+  "Puxada Fechada (Pegada Neutra)": "V-Bar Pulldown",
+  "Pulldown com Triângulo": "V-Bar Pulldown",
+  "Pull-Down no Cabo (Straight Arm)": "Straight-Arm Pulldown",
+  "Barra Fixa Pegada Neutra": "V-Bar Pullup",
+  "Chin-Up (Pegada Supinada)": "Chin-Up",
+  "Remada Baixa no Cabo": "Seated Cable Rows",
+  "Remada Sentada no Cabo": "Seated Cable Rows",
+  "Remada Curvada com Halteres": "Bent Over Two-Dumbbell Row",
+  "Remada Unilateral (Serrote)": "One-Arm Dumbbell Row",
+  "Remada Unilateral com Haltere": "One-Arm Dumbbell Row",
+  "Remada na Máquina": "Leverage Iso Row",
+  "Remada Máquina (Chest Supported)": "Leverage Iso Row",
+  "Remada Invertida (Australian Pull-Up)": "Inverted Row",
+  "Flexão Supinada em Mesa": "Inverted Row",
+  "Flexão com Halteres (Pushup Row)": "Alternating Renegade Row",
+  "Levantamento Terra": "Levantamento Terra (Deadlift)",
+  "Extensão de Costas no Chão": "Superman",
+
+  // ── Ombros ──
+  "Desenvolvimento com Barra": "Barbell Shoulder Press",
+  "Desenvolvimento Militar com Barra": "Standing Military Press",
+  "Desenvolvimento com Halteres": "Dumbbell Shoulder Press",
+  "Desenvolvimento na Máquina": "Machine Shoulder (Military) Press",
+  "Press Arnold": "Desenvolvimento Arnold",
+  "Elevação Lateral com Garrafa": "Side Lateral Raise",
+  "Remada Alta com Barra": "Upright Barbell Row",
+  "Remada Alta com Halteres": "Standing Dumbbell Upright Row",
+  "Face Pull no Cabo": "Face Pull",
+  "Pássaro (Fly Invertido) c/ Halteres": "Crucifixo Invertido (Deltoide Posterior)",
+  "Pássaro c/ Halteres (Fly Invertido)": "Crucifixo Invertido (Deltoide Posterior)",
+  "Arm Circles (Círculos de Braço)": "Arm Circles",
+  "Wall Handstand Push-Up": "Handstand Push-Ups",
+
+  // ── Bíceps ──
+  "Rosca Direta com Halteres": "Dumbbell Bicep Curl",
+  "Rosca 21 com Halteres": "Dumbbell Bicep Curl",
+  "Rosca Alternada com Halteres": "Dumbbell Alternate Bicep Curl",
+  "Rosca Inclinada com Halteres": "Incline Dumbbell Curl",
+  "Rosca Martelo com Halteres": "Rosca Martelo",
+  "Rosca Scott (Barra EZ)": "Rosca Scott (Barra W)",
+  "Rosca Scott com Barra W": "Rosca Scott (Barra W)",
+  "Rosca na Máquina": "Machine Bicep Curl",
+  "Rosca no Cabo (Polia Baixa)": "Standing Biceps Cable Curl",
+  "Spider Curl no Banco Inclinado": "Spider Curl",
+
+  // ── Tríceps ──
+  "Tríceps Pulley (Corda)": "Triceps Pushdown - Rope Attachment",
+  "Tríceps Pulley Invertido": "Reverse Grip Triceps Pushdown",
+  "Tríceps Testa com Barra": "Lying Triceps Press",
+  "Tríceps Testa com Barra EZ": "Tríceps Testa com Barra W",
+  "Skullcrusher com Barra W": "Tríceps Testa com Barra W",
+  "Tríceps Testa com Halteres": "Lying Dumbbell Tricep Extension",
+  "Tríceps Francês com Haltere": "Standing Dumbbell Triceps Extension",
+  "Tríceps Francês Unilateral": "Standing One-Arm Dumbbell Triceps Extension",
+  "Extensão de Tríceps sobre a Cabeça": "Standing Dumbbell Triceps Extension",
+  "Tríceps Coice (Kickback)": "Kick-back com Haltere",
+  "Tríceps na Máquina": "Machine Triceps Extension",
+  "Mergulho nas Barras Paralelas": "Dips - Triceps Version",
+  "Mergulho entre Bancos": "Bench Dips",
+  "Mergulho entre Bancos (Bench Dip)": "Bench Dips",
+  "Mergulho entre Cadeiras": "Bench Dips",
+  "Mergulho entre Cadeiras (Bench Dip)": "Bench Dips",
+  "Dip na Cadeira (Bench Dip)": "Bench Dips",
+
+  // ── Pernas ──
+  "Agachamento Livre com Barra": "Agachamento Livre",
+  "Agachamento Bodyweight": "Bodyweight Squat",
+  "Agachamento com Halteres": "Dumbbell Squat",
+  "Agachamento Goblet com Haltere": "Goblet Squat",
+  "Agachamento no Smith": "Smith Machine Squat",
+  "Agachamento Hack": "Agachamento Hack (Máquina)",
+  "Agachamento Sumô": "Agachamento Sumô (Glúteo)",
+  "Agachamento Sumô com Barra": "Wide Stance Barbell Squat",
+  "Agachamento Sumô com Haltere": "Plie Dumbbell Squat",
+  "Agachamento Búlgaro": "Split Squat with Dumbbells",
+  "Agachamento Búlgaro (Glúteo)": "Split Squat with Dumbbells",
+  "Agachamento Búlgaro (Split Squat)": "Split Squat with Dumbbells",
+  "Agachamento Búlgaro com Halteres": "Split Squat with Dumbbells",
+  "Agachamento Búlgaro c/ Halteres (Glúteo)": "Split Squat with Dumbbells",
+  "Jump Squat": "Freehand Jump Squat",
+  "Afundo (Lunge)": "Split Squats",
+  "Afundo (Lunge) com Halteres": "Afundo (Lunges) com Halteres",
+  "Afundo com Barra (Lunge)": "Barbell Lunge",
+  "Afundo Reverso": "Dumbbell Rear Lunge",
+  "Afundo Reverso com Halteres": "Dumbbell Rear Lunge",
+  "Step-Up com Halteres": "Dumbbell Step Ups",
+  "Extensora (Leg Extension)": "Leg Extensions",
+  "Mesa Flexora": "Lying Leg Curls",
+  "Cadeira Flexora (Leg Curl)": "Seated Leg Curl",
+  "Leg Press Unilateral": "Leg Press",
+  "Levantamento Terra Romeno": "Romanian Deadlift",
+  "Stiff com Barra (RDL)": "Stiff-Legged Barbell Deadlift",
+  "Stiff com Halteres (RDL)": "Stiff com Halteres",
+  "Good Morning sem Peso": "Good Morning",
+  "Cadeira Abdutora": "Thigh Abductor",
+  "Abdução de Quadril na Máquina": "Thigh Abductor",
+  "Panturrilha em Pé (Sem Peso)": "Elevação de Panturrilha em Pé",
+  "Panturrilha Unilateral": "Calf Raise On A Dumbbell",
+  "Panturrilha Unilateral c/ Haltere": "Standing Dumbbell Calf Raise",
+  "Panturrilha em Pé com Halteres": "Standing Dumbbell Calf Raise",
+  "Panturrilha em Pé na Máquina": "Standing Calf Raises",
+  "Panturrilha Sentada (Sóleo)": "Seated Calf Raise",
+  "Panturrilha no Leg Press": "Calf Press On The Leg Press Machine",
+  "Mountain Climber": "Mountain Climbers",
+
+  // ── Glúteos ──
+  "Hip Thrust com Barra": "Barbell Hip Thrust",
+  "Hip Thrust com Haltere": "Barbell Hip Thrust",
+  "Hip Thrust com Peso Corporal": "Butt Lift (Bridge)",
+  "Ponte de Glúteo": "Elevação Pélvica (Glute Bridge)",
+  "Donkey Kick": "Glute Kickback",
+  "Kickback no Cabo (Glúteo)": "One-Legged Cable Kickback",
+
+  // ── Abdômen ──
+  "Crunch Abdominal": "Crunches",
+  "Abdominal Oblíquo": "Oblique Crunches",
+  "Abdominal na Polia": "Cable Crunch",
+  "Bicicleta Abdominal": "Abdominal Oblíquo (Bicicleta)",
+  "Prancha Frontal": "Prancha (Plank)",
+  "Elevação de Pernas na Barra": "Hanging Leg Raise",
+  "Elevação de Pernas no Chão": "Elevação de Pernas",
+  "Roda Abdominal (Abs Wheel)": "Ab Roller",
+  "Russian Twist com Haltere": "Russian Twist",
+  "Dead Bug com Haltere": "Dead Bug",
+  "V-Up": "Jackknife Sit-Up",
+};
