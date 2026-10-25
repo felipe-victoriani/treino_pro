@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Excluir minha conta — Treino Pro</title>
+    <meta
+      name="description"
+      content="Exclua sua conta do Treino Pro e todos os dados associados a ela."
+    />
+    <meta name="theme-color" content="#f7f6f3" />
+    <link rel="icon" href="assets/icons/icon.svg?v=2" type="image/svg+xml" />
+    <link rel="icon" href="assets/icons/icon-96.png?v=2" type="image/png" />
+    <link rel="apple-touch-icon" href="assets/icons/icon-180.png?v=2" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/legal.css" />
+  </head>
+  <body>
+    <main class="legal-page">
+      <article class="legal-doc">
+        <a class="legal-brand" href="index.html">
+          <span class="legal-brand-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"
+              />
+            </svg>
+          </span>
+          Treino Pro
+        </a>
+
+        <h1 class="legal-title">Excluir minha conta</h1>
+        <p class="legal-meta">
+          Você pode excluir sua conta a qualquer momento, sem precisar falar com
+          ninguém.
+        </p>
+
+        <div class="legal-aviso" role="note">
+          <strong>A exclusão é permanente e não pode ser desfeita.</strong>
+          Serão apagados: seu cadastro e login, dados de perfil, peso, altura e
+          IMC, treinos e histórico, cargas, conquistas, dieta, mensagens e os
+          vídeos de exercício feitos para você. Se você for professor, seus
+          alunos serão desvinculados de você.
+        </div>
+
+        <!-- Formulário: confirmar identidade com e-mail e senha -->
+        <form class="legal-card" id="form-excluir" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="excluir-email">E-mail da conta</label>
+            <input
+              class="form-control"
+              type="email"
+              id="excluir-email"
+              autocomplete="email"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="excluir-senha">Senha</label>
+            <input
+              class="form-control"
+              type="password"
+              id="excluir-senha"
+              autocomplete="current-password"
+              required
+            />
+          </div>
+
+          <label class="legal-check" for="excluir-confirma">
+            <input type="checkbox" id="excluir-confirma" required />
+            <span>
+              Entendo que todos os meus dados serão apagados de forma
+              permanente.
+            </span>
+          </label>
+
+          <div class="legal-acoes">
+            <button type="submit" class="btn-danger btn-block" id="excluir-btn">
+              Excluir minha conta definitivamente
+            </button>
+            <a class="btn-secondary btn-block" href="index.html">Cancelar</a>
+          </div>
+
+          <p class="legal-status" id="excluir-status" role="status" aria-live="polite"></p>
+        </form>
+
+        <!-- Mostrado só depois da exclusão concluída -->
+        <section class="legal-card hidden" id="excluir-sucesso" tabindex="-1">
+          <h2>Conta excluída</h2>
+          <p>
+            Sua conta e todos os seus dados foram apagados. Obrigado por ter
+            usado o Treino Pro.
+          </p>
+        </section>
+
+        <p>
+          Não consegue entrar na conta? Peça a exclusão pelo e-mail
+          <a href="mailto:felipevictoriani@hotmail.com">felipevictoriani@hotmail.com</a>
+          a partir do endereço cadastrado.
+        </p>
+
+        <footer class="legal-footer">
+          <a href="privacidade.html">Política de Privacidade</a>
+          <a href="index.html">Voltar ao Treino Pro</a>
+        </footer>
+      </article>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-functions-compat.js"></script>
+    <script src="js/config/firebase.js"></script>
+    <script src="js/pages/excluir-conta.js"></script>
+  </body>
+</html>

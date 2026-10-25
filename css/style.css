@@ -5251,3 +5251,61 @@ h4 {
 .btn-carga-chart svg {
   display: block;
 }
+
+/* ---- Perfil: links de privacidade e exclusão de conta ---- */
+.perfil-legal {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 20px;
+  margin-top: 20px;
+  font-size: 0.85rem;
+}
+
+.perfil-legal a {
+  color: var(--text-secondary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  /* alvo de toque confortável */
+  padding: 10px 4px;
+}
+
+.perfil-legal a.perfil-legal-perigo {
+  color: var(--err-fg);
+}
+
+/* ---- Cadastro: consentimento LGPD ---- */
+.consentimento {
+  border: none;
+  margin: 8px 0 12px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.consent-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+  cursor: pointer;
+  /* alvo de toque confortável */
+  padding: 6px 0;
+}
+
+.consent-check input {
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  flex-shrink: 0;
+  accent-color: var(--ink-900);
+}
+
+.consent-check a {
+  color: var(--text-white);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

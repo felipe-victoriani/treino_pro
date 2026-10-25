@@ -24,12 +24,6 @@ const firebaseConfig = {
 /* Expõe config para uso na instância secundária (admin) */
 window._firebaseConfig = firebaseConfig;
 
-/* ─────────────────────────────────────────────────────────────
-   Chave da API Gemini (Google AI Studio)
-   Necessária para gerar treinos personalizados com IA.
-   Obtenha em: https://aistudio.google.com/apikey
-   ───────────────────────────────────────────────────────────── */
-window._GEMINI_KEY = "AIzaSyAQ77Oq1Y_yemNcUf80mHvaC1Iwi71VnxQ";
 
 /* --- Inicializar Firebase --- */
 firebase.initializeApp(firebaseConfig);

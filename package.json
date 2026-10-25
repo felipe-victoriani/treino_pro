@@ -4,7 +4,8 @@
     "test:watch": "jest --watch",
     "test:rules": "firebase emulators:exec --only database --project demo-treino \"jest -c jest.rules.config.js\"",
     "predeploy": "node scripts/bump-cache.js",
-    "deploy": "vercel --prod"
+    "deploy": "vercel --prod",
+    "test:functions": "firebase emulators:exec --only auth,database,functions --project demo-treino \"jest -c jest.functions.config.js\""
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

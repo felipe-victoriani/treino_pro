@@ -410,6 +410,27 @@
           </div>
         </div>
 
+        <!-- Consentimento (LGPD): política obrigatória; dados de saúde só se informados -->
+        <fieldset class="consentimento">
+          <legend class="sr-only">Privacidade</legend>
+          <label class="consent-check" for="aceite-politica">
+            <input type="checkbox" id="aceite-politica" aria-describedby="aceite-politica-error" />
+            <span>
+              Li e concordo com a
+              <a href="privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a>.
+            </span>
+          </label>
+          <span id="aceite-politica-error" class="form-error hidden"></span>
+
+          <label class="consent-check" for="aceite-saude">
+            <input type="checkbox" id="aceite-saude" aria-describedby="aceite-saude-error" />
+            <span>
+              Se eu informar peso e altura, autorizo o uso desses dados de
+              saúde para calcular meu IMC e acompanhar minha evolução.
+            </span>
+          </label>
+          <span id="aceite-saude-error" class="form-error hidden"></span>
+        </fieldset>
         <button
           type="submit"
           class="btn-primary btn-block btn-lg mt-8"

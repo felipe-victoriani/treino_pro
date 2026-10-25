@@ -55,6 +55,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Guarda os dados validados para usar após confirmação do modal
   let dadosPendentes = null;
 
+  // Versão da Política de Privacidade aceita no cadastro (data da última atualização)
+  const POLITICA_VERSAO = "2026-10-24";
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     clearErrors();
@@ -110,7 +113,30 @@ document.addEventListener("DOMContentLoaded", async () => {
       showFieldError("professor-error", "Selecione um professor");
       hasError = true;
     }
+
+    // Consentimento (LGPD): política sempre; dados de saúde (art. 11) só
+    // quando peso ou altura forem informados
+    const informouSaude = peso !== null || altura !== null;
+    const aceitouPolitica = document.getElementById("aceite-politica")?.checked;
+    const aceitouSaude = document.getElementById("aceite-saude")?.checked;
+    if (!aceitouPolitica) {
+      showFieldError("aceite-politica-error", "Aceite a Política de Privacidade para continuar");
+      hasError = true;
+    }
+    if (informouSaude && !aceitouSaude) {
+      showFieldError(
+        "aceite-saude-error",
+        "Autorize o uso de peso e altura, ou deixe esses campos em branco",
+      );
+      hasError = true;
+    }
     if (hasError) return;
+
+    const consentimento = {
+      politicaVersao: POLITICA_VERSAO,
+      aceitoEm: Date.now(),
+      dadosSaude: informouSaude && !!aceitouSaude,
+    };
 
     // Calcular IMC se peso e altura informados
     let imc = null;
@@ -131,6 +157,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         imc,
         modo,
         profId,
+        consentimento,
       };
       abrirAvisoProfessor();
       return;
@@ -147,6 +174,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       imc,
       modo,
       profId,
+      consentimento,
     });
   });
 
@@ -201,6 +229,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     imc,
     modo,
     profId,
+    consentimento,
   }) {
     setLoading(true);
 
@@ -225,6 +254,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         imc: imc || null,
         ativo: true,
         createdAt: timestamp,
+        // Registro do aceite da política / consentimento de dados de saúde
+        consentimento: consentimento || null,
       };
 
       if (profId) {

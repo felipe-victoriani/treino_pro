@@ -176,6 +176,123 @@ exports.deletarAluno = onCall(async (request) => {
   }
 });
 
+// ── Função: Excluir a própria conta (LGPD / Play Store / App Store) ──
+// O próprio usuário (aluno ou professor) apaga a conta e todos os dados.
+// Exige login recente (≤ 5 min): o cliente reautentica com a senha antes
+// de chamar, então um token antigo/roubado não basta para excluir.
+const JANELA_LOGIN_RECENTE_S = 5 * 60;
+
+// Nós do Realtime Database que pertencem a cada tipo de conta
+const NOS_ALUNO = [
+  "users", "alunos", "treinos", "dietas", "mensagens",
+  "historicoTreinos", "historicoIMC", "conquistas", "rateLimits",
+];
+const NOS_PROFESSOR = [
+  "users", "professores", "professoresPublico", "favoritosProfessor",
+  "recentesProfessor", "exerciciosCustom", "rateLimits",
+];
+
+/** Apaga arquivos do Storage por prefixo; falha aqui não bloqueia a exclusão. */
+async function apagarStoragePorPrefixo(prefixo) {
+  try {
+    await admin.storage().bucket().deleteFiles({ prefix: prefixo });
+  } catch (err) {
+    console.error("[ExcluirConta] Falha ao limpar Storage:", prefixo, err.message);
+  }
+}
+
+/** Monta o update multi-path que remove os dados de um professor. */
+async function montarRemocaoProfessor(uid, updates) {
+  NOS_PROFESSOR.forEach((no) => (updates[`${no}/${uid}`] = null));
+
+  // Desvincula os alunos e remove as mensagens que o professor enviou
+  const alunosSnap = await db
+    .ref("alunos")
+    .orderByChild("professorId")
+    .equalTo(uid)
+    .once("value");
+  const alunoIds = [];
+  alunosSnap.forEach((c) => {
+    alunoIds.push(c.key);
+  });
+  for (const alunoId of alunoIds) {
+    ["alunos", "users"].forEach((no) => {
+      updates[`${no}/${alunoId}/professorId`] = null;
+      updates[`${no}/${alunoId}/professorNome`] = null;
+    });
+    const msgsSnap = await db.ref(`mensagens/${alunoId}`).once("value");
+    msgsSnap.forEach((m) => {
+      if (m.val()?.deUid === uid) updates[`mensagens/${alunoId}/${m.key}`] = null;
+    });
+  }
+}
+
+exports.excluirMinhaConta = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Usuário não autenticado");
+  }
+  const uid = request.auth.uid;
+
+  // Confirmação de identidade: login feito há poucos minutos
+  const authTime = Number(request.auth.token?.auth_time || 0);
+  if (Date.now() / 1000 - authTime > JANELA_LOGIN_RECENTE_S) {
+    throw new HttpsError(
+      "failed-precondition",
+      "Confirme sua senha novamente para excluir a conta.",
+    );
+  }
+
+  const tipo = (await db.ref(`users/${uid}/tipo`).once("value")).val();
+  if (tipo === "admin") {
+    // Excluir o único admin trancaria o sistema; feito só manualmente
+    throw new HttpsError(
+      "permission-denied",
+      "Conta de administrador não pode ser excluída por aqui.",
+    );
+  }
+
+  const updates = {};
+  if (tipo === "professor") {
+    await montarRemocaoProfessor(uid, updates);
+  } else {
+    NOS_ALUNO.forEach((no) => (updates[`${no}/${uid}`] = null));
+  }
+
+  // Vídeos de exercício: do professor (pasta dele) ou feitos para o aluno
+  let prefixoStorage = null;
+  if (tipo === "professor") {
+    prefixoStorage = `exerciciosVideos/${uid}/`;
+  } else {
+    const profId = (
+      await db.ref(`alunos/${uid}/professorId`).once("value")
+    ).val();
+    if (profId) prefixoStorage = `exerciciosVideos/${profId}/${uid}/`;
+  }
+
+  try {
+    // 1. Dados primeiro: se a conta Auth falhar depois, não sobra dado órfão
+    await db.ref().update(updates);
+    if (prefixoStorage) await apagarStoragePorPrefixo(prefixoStorage);
+
+    // 2. Conta de autenticação (libera o e-mail)
+    try {
+      await admin.auth().deleteUser(uid);
+    } catch (authErr) {
+      if (authErr.code !== "auth/user-not-found") throw authErr;
+    }
+
+    // Log sem dado pessoal: só uid e tipo
+    console.log("[ExcluirConta] Conta excluída", { uid, tipo: tipo || "aluno" });
+    return { success: true };
+  } catch (error) {
+    console.error("[ExcluirConta] Erro", { uid, msg: error.message });
+    throw new HttpsError(
+      "internal",
+      "Não foi possível excluir a conta. Tente novamente.",
+    );
+  }
+});
+
 // ── Função: Gerar Treino com IA (Claude Haiku) ───────────
 // CORS: onCall só aceita chamadas via Firebase SDK (protegido automaticamente)
 // Rate limit: máximo 10 gerações por usuário por dia (contagem em /rateLimits)

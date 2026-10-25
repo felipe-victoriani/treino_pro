@@ -202,3 +202,25 @@ body {
   background: #f1f0ec;
   color: #111111;
 }
+
+/* Rodapé da landing: crédito + link da política de privacidade */
+.landing-footer {
+  width: 100%;
+  text-align: center;
+  padding: 1.5rem 16px 1rem;
+  font-size: 0.9rem;
+  color: #787774;
+}
+
+.landing-footer p {
+  margin: 0 0 6px;
+}
+
+.landing-footer a {
+  color: #5f5e5b;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  /* alvo de toque confortável */
+  display: inline-block;
+  padding: 8px 4px;
+}
