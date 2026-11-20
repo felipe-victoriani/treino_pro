@@ -2746,14 +2746,14 @@ textarea.form-control {
   overflow: hidden;
 }
 
-.welcome-banner::after {
-  content: "💪";
-  position: absolute;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 3rem;
-  opacity: 0.3;
+/* (O emoji decorativo 💪 em ::after foi removido: ficava por cima do texto no celular) */
+
+/* Badges do banner alinhados à esquerda, junto com o texto */
+.welcome-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
 }
 
 .welcome-banner h2 {
@@ -5308,4 +5308,69 @@ h4 {
   color: var(--text-white);
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+/* ============================================================
+   AJUSTES MOBILE (varredura UI/UX 2026-11)
+   ============================================================ */
+
+/* Ícones dos atalhos (Início do aluno): neutros, sem cor por card.
+   Cor fica reservada para status. */
+.quick-card-icon {
+  background: var(--ink-100);
+  color: var(--ink-900);
+}
+.quick-card-icon svg {
+  color: var(--ink-900);
+}
+
+/* Conquistas: colunas se adaptam à largura (5 colunas fixas
+   cortavam os 2 últimos itens no celular). */
+.conquistas-grid {
+  grid-template-columns: repeat(auto-fill, minmax(66px, 1fr));
+}
+.conquista-item {
+  min-width: 0;
+}
+/* Quebra por hifenização (pt-BR), não no meio da palavra */
+.conquista-nome {
+  font-size: 0.66rem;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+
+/* Pílulas de série: até 4 por linha no celular (antes S4 ficava sozinha) */
+.series-pills-row {
+  grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
+}
+
+@media (max-width: 600px) {
+  /* Stats do professor: faixa compacta de 2 colunas, ícone ao lado do número */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .stat-card {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    column-gap: 12px;
+    align-items: center;
+    padding: 14px;
+    text-align: left;
+  }
+  .stat-card .stat-icon {
+    grid-row: 1 / span 2;
+    width: 38px;
+    height: 38px;
+    margin: 0;
+  }
+  .stat-card h3 {
+    font-size: 1.4rem;
+    margin: 0;
+  }
+  .stat-card p {
+    font-size: 0.72rem;
+  }
 }

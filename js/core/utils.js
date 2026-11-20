@@ -265,14 +265,9 @@ function getInitials(nome) {
  * @returns {string}
  */
 function getAvatarColor(nome) {
-  const colors = [
-    "#111111",
-    "#9f2f2d",
-    "#00BCD4",
-    "#346538",
-    "#956400",
-    "#E91E63",
-  ];
+  // Só tons neutros escuros (tema monocromático); todos com contraste
+  // AA para o texto branco das iniciais.
+  const colors = ["#111111", "#2f3437", "#45443f", "#5f5e5b"];
   let hash = 0;
   for (let i = 0; i < (nome || "").length; i++) {
     hash = nome.charCodeAt(i) + ((hash << 5) - hash);

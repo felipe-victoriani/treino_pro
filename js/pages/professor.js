@@ -32,7 +32,10 @@ document.addEventListener("userReady", async function (e) {
   // Header de boas-vindas
   var welcomeEl = document.getElementById("dashboard-welcome");
   if (welcomeEl)
-    welcomeEl.textContent = "Ola, " + sanitize(profState.nome) + "!";
+    // textContent já é seguro: sanitize aqui exibiria "&amp;" literal.
+    // Só o primeiro nome, para a saudação não quebrar linha no celular.
+    welcomeEl.textContent =
+      "Olá, " + String(profState.nome || "").split(" ")[0] + "!";
   setupNavigation();
   setupLogout();
   if (typeof initVideoUploadListeners === "function")
@@ -157,10 +160,6 @@ async function loadDashboard() {
         recentes.push(Object.assign({ uid: uid, naoLidas: naoLidas }, aluno));
       }
     }
-
-    // ⚡ Stat de treinos agora mostra apenas "Ver detalhes" para evitar query pesada
-    var statTreinos = document.getElementById("stat-treinos");
-    if (statTreinos) statTreinos.textContent = "Ver detalhes";
 
     var statMsgs = document.getElementById("stat-msgs");
     if (statMsgs) statMsgs.textContent = totalMsgNaoLidas;
@@ -388,6 +387,10 @@ function renderAlunosRecentes(alunos) {
         getAvatarColor(a.nome) +
         '">' +
         sanitize(getInitials(a.nome || "Aluno")) +
+        "</div>" +
+        // Nome do aluno ao lado do avatar (faltava: o card só mostrava as iniciais)
+        '<div class="student-card-name">' +
+        sanitize(a.nome || "Aluno") +
         "</div>" +
         "</div>" +
         '<div class="student-card-stats">' +

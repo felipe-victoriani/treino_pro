@@ -168,7 +168,10 @@ async function loadInicio() {
 
     // Boas-vindas
     const welcomeEl = document.getElementById("welcome-name");
-    if (welcomeEl) welcomeEl.textContent = "Ola, " + alunoState.nome + "!";
+    // Só o primeiro nome: nome completo quebrava linha no celular
+    if (welcomeEl)
+      welcomeEl.textContent =
+        "Olá, " + String(alunoState.nome || "").split(" ")[0] + "!";
 
     // Treino do dia na badge
     const treinoDia = document.getElementById("treino-dia-letra");

@@ -129,8 +129,9 @@
     --bottom-nav-height: 65px;
   }
 
+  /* 2 colunas compactas (ver "AJUSTES MOBILE" em style.css) */
   .stats-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .workout-tab-btn {
