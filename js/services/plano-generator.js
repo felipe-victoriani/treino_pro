@@ -1,7 +1,8 @@
 /* ============================================================
    TREINO PRO — Gerador de Planos Local
    Cria planos de treino personalizados sem depender de APIs externas.
-   Mesmo formato de saída da Gemini API para compatibilidade total.
+   Mesmo formato de saída da Cloud Function gerarTreino (Claude),
+   para os dois caminhos serem intercambiáveis.
    ============================================================ */
 
 /* ──────────────────────────────────────────────────────────────
