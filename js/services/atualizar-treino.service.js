@@ -182,9 +182,16 @@ const AtualizarTreinoService = (() => {
   // Cada exercício antigo é trocado por um novo do MESMO grupo, na mesma
   // posição. Sem novo disponível (catálogo pequeno), o antigo fica.
   function _encaixar(antigos, novos) {
+    // IA às vezes devolve o mesmo exercício: isso não conta como troca
+    const norm = TreinoIAService.normNome;
+    const idsAntigos = new Set(antigos.map((a) => a.exercicioId || a.id).filter(Boolean));
+    const nomesAntigos = new Set(antigos.map((a) => norm(a.nome)));
+    const repetido = (ex) =>
+      (ex.id && idsAntigos.has(ex.id)) || nomesAntigos.has(norm(ex.nome));
+
     const fila = new Map();
     novos.forEach((ex) => {
-      if (!ex.grupo) return;
+      if (!ex.grupo || repetido(ex)) return;
       if (!fila.has(ex.grupo)) fila.set(ex.grupo, []);
       fila.get(ex.grupo).push(ex);
     });
@@ -340,7 +347,7 @@ const AtualizarTreinoUI = (() => {
       .at-lista{max-height:52vh;overflow-y:auto;padding-right:4px}
       .at-rodape{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
       .at-rodape .at-esq{margin-right:auto}
-      @media (max-width:520px){.at-linha{grid-template-columns:1fr;gap:2px}.at-seta{display:none}.at-rodape button{flex:1}}
+      @media (max-width:520px){.at-linha{grid-template-columns:1fr;gap:2px}.at-seta{display:none}.at-rodape{flex-direction:column-reverse}.at-rodape button{width:100%;white-space:normal}.at-rodape .at-esq{margin-right:0}}
     `;
     document.head.appendChild(css);
 
@@ -470,7 +477,7 @@ const AtualizarTreinoUI = (() => {
             if (novo) novos++;
             return novo
               ? `<div class="at-linha"><span class="at-antigo">${esc(antigo.nome)}</span><span class="at-seta" aria-hidden="true">→</span><span class="at-novo">${esc(novo.nome)}</span></div>`
-              : `<div class="at-linha"><span>${esc(antigo.nome)}</span><span class="at-seta" aria-hidden="true">·</span><span class="at-mantido">mantido</span></div>`;
+              : `<div class="at-linha"><span>${esc(antigo.nome)}</span><span class="at-seta" aria-hidden="true">·</span><span class="at-mantido">mantido · sem alternativa</span></div>`;
           })
           .join("");
         return `<div class="at-letra"><h4>Treino ${esc(l.letra)} — ${esc(l.nome)}</h4>${linhas}</div>`;
@@ -482,7 +489,7 @@ const AtualizarTreinoUI = (() => {
     _botoes([
       { texto: "Cancelar", acao: fechar, esquerda: true },
       { texto: "Gerar de novo", acao: _gerar },
-      ...(novos ? [{ texto: "Salvar no treino do aluno", classe: "btn-primary", acao: _salvar }] : []),
+      ...(novos ? [{ texto: "Salvar treino", classe: "btn-primary", acao: _salvar }] : []),
     ]);
   }
 

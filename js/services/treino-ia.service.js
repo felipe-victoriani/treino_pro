@@ -103,7 +103,12 @@ const TreinoIAService = (() => {
     return _cacheCatalogo.promessa;
   }
 
-  async function _buscarExercicios({ grupoMuscular, equipamentos, nivel }) {
+  async function _buscarExercicios({
+    grupoMuscular,
+    equipamentos,
+    nivel,
+    incluirInativos = false,
+  }) {
     const nivelPT = NIVEL_PT[nivel] || nivel;
     const niveisOk = NIVEIS_PERMITIDOS[nivelPT] || Object.values(NIVEL_PT);
     const equipFiltro = EQUIPAMENTOS_MAP[equipamentos] ?? null;
@@ -137,7 +142,9 @@ const TreinoIAService = (() => {
     });
 
     return lista.filter((ex) => {
-      if (ex.ativo === false) return false;
+      // inativos = import em inglês (fora da busca do professor). A IA
+      // traduz o nome, então servem quando o catálogo PT é pequeno.
+      if (ex.ativo === false && !incluirInativos) return false;
       // Se o exercício não tem nível definido, aceita (não penaliza por dado ausente)
       if (ex.nivel && !niveisOk.includes(ex.nivel)) return false;
       // Se o exercício não tem equipamento definido, aceita
@@ -433,20 +440,35 @@ Retorne APENAS este JSON, sem texto adicional:
       nomesEvitar.has(_normNome(ex.nome)) ||
       nomesEvitar.has(_normNome(ex.nome_original));
 
-    // 1. Buscar exercícios filtrados do Firebase (um grupo por vez)
+    // 1. Buscar exercícios filtrados do Firebase (um grupo por vez).
+    // Ao trocar exercícios (excluir), amplia a busca em etapas até ter
+    // novos suficientes: PT do nível → + importados → + outros níveis.
+    const etapas = excluir
+      ? [
+          { nivel, incluirInativos: false },
+          { nivel, incluirInativos: true },
+          { nivel: "AVANCADO", incluirInativos: true },
+        ]
+      : [{ nivel, incluirInativos: false }];
+
     for (const g of pedidos) {
-      const todos = await _buscarExercicios({
-        grupoMuscular: g.musculo,
-        equipamentos: equipamentos || "Academia completa",
-        nivel,
-      });
-      const novos = todos.filter((ex) => !evitar(ex));
       const precisa = g.qtdFixa || 1;
-      // catálogo pequeno: aceita repetir antigos só no que faltar
-      g.disponiveis =
-        novos.length >= precisa
-          ? novos
-          : [...novos, ...todos.filter(evitar)];
+      let todos = [];
+      let novos = [];
+      for (const etapa of etapas) {
+        todos = await _buscarExercicios({
+          grupoMuscular: g.musculo,
+          equipamentos: equipamentos || "Academia completa",
+          ...etapa,
+        });
+        novos = todos.filter((ex) => !evitar(ex));
+        if (novos.length >= precisa) break;
+      }
+      // ainda faltou: completa só o que falta com antigos (repetição mínima)
+      const faltam = Math.max(0, precisa - novos.length);
+      g.disponiveis = faltam
+        ? [...novos, ...todos.filter(evitar).slice(0, faltam)]
+        : novos;
     }
 
     const totalDisponivel = pedidos.reduce(
