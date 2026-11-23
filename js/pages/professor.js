@@ -568,6 +568,18 @@ async function selecionarAluno(uid) {
     // Botao voltar
     var btnBack = document.getElementById("btn-back-alunos");
     if (btnBack) btnBack.onclick = voltarParaAlunos;
+    // Atualizar exercícios (gera substitutos do mesmo grupo, com prévia)
+    var btnAtualizar = document.getElementById("btn-atualizar-exercicios");
+    if (btnAtualizar)
+      btnAtualizar.onclick = function () {
+        AtualizarTreinoUI.abrir({
+          alunoId: uid,
+          nome: data.nome,
+          aoSalvar: function () {
+            loadTreinoProfessor(uid, profState.treinoLetraAtual || "A");
+          },
+        });
+      };
     // Registra clicks nas sub-tabs
     setupSubTabs(uid);
     // Ativa sub-tab treinos por padrao

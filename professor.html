@@ -335,6 +335,18 @@
                       </svg>
                       Gerenciar Treinos
                     </h3>
+                    <!-- Troca os exercícios por outros do mesmo grupo (IA) -->
+                    <button
+                      type="button"
+                      class="btn-secondary btn-sm gap-6"
+                      id="btn-atualizar-exercicios"
+                      title="Gerar novos exercícios para este aluno"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M17.65 6.35A7.96 7.96 0 0 0 12 4a8 8 0 1 0 7.73 10h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
+                      </svg>
+                      Atualizar exercícios
+                    </button>
                   </div>
 
                   <!-- Tabs de treino A-E -->
@@ -1462,6 +1474,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-functions-compat.js"></script>
     <!-- Tom Select JS -->
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <!-- Fuse.js (fuzzy search) -->
@@ -1478,6 +1491,8 @@
     <script src="js/services/autocomplete.js"></script>
     <script src="js/services/exercicios-seed.js"></script>
     <script src="js/features/treinos.js"></script>
+    <script src="js/services/treino-ia.service.js"></script>
+    <script src="js/services/atualizar-treino.service.js"></script>
     <script src="js/features/dietas.js"></script>
     <script src="js/features/mensagens.js"></script>
     <script src="js/features/fcm.js"></script>

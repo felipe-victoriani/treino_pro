@@ -321,14 +321,20 @@ exports.gerarTreino = onCall(
       );
     }
 
-    // ── Rate limit: máx 20 chamadas por usuário por dia ────
+    // ── Rate limit diário por usuário ──────────────────────
+    // Aluno: 20 (monta o próprio plano). Professor/adm: 150 — o botão
+    // "Atualizar exercícios" gasta 1 geração por treino de cada aluno.
+    const tipoSnap = await db.ref(`users/${uid}/tipo`).once("value");
+    const equipe = ["admin", "professor"].includes(tipoSnap.val());
+    const limite = equipe ? 150 : 20;
+
     const hoje = new Date().toISOString().split("T")[0]; // ex: "2026-06-02"
     const rateRef = db.ref(`rateLimits/${uid}/${hoje}`);
 
     let permitido = false;
     await rateRef.transaction((atual) => {
       const count = atual ?? 0;
-      if (count >= 20) {
+      if (count >= limite) {
         permitido = false;
         return; // undefined = aborta sem gravar
       }
@@ -339,7 +345,7 @@ exports.gerarTreino = onCall(
     if (!permitido) {
       throw new HttpsError(
         "resource-exhausted",
-        "Limite diário de 20 gerações atingido. Tente novamente amanhã.",
+        `Limite diário de ${limite} gerações atingido. Tente novamente amanhã.`,
       );
     }
 

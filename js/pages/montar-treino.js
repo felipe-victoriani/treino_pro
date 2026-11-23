@@ -10,37 +10,59 @@ const NIVEL_LABELS = {
   AVANCADO: { label: "Experiente", icon: "" },
 };
 
-/* Divisão de treinos por número de dias → grupo muscular principal */
+/* Divisão de treinos por número de dias.
+   grupos: [musculo, peso] — o peso define a proporção de exercícios de
+   cada grupo dentro do treino (o total vem do nível: 6/7/8).
+   Ex.: Costas 2 + Bíceps 1 no Iniciante → 4 de costas e 2 de bíceps.
+   Todo grupo citado no nome PRECISA estar em grupos. */
 const SPLITS_POR_DIA = {
   2: [
-    { treino: "A", nome: "Superior", musculo: "Peitoral" },
-    { treino: "B", nome: "Inferior", musculo: "Pernas" },
+    {
+      treino: "A",
+      nome: "Superior",
+      grupos: [
+        ["Peitoral", 2],
+        ["Costas", 2],
+        ["Ombros", 1],
+        ["Bíceps", 1],
+        ["Tríceps", 1],
+      ],
+    },
+    { treino: "B", nome: "Inferior", grupos: [["Pernas", 1]] },
   ],
   3: [
-    { treino: "A", nome: "Peito + Tríceps", musculo: "Peitoral" },
-    { treino: "B", nome: "Costas + Bíceps", musculo: "Costas" },
-    { treino: "C", nome: "Pernas", musculo: "Pernas" },
+    { treino: "A", nome: "Peito + Tríceps", grupos: [["Peitoral", 2], ["Tríceps", 1]] },
+    { treino: "B", nome: "Costas + Bíceps", grupos: [["Costas", 2], ["Bíceps", 1]] },
+    { treino: "C", nome: "Pernas + Ombros", grupos: [["Pernas", 2], ["Ombros", 1]] },
   ],
   4: [
-    { treino: "A", nome: "Peito", musculo: "Peitoral" },
-    { treino: "B", nome: "Costas", musculo: "Costas" },
-    { treino: "C", nome: "Pernas", musculo: "Pernas" },
-    { treino: "D", nome: "Ombros + Braços", musculo: "Ombros" },
+    { treino: "A", nome: "Peito + Tríceps", grupos: [["Peitoral", 2], ["Tríceps", 1]] },
+    { treino: "B", nome: "Costas + Bíceps", grupos: [["Costas", 2], ["Bíceps", 1]] },
+    { treino: "C", nome: "Pernas", grupos: [["Pernas", 1]] },
+    {
+      treino: "D",
+      nome: "Ombros + Braços",
+      grupos: [
+        ["Ombros", 2],
+        ["Bíceps", 1],
+        ["Tríceps", 1],
+      ],
+    },
   ],
   5: [
-    { treino: "A", nome: "Peito", musculo: "Peitoral" },
-    { treino: "B", nome: "Costas", musculo: "Costas" },
-    { treino: "C", nome: "Pernas", musculo: "Pernas" },
-    { treino: "D", nome: "Ombros", musculo: "Ombros" },
-    { treino: "E", nome: "Braços", musculo: "Tríceps" },
+    { treino: "A", nome: "Peito", grupos: [["Peitoral", 1]] },
+    { treino: "B", nome: "Costas", grupos: [["Costas", 1]] },
+    { treino: "C", nome: "Pernas", grupos: [["Pernas", 1]] },
+    { treino: "D", nome: "Ombros", grupos: [["Ombros", 1]] },
+    { treino: "E", nome: "Bíceps + Tríceps", grupos: [["Bíceps", 1], ["Tríceps", 1]] },
   ],
   6: [
-    { treino: "A", nome: "Peito", musculo: "Peitoral" },
-    { treino: "B", nome: "Costas", musculo: "Costas" },
-    { treino: "C", nome: "Pernas", musculo: "Pernas" },
-    { treino: "D", nome: "Ombros", musculo: "Ombros" },
-    { treino: "E", nome: "Tríceps", musculo: "Tríceps" },
-    { treino: "F", nome: "Bíceps", musculo: "Bíceps" },
+    { treino: "A", nome: "Peito", grupos: [["Peitoral", 1]] },
+    { treino: "B", nome: "Costas", grupos: [["Costas", 1]] },
+    { treino: "C", nome: "Pernas", grupos: [["Pernas", 1]] },
+    { treino: "D", nome: "Ombros", grupos: [["Ombros", 1]] },
+    { treino: "E", nome: "Tríceps", grupos: [["Tríceps", 1]] },
+    { treino: "F", nome: "Bíceps", grupos: [["Bíceps", 1]] },
   ],
 };
 
@@ -186,7 +208,7 @@ async function gerarTreino(user, nivel) {
         uid: user.uid,
         nivel,
         objetivo,
-        grupoMuscular: day.musculo,
+        grupos: day.grupos.map(([musculo, peso]) => ({ musculo, peso })),
         equipamentos,
       });
 

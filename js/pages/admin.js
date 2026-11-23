@@ -403,6 +403,10 @@ async function carregarAlunos() {
               }
             </div>
             <div class="admin-prof-actions">
+              <button class="btn-icon" title="Atualizar exercícios" aria-label="Atualizar exercícios de ${sanitize(a.nome || "aluno")}"
+                data-atualizar-aluno="${sanitize(a.id)}" data-nome="${sanitize(a.nome || "")}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.65 6.35A7.96 7.96 0 0 0 12 4a8 8 0 1 0 7.73 10h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+              </button>
               <button class="btn-icon" title="Editar aluno"
                 onclick='abrirEditarAluno(${JSON.stringify(a)})'>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
@@ -421,6 +425,16 @@ async function carregarAlunos() {
     }
 
     lista.innerHTML = html;
+
+    // Atualizar exercícios: id/nome vêm de data-* (sem montar JS em string)
+    lista.querySelectorAll("[data-atualizar-aluno]").forEach((btn) => {
+      btn.addEventListener("click", () =>
+        AtualizarTreinoUI.abrir({
+          alunoId: btn.dataset.atualizarAluno,
+          nome: btn.dataset.nome,
+        }),
+      );
+    });
   } catch (err) {
     lista.innerHTML =
       '<div class="empty-state"><p>Erro ao carregar alunos.</p></div>';
