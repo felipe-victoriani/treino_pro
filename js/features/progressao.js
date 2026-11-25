@@ -8,19 +8,19 @@
 const FASES_INFO = {
   1: {
     nome: "Iniciante",
-    cor: "#111111",
+    cor: "#ff5a1f",
     icone: "",
     desc: "Construindo a base",
   },
   2: {
     nome: "Intermediário",
-    cor: "#2196F3",
+    cor: "#3b82f6",
     icone: "",
     desc: "Intensidade aumentada",
   },
   3: {
     nome: "Avançado",
-    cor: "#956400",
+    cor: "#c6f432",
     icone: "",
     desc: "Nível elite alcançado",
   },

@@ -368,10 +368,10 @@ async function renderSemanaChart() {
       const entry = historico[key];
       if (!entry) {
         valores.push(0);
-        cores.push("rgba(17, 17, 17, 0.15)");
+        cores.push("rgba(244, 244, 242, 0.08)");
       } else if (entry.completado) {
         valores.push(100);
-        cores.push("rgba(17, 17, 17, 0.9)");
+        cores.push("#c6f432");
       } else {
         const pct =
           entry.totalExercicios > 0
@@ -380,7 +380,7 @@ async function renderSemanaChart() {
               )
             : 0;
         valores.push(pct);
-        cores.push("rgba(17, 17, 17, 0.45)");
+        cores.push("#ff5a1f");
       }
     }
 
@@ -429,13 +429,13 @@ async function renderSemanaChart() {
             max: 100,
             ticks: {
               callback: (v) => v + "%",
-              color: "#787774",
+              color: "#858c97",
               font: { size: 10 },
             },
-            grid: { color: "rgba(0,0,0,0.05)" },
+            grid: { color: "rgba(244,244,242,0.06)" },
           },
           x: {
-            ticks: { color: "#787774", font: { size: 11 } },
+            ticks: { color: "#858c97", font: { size: 11 } },
             grid: { display: false },
           },
         },
@@ -769,13 +769,13 @@ async function loadPerfilSection() {
               profEl.style.color = "";
             } else {
               profEl.textContent = "Sem professor vinculado";
-              profEl.style.color = "#787774";
+              profEl.style.color = "#858c97";
             }
           }
         });
     } else if (profEl) {
       profEl.textContent = "Sem professor vinculado";
-      profEl.style.color = "#787774";
+      profEl.style.color = "#858c97";
     }
     // Objetivo
     const objetivoRow = document.getElementById("perfil-objetivo-row");
@@ -827,10 +827,10 @@ async function renderIMCChart() {
         datasets: [
           {
             data: imcs,
-            borderColor: "#111111",
-            backgroundColor: "rgba(17,17,17,0.06)",
+            borderColor: "#ff5a1f",
+            backgroundColor: "rgba(255,90,31,0.12)",
             borderWidth: 2,
-            pointBackgroundColor: "#111111",
+            pointBackgroundColor: "#ff5a1f",
             pointRadius: 4,
             fill: true,
             tension: 0.4,
@@ -842,11 +842,11 @@ async function renderIMCChart() {
         plugins: { legend: { display: false } },
         scales: {
           y: {
-            ticks: { color: "#787774", font: { size: 10 } },
-            grid: { color: "rgba(0,0,0,0.05)" },
+            ticks: { color: "#858c97", font: { size: 10 } },
+            grid: { color: "rgba(244,244,242,0.06)" },
           },
           x: {
-            ticks: { color: "#787774", font: { size: 10 } },
+            ticks: { color: "#858c97", font: { size: 10 } },
             grid: { display: false },
           },
         },
@@ -1052,10 +1052,10 @@ async function renderCargaHistoricoChart(exId, alunoId) {
         datasets: [
           {
             data: entries.map((e) => parseFloat(e.carga) || null),
-            borderColor: "#111111",
-            backgroundColor: "rgba(17,17,17,0.06)",
+            borderColor: "#ff5a1f",
+            backgroundColor: "rgba(255,90,31,0.12)",
             borderWidth: 2,
-            pointBackgroundColor: "#111111",
+            pointBackgroundColor: "#ff5a1f",
             pointRadius: 5,
             fill: true,
             tension: 0.3,
@@ -1076,11 +1076,11 @@ async function renderCargaHistoricoChart(exId, alunoId) {
         },
         scales: {
           y: {
-            ticks: { color: "#787774", font: { size: 10 } },
-            grid: { color: "rgba(0,0,0,0.05)" },
+            ticks: { color: "#858c97", font: { size: 10 } },
+            grid: { color: "rgba(244,244,242,0.06)" },
           },
           x: {
-            ticks: { color: "#787774", font: { size: 10 } },
+            ticks: { color: "#858c97", font: { size: 10 } },
             grid: { display: false },
           },
         },

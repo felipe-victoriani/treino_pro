@@ -153,7 +153,7 @@ function renderCardPrograma(programa) {
         font-weight: 600;
         cursor: pointer;
         transition: all 0.2s;
-      " onmouseover="this.style.background='#e1f3fe'"
+      " onmouseover="this.style.background='var(--info-bg)'"
          onmouseout="this.style.background='transparent'">
         Ver exercícios →
       </button>
@@ -314,7 +314,7 @@ function abrirDetalhes(id) {
     <p style="font-size:0.82rem;color:var(--text-muted);margin:0 0 20px;line-height:1.6;">${sanitize(programa.descricao)}</p>
     ${treinosHtml}
     <button onclick="fecharDetalhes();selecionarPrograma('${sanitize(programa.id)}')" style="
-      width:100%;padding:14px;background:var(--gradient-primary);color:white;
+      width:100%;padding:14px;background:var(--gradient-primary);color:var(--on-accent);
       border:none;border-radius:var(--radius-xl);font-size:1rem;font-weight:700;
       cursor:pointer;margin-top:8px;
     ">

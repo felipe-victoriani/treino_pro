@@ -11,28 +11,23 @@
     />
     <title>Acesso Restrito</title>
     <link rel="manifest" href="manifest.json" />
-    <meta name="theme-color" content="#f7f6f3" />
+    <meta name="theme-color" content="#0f1115" />
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/responsive.css" />
     <style>
       body.login-page {
-        background: linear-gradient(
-          135deg,
-          #f7f6f3 0%,
-          #ffffff 50%,
-          #ffffff 100%
-        );
+        background: var(--bg-app);
       }
       .login-logo-icon {
-        background: linear-gradient(135deg, #eaeaea, #ffffff);
+        background: var(--accent);
       }
       .admin-badge {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        background: #fdebec;
-        border: 1px solid rgba(159, 47, 45, 0.3);
-        color: #9f2f2d;
+        background: var(--err-bg);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: var(--err-fg);
         font-size: 11px;
         font-weight: 600;
         letter-spacing: 0.08em;
@@ -48,14 +43,14 @@
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        color: rgba(17, 17, 17, 0.35);
+        color: rgba(244, 244, 242, 0.35);
         font-size: 13px;
         text-decoration: none;
         margin-top: 20px;
         transition: color 0.2s;
       }
       .back-link:hover {
-        color: rgba(17, 17, 17, 0.6);
+        color: rgba(244, 244, 242, 0.6);
       }
     </style>
   </head>
@@ -64,7 +59,7 @@
       <!-- Logo -->
       <div class="login-logo">
         <div class="login-logo-icon">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="#0f1115">
             <path
               d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"
             />

@@ -290,7 +290,7 @@ function mostrarPreview(planData, user, nivel, objetivo, dias, equipamentos) {
             <div class="ex-row">
               <strong>${safe(ex.nome)}</strong>
               <span>${ex.series}x ${safe(ex.repeticoes)} · ${safe(ex.descanso)}</span>
-              ${ex.observacao ? `<span style="display:block;font-size:.75rem;color:#64748b;margin-top:2px">${safe(ex.observacao)}</span>` : ""}
+              ${ex.observacao ? `<span style="display:block;font-size:.75rem;color:var(--text-muted);margin-top:2px">${safe(ex.observacao)}</span>` : ""}
             </div>`,
             )
             .join("")}

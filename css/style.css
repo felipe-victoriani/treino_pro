@@ -1,109 +1,132 @@
 /* ============================================================
    TREINO PRO - Estilos Principais
-   Tema: claro quente, monocromático; cor só para status
+   Tema: escuro esportivo (grafite). Regra 60-30-10:
+   60% fundo, 30% superfícies/texto, 10% laranja (ação) + lima (conquista).
+   Ação = quente (laranja/vermelho), descanso = frio (azul).
    ============================================================ */
 @import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap");
 
 /* ---- Variáveis CSS (Design Tokens) ---- */
 :root {
-  /* Escala neutra (carvão → osso). Base de todo o tema. */
-  --ink-900: #111111;
-  --ink-700: #2f3437;
-  --ink-500: #5f5e5b;
-  --ink-400: #787774;
-  --ink-300: #a5a49f;
-  --ink-200: #d9d8d4;
-  --ink-150: #eaeaea;
-  --ink-100: #f1f0ec;
-  --ink-50: #f7f6f3;
+  /* Controles nativos (scroll, date, select) no modo escuro */
+  color-scheme: dark;
 
-  /* Status (pastéis lavados; únicos usos de cor) */
-  --ok-bg: #edf3ec;
-  --ok-fg: #346538;
-  --warn-bg: #fbf3db;
-  --warn-fg: #956400;
-  --err-bg: #fdebec;
-  --err-fg: #9f2f2d;
-  --info-bg: #e1f3fe;
-  --info-fg: #1f6c9f;
+  /* ---- Marca (psicologia das cores) ---- */
+  /* Ação: CTA "Iniciar treino", botões, aba ativa. Texto escuro por cima (AA). */
+  --accent: #ff5a1f;
+  --accent-hover: #ff7440;
+  --accent-soft: rgba(255, 90, 31, 0.14);
+  --on-accent: #0f1115;
+  /* Conquista: só recorde, streak e meta batida (reforço positivo) */
+  --win: #c6f432;
+  --win-soft: rgba(198, 244, 50, 0.12);
+  --on-win: #0f1115;
+  /* Intensidade: HIIT, timer, carga máxima. Usar pouco. */
+  --intense: #e5262e;
+  --intense-soft: rgba(229, 38, 46, 0.14);
+  /* Descanso/recuperação: pausa entre séries, alongamento (frio) */
+  --rest: #3b82f6;
+  --rest-soft: rgba(59, 130, 246, 0.14);
 
-  /* Aliases legados (green/purple/blue/cyan) → escala neutra.
-     500/600 = destaque (preto), 400 = texto de destaque, 300 = secundário,
+  /* Escala neutra (900 = primeiro plano mais forte → 50 = fundo).
+     Mesma semântica do tema antigo, valores invertidos para o escuro. */
+  --ink-900: #f4f4f2;
+  --ink-700: #d9dce0;
+  --ink-500: #9ba1ab;
+  --ink-400: #858c97;
+  --ink-300: #5c626c;
+  --ink-200: #2a2e36;
+  --ink-150: #262a31;
+  --ink-100: #22262d;
+  --ink-50: #0f1115;
+
+  /* Status (fundo translúcido + texto vivo; todos AA sobre #1a1d23) */
+  --ok-bg: rgba(34, 197, 94, 0.12);
+  --ok-fg: #22c55e;
+  --warn-bg: rgba(245, 158, 11, 0.12);
+  --warn-fg: #f59e0b;
+  --err-bg: rgba(239, 68, 68, 0.12);
+  --err-fg: #ef4444;
+  --info-bg: rgba(59, 130, 246, 0.14);
+  --info-fg: #60a5fa; /* azul de descanso clareado p/ texto pequeno (AA) */
+
+  /* Aliases legados (green/purple/blue/cyan).
+     500/600 = destaque (laranja), 400 = texto de destaque, 300 = secundário,
      700 = trilho/scroll, 800/900 = superfícies de hover. */
-  --green-900: #f7f6f3;
-  --green-800: #f1f0ec;
-  --green-700: #d9d8d4;
-  --green-600: #111111;
-  --green-500: #111111;
-  --green-400: #2f3437;
-  --green-300: #787774;
-  --green-200: #eaeaea;
-  --green-100: #f1f0ec;
+  --green-900: #1a1d23;
+  --green-800: #22262d;
+  --green-700: #2a2e36;
+  --green-600: #ff5a1f;
+  --green-500: #ff5a1f;
+  --green-400: #f4f4f2;
+  --green-300: #9ba1ab;
+  --green-200: #2a2e36;
+  --green-100: #22262d;
 
-  --purple-900: #f7f6f3;
-  --purple-800: #f1f0ec;
-  --purple-700: #d9d8d4;
-  --purple-600: #111111;
-  --purple-500: #111111;
-  --purple-400: #2f3437;
-  --purple-300: #787774;
+  --purple-900: #1a1d23;
+  --purple-800: #22262d;
+  --purple-700: #2a2e36;
+  --purple-600: #ff5a1f;
+  --purple-500: #ff5a1f;
+  --purple-400: #f4f4f2;
+  --purple-300: #9ba1ab;
 
-  --blue-900: #f7f6f3;
-  --blue-800: #f1f0ec;
-  --blue-700: #d9d8d4;
-  --blue-600: #111111;
-  --blue-500: #111111;
-  --blue-400: #2f3437;
-  --blue-300: #787774;
-  --blue-200: #eaeaea;
-  --blue-100: #f1f0ec;
+  --blue-900: #1a1d23;
+  --blue-800: #22262d;
+  --blue-700: #2a2e36;
+  --blue-600: #ff5a1f;
+  --blue-500: #ff5a1f;
+  --blue-400: #f4f4f2;
+  --blue-300: #9ba1ab;
+  --blue-200: #2a2e36;
+  --blue-100: #22262d;
 
-  --cyan-400: #2f3437;
-  --cyan-300: #787774;
-  --cyan-200: #eaeaea;
+  --cyan-400: #f4f4f2;
+  --cyan-300: #9ba1ab;
+  --cyan-200: #2a2e36;
 
-  /* Perigo (sóbrio) */
-  --red-500: #9f2f2d;
-  --red-400: #9f2f2d;
-  --red-300: #b5524f;
+  /* Perigo / erro */
+  --red-500: #ef4444;
+  --red-400: #ef4444;
+  --red-300: #f87171;
 
-  /* Backgrounds */
-  --bg-app: #f7f6f3;
-  --bg-dark: #f7f6f3;
-  --bg-card: #ffffff;
-  --bg-card-2: #fbfbfa;
-  --bg-card-3: #f1f0ec;
-  --bg-input: #ffffff;
-  --bg-overlay: rgba(17, 17, 17, 0.32);
+  /* Backgrounds: grafite (60%) → carvão (cards) */
+  --bg-app: #0f1115;
+  --bg-dark: #0f1115;
+  --bg-card: #1a1d23;
+  --bg-card-2: #1e2128;
+  --bg-card-3: #22262d;
+  --bg-input: #14171c;
+  --bg-overlay: rgba(0, 0, 0, 0.6);
 
-  /* Textos (--text-white = texto mais forte; nome mantido por compatibilidade) */
-  --text-white: #111111;
-  --text-primary: #2f3437;
-  --text-secondary: #5f5e5b;
-  --text-muted: #787774;
-  --text-accent: #111111;
+  /* Textos (--text-white = texto mais forte; off-white, cansa menos no escuro) */
+  --text-white: #f4f4f2;
+  --text-primary: #d9dce0;
+  --text-secondary: #9ba1ab;
+  --text-muted: #858c97;
+  --text-accent: #ff5a1f;
 
-  /* Bordas */
-  --border-blue: #d9d8d4;
-  --border-cyan: #eaeaea;
-  --border-subtle: rgba(0, 0, 0, 0.06);
-  --border-card: #eaeaea;
-  --border-purple: #d9d8d4;
+  /* Bordas: cinza aço */
+  --border-blue: #2a2e36;
+  --border-cyan: #23272e;
+  --border-subtle: rgba(244, 244, 242, 0.06);
+  --border-card: #2a2e36;
+  --border-purple: #2a2e36;
 
-  /* "Gradientes" agora são cores sólidas; linear-gradient de uma cor só
+  /* "Gradientes" são cores sólidas; linear-gradient de uma cor só
      funciona tanto em background quanto em background-clip: text. */
-  --gradient-primary: linear-gradient(#111111, #111111);
-  --gradient-blue: linear-gradient(#111111, #111111);
-  --gradient-cyan: linear-gradient(#111111, #111111);
-  --gradient-dark: linear-gradient(#f7f6f3, #f7f6f3);
-  --gradient-card: linear-gradient(#ffffff, #ffffff);
-  --gradient-hero: linear-gradient(#ffffff, #ffffff);
-  --gradient-red: linear-gradient(#9f2f2d, #9f2f2d);
+  --gradient-primary: linear-gradient(#ff5a1f, #ff5a1f);
+  --gradient-blue: linear-gradient(#ff5a1f, #ff5a1f);
+  --gradient-cyan: linear-gradient(#ff5a1f, #ff5a1f);
+  --gradient-dark: linear-gradient(#0f1115, #0f1115);
+  --gradient-card: linear-gradient(#1a1d23, #1a1d23);
+  --gradient-hero: linear-gradient(#1a1d23, #1a1d23);
+  --gradient-red: linear-gradient(#ef4444, #ef4444);
 
-  /* Sombras quase inexistentes */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
-  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.05);
+  /* Sombras: no escuro as camadas se separam pela superfície, não pela sombra */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.45);
   --shadow-blue: none;
   --shadow-cyan: none;
   --shadow-purple: none;
@@ -294,7 +317,7 @@ button {
 
 .btn-primary {
   background: var(--gradient-primary);
-  color: #fff;
+  color: var(--on-accent);
   box-shadow: none;
 }
 
@@ -314,23 +337,23 @@ button {
 }
 
 .btn-secondary:hover {
-  background: rgba(17, 17, 17, 0.08);
+  background: rgba(244, 244, 242, 0.08);
   border-color: var(--purple-400);
 }
 
 .btn-danger {
   background: var(--gradient-red);
-  color: #fff;
-  box-shadow: 0 4px 15px rgba(159, 47, 45, 0.3);
+  color: var(--on-accent);
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
 }
 
 .btn-danger:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(159, 47, 45, 0.3);
+  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
 }
 
 .btn-ghost {
-  background: rgba(17, 17, 17, 0.05);
+  background: rgba(244, 244, 242, 0.05);
   color: var(--text-secondary);
   border: 1px solid var(--border-subtle);
   padding: 8px 16px;
@@ -338,7 +361,7 @@ button {
 }
 
 .btn-ghost:hover {
-  background: rgba(17, 17, 17, 0.1);
+  background: rgba(244, 244, 242, 0.1);
   color: var(--text-white);
 }
 
@@ -359,7 +382,7 @@ button {
 }
 
 .btn-icon-ghost {
-  background: rgba(17, 17, 17, 0.08);
+  background: rgba(244, 244, 242, 0.08);
   border-color: transparent;
 }
 
@@ -418,7 +441,7 @@ button:disabled,
   outline: none;
   border-color: var(--purple-500);
   box-shadow: none;
-  background: rgba(17, 17, 17, 0.03);
+  background: rgba(244, 244, 242, 0.03);
 }
 
 .form-control::placeholder {
@@ -582,7 +605,7 @@ textarea.form-control {
   align-items: center;
   justify-content: center;
   margin: 0 auto 12px;
-  background: rgba(17, 17, 17, 0.08);
+  background: rgba(244, 244, 242, 0.08);
   color: var(--purple-400);
 }
 
@@ -624,31 +647,31 @@ textarea.form-control {
 }
 
 .badge-purple {
-  background: rgba(17, 17, 17, 0.1);
+  background: rgba(244, 244, 242, 0.1);
   color: var(--purple-400);
-  border: 1px solid rgba(17, 17, 17, 0.15);
+  border: 1px solid rgba(244, 244, 242, 0.15);
 }
 
 .badge-red {
   background: var(--err-bg);
   color: var(--red-300);
-  border: 1px solid rgba(159, 47, 45, 0.3);
+  border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
 .badge-green {
   background: var(--ok-bg);
   color: var(--ok-fg);
-  border: 1px solid rgba(52, 101, 56, 0.3);
+  border: 1px solid rgba(34, 197, 94, 0.3);
 }
 
 .badge-yellow {
   background: var(--warn-bg);
   color: var(--warn-fg);
-  border: 1px solid rgba(149, 100, 0, 0.3);
+  border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
 .badge-gray {
-  background: rgba(17, 17, 17, 0.08);
+  background: rgba(244, 244, 242, 0.08);
   color: var(--text-secondary);
 }
 
@@ -664,9 +687,9 @@ textarea.form-control {
   justify-content: center;
   font-size: 0.8rem;
   font-weight: 800;
-  color: #fff;
+  color: var(--text-white); /* fundo vem de getAvatarColor (carvão) */
   flex-shrink: 0;
-  border: 2px solid rgba(17, 17, 17, 0.1);
+  border: 2px solid rgba(244, 244, 242, 0.1);
 }
 
 /* Badge de nome colorido nos cards de aluno */
@@ -680,7 +703,7 @@ textarea.form-control {
   justify-content: center;
   font-size: 0.82rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-white); /* fundo vem de getAvatarColor (carvão) */
   flex-shrink: 0;
   white-space: nowrap;
   letter-spacing: 0.2px;
@@ -825,7 +848,7 @@ textarea.form-control {
 .spinner {
   width: 48px;
   height: 48px;
-  border: 3px solid rgba(17, 17, 17, 0.1);
+  border: 3px solid rgba(244, 244, 242, 0.1);
   border-top-color: var(--purple-500);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
@@ -894,7 +917,7 @@ textarea.form-control {
 }
 
 .modal-close {
-  background: rgba(17, 17, 17, 0.08);
+  background: rgba(244, 244, 242, 0.08);
   border: none;
   color: var(--text-secondary);
   width: 34px;
@@ -950,7 +973,7 @@ textarea.form-control {
   bottom: calc(var(--bottom-nav-height) + 16px);
   right: 16px;
   background: var(--gradient-primary);
-  color: #fff;
+  color: var(--on-accent);
   border: none;
   border-radius: var(--radius-pill);
   padding: 12px 20px;
@@ -979,7 +1002,7 @@ textarea.form-control {
   left: 0;
   right: 0;
   background: var(--gradient-primary);
-  color: #fff;
+  color: var(--on-accent);
   padding: 10px 20px;
   display: flex;
   align-items: center;
@@ -990,9 +1013,9 @@ textarea.form-control {
 }
 
 .update-banner button {
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  color: #fff;
+  background: rgba(15, 17, 21, 0.12);
+  border: 1px solid rgba(15, 17, 21, 0.35);
+  color: var(--on-accent);
   padding: 4px 12px;
   border-radius: var(--radius-pill);
   cursor: pointer;
@@ -1011,7 +1034,7 @@ textarea.form-control {
   background: var(--bg-dark);
   background-image: radial-gradient(
     ellipse at 50% 0%,
-    rgba(17, 17, 17, 0.03) 0%,
+    rgba(244, 244, 242, 0.03) 0%,
     transparent 55%
   );
   padding: 20px;
@@ -1195,7 +1218,7 @@ textarea.form-control {
 }
 
 .sidebar-nav-btn:hover {
-  background: rgba(17, 17, 17, 0.06);
+  background: rgba(244, 244, 242, 0.06);
   color: var(--text-white);
 }
 
@@ -1204,7 +1227,7 @@ textarea.form-control {
 }
 
 .sidebar-nav-btn.active {
-  background: rgba(17, 17, 17, 0.1);
+  background: rgba(244, 244, 242, 0.1);
   color: var(--purple-400);
   font-weight: 600;
 }
@@ -1229,7 +1252,7 @@ textarea.form-control {
 .nav-badge {
   margin-left: auto;
   background: var(--red-500);
-  color: #fff;
+  color: var(--on-accent);
   font-size: 0.7rem;
   font-weight: 700;
   padding: 2px 7px;
@@ -1250,7 +1273,7 @@ textarea.form-control {
   padding: 10px 12px;
   border-radius: var(--radius-md);
   margin-bottom: 8px;
-  background: rgba(17, 17, 17, 0.03);
+  background: rgba(244, 244, 242, 0.03);
 }
 
 .sidebar-user-info .user-details {
@@ -1536,7 +1559,7 @@ textarea.form-control {
   top: 8px;
   right: 8px;
   background: var(--err-fg);
-  color: #fff;
+  color: var(--on-accent);
   font-size: 0.68rem;
   font-weight: 700;
   min-width: 20px;
@@ -1547,7 +1570,7 @@ textarea.form-control {
   align-items: center;
   justify-content: center;
   line-height: 1;
-  box-shadow: 0 1px 4px rgba(159, 47, 45, 0.3);
+  box-shadow: 0 1px 4px rgba(239, 68, 68, 0.3);
   z-index: 2;
 }
 
@@ -1685,7 +1708,7 @@ textarea.form-control {
 
 .sub-tab-btn.active {
   background: var(--gradient-primary);
-  color: #fff;
+  color: var(--on-accent);
   box-shadow: var(--shadow-purple);
 }
 
@@ -1721,7 +1744,7 @@ textarea.form-control {
 .workout-tab-btn.active {
   background: var(--gradient-primary);
   border-color: transparent;
-  color: #fff;
+  color: var(--on-accent);
   box-shadow: var(--shadow-purple);
 }
 
@@ -1751,7 +1774,7 @@ textarea.form-control {
   align-items: center;
   gap: 6px;
   padding: 6px 14px;
-  background: rgba(17, 17, 17, 0.08);
+  background: rgba(244, 244, 242, 0.08);
   border: 1px solid var(--border-purple);
   border-radius: var(--radius-pill);
   font-size: 0.82rem;
@@ -1804,7 +1827,7 @@ textarea.form-control {
   justify-content: center;
   font-size: 0.7rem;
   font-weight: 800;
-  color: #fff;
+  color: var(--on-accent);
   flex-shrink: 0;
 }
 
@@ -1816,7 +1839,7 @@ textarea.form-control {
 }
 
 .exercise-meta-item {
-  background: rgba(17, 17, 17, 0.04);
+  background: rgba(244, 244, 242, 0.04);
   border-radius: var(--radius-sm);
   padding: 8px;
   text-align: center;
@@ -1839,7 +1862,7 @@ textarea.form-control {
 .exercise-obs {
   font-size: 0.82rem;
   color: var(--text-secondary);
-  background: rgba(17, 17, 17, 0.03);
+  background: rgba(244, 244, 242, 0.03);
   border-left: 3px solid var(--purple-700);
   padding: 8px 12px;
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
@@ -1884,7 +1907,7 @@ textarea.form-control {
   border-radius: 50%;
   font-size: 0.68rem;
   font-weight: 800;
-  color: #fff;
+  color: var(--on-accent);
   flex-shrink: 0;
 }
 .exercise-meta-text {
@@ -1916,7 +1939,7 @@ textarea.form-control {
   color: var(--purple-400);
   margin-top: 6px;
   padding: 6px 10px;
-  background: rgba(17, 17, 17, 0.08);
+  background: rgba(244, 244, 242, 0.08);
   border-radius: 8px;
   border-left: 2px solid var(--purple-600);
 }
@@ -1967,7 +1990,7 @@ textarea.form-control {
 .focus-chip.selected {
   background: var(--gradient-primary);
   border-color: transparent;
-  color: #fff;
+  color: var(--on-accent);
 }
 
 /* ============================================================
@@ -2016,7 +2039,7 @@ textarea.form-control {
   align-items: center;
   justify-content: space-between;
   padding: 14px 16px;
-  background: rgba(17, 17, 17, 0.05);
+  background: rgba(244, 244, 242, 0.05);
   border-bottom: 1px solid var(--border-card);
 }
 
@@ -2104,7 +2127,7 @@ textarea.form-control {
 .diet-dia-btn.active {
   background: var(--gradient-primary);
   border-color: transparent;
-  color: #fff;
+  color: var(--on-accent);
   box-shadow: none;
 }
 
@@ -2296,7 +2319,7 @@ textarea.form-control {
 .diet-dia-btn-aluno.active {
   background: var(--gradient-primary);
   border-color: transparent;
-  color: #fff;
+  color: var(--on-accent);
   box-shadow: none;
 }
 
@@ -2312,7 +2335,7 @@ textarea.form-control {
 .diet-dia-btn-aluno.has-data.active {
   background: var(--ok-fg);
   border-color: transparent;
-  color: #fff;
+  color: var(--on-accent);
   box-shadow: none;
 }
 
@@ -2346,7 +2369,7 @@ textarea.form-control {
   align-items: center;
   justify-content: space-between;
   padding: 14px 16px;
-  background: rgba(17, 17, 17, 0.06);
+  background: rgba(244, 244, 242, 0.06);
   border-bottom: 1px solid var(--border-card);
 }
 
@@ -2427,7 +2450,7 @@ textarea.form-control {
 
 .message-bubble.sent {
   background: var(--gradient-primary);
-  color: #fff;
+  color: var(--on-accent);
   align-self: flex-end;
   border-bottom-right-radius: var(--radius-xs);
   box-shadow: none;
@@ -2538,7 +2561,7 @@ textarea.form-control {
   flex: 14;
 } /* <18.5  → 14% dos 25 pts */
 .imc-seg-normal {
-  background: #111111;
+  background: var(--ok-fg);
   flex: 25;
 } /* 18.5–24.9 */
 .imc-seg-sobrepeso {
@@ -2556,9 +2579,9 @@ textarea.form-control {
   transform: translate(-50%, -50%);
   width: 14px;
   height: 14px;
-  background: #fff;
+  background: #f4f4f2;
   border-radius: 50%;
-  border: 2px solid var(--ink-900);
+  border: 2px solid var(--bg-app);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
   z-index: 2;
   pointer-events: none;
@@ -2653,7 +2676,7 @@ textarea.form-control {
   justify-content: center;
   font-size: 0.85rem;
   font-weight: 800;
-  color: #fff;
+  color: var(--on-accent);
 }
 
 .history-progress {
@@ -2678,7 +2701,7 @@ textarea.form-control {
 .empty-state-icon {
   width: 64px;
   height: 64px;
-  background: rgba(17, 17, 17, 0.05);
+  background: rgba(244, 244, 242, 0.05);
   border-radius: var(--radius-xl);
   display: flex;
   align-items: center;
@@ -2773,7 +2796,7 @@ textarea.form-control {
   align-items: center;
   gap: 6px;
   background: var(--gradient-primary);
-  color: #fff;
+  color: var(--on-accent);
   padding: 5px 14px;
   border-radius: var(--radius-pill);
   font-size: 0.82rem;
@@ -2950,7 +2973,7 @@ textarea.form-control {
   font-size: 0.78rem;
   font-weight: 700;
   color: var(--purple-400);
-  background: rgba(17, 17, 17, 0.08);
+  background: rgba(244, 244, 242, 0.08);
   border-radius: var(--radius-pill);
   padding: 2px 8px;
   transition: var(--transition-fast);
@@ -2995,7 +3018,7 @@ textarea.form-control {
 
 .finish-workout-btn {
   background: var(--gradient-primary);
-  color: #fff;
+  color: var(--on-accent);
   border: none;
   border-radius: var(--radius-pill);
   padding: 17px 32px;
@@ -3118,7 +3141,7 @@ textarea.form-control {
   color: var(--warn-fg);
 }
 .text-faded {
-  color: rgba(17, 17, 17, 0.2);
+  color: rgba(244, 244, 242, 0.2);
 }
 
 .text-sm {
@@ -3145,7 +3168,7 @@ textarea.form-control {
    UTILIDADES — ÍCONE BACKGROUNDS (quick cards)
    ============================================================ */
 .icon-bg-purple {
-  background: rgba(17, 17, 17, 0.08);
+  background: rgba(244, 244, 242, 0.08);
 }
 .icon-bg-red {
   background: var(--err-bg);
@@ -3228,8 +3251,8 @@ textarea.form-control {
   align-items: center;
   gap: 4px;
   background: transparent;
-  border: 1px solid #111111;
-  color: #111111;
+  border: 1px solid var(--border-card);
+  color: var(--text-white);
   border-radius: 8px;
   padding: 4px 10px;
   font-size: 0.8rem;
@@ -3238,7 +3261,7 @@ textarea.form-control {
   transition: background 0.2s;
 }
 .btn-editar:hover {
-  background: rgba(17, 17, 17, 0.05);
+  background: rgba(244, 244, 242, 0.05);
 }
 
 /* ============================================================
@@ -3414,8 +3437,8 @@ textarea.form-control {
     color 0.2s;
 }
 .tipo-btn.active {
-  background: #111111;
-  color: #fff;
+  background: var(--accent);
+  color: var(--on-accent);
   font-weight: 600;
 }
 
@@ -3517,7 +3540,7 @@ textarea.form-control {
 .ts-dropdown .ts-ex-option {
   padding: 10px 14px;
   cursor: pointer;
-  border-bottom: 1px solid rgba(17, 17, 17, 0.04);
+  border-bottom: 1px solid rgba(244, 244, 242, 0.04);
   transition: background 0.15s;
 }
 .ts-dropdown .ts-ex-option:last-child {
@@ -3525,7 +3548,7 @@ textarea.form-control {
 }
 .ts-dropdown .ts-ex-option:hover,
 .ts-dropdown .option.active {
-  background: rgba(17, 17, 17, 0.08);
+  background: rgba(244, 244, 242, 0.08);
 }
 .ts-ex-name {
   font-weight: 600;
@@ -3546,11 +3569,11 @@ textarea.form-control {
   line-height: 1.4;
 }
 .ts-tag-muscle {
-  background: rgba(17, 17, 17, 0.1);
+  background: rgba(244, 244, 242, 0.1);
   color: var(--purple-400, #2f3437);
 }
 .ts-tag-type {
-  background: rgba(17, 17, 17, 0.07);
+  background: rgba(244, 244, 242, 0.07);
   color: var(--text-secondary, rgba(17, 17, 17, 0.6));
 }
 .ts-tag-level {
@@ -3607,15 +3630,15 @@ textarea.form-control {
   color: var(--text-white, #fff);
 }
 .ex-filter-chip.active {
-  background: rgba(17, 17, 17, 0.1);
+  background: rgba(244, 244, 242, 0.1);
   border-color: var(--purple-500, #111111);
   color: var(--purple-400, #2f3437);
 }
 
 /* Painel de info do exercicio selecionado */
 .ex-info-panel {
-  background: rgba(17, 17, 17, 0.04);
-  border: 1px solid rgba(17, 17, 17, 0.13);
+  background: rgba(244, 244, 242, 0.04);
+  border: 1px solid rgba(244, 244, 242, 0.13);
   border-radius: var(--radius-md, 10px);
   padding: 14px;
   margin-top: 12px;
@@ -3645,11 +3668,11 @@ textarea.form-control {
   font-weight: 600;
 }
 .ex-tag-grupo {
-  background: rgba(17, 17, 17, 0.1);
+  background: rgba(244, 244, 242, 0.1);
   color: var(--purple-400, #2f3437);
 }
 .ex-tag-tipo {
-  background: rgba(17, 17, 17, 0.07);
+  background: rgba(244, 244, 242, 0.07);
   color: var(--text-secondary, rgba(17, 17, 17, 0.6));
 }
 .ex-tag-nivel {
@@ -3732,11 +3755,11 @@ textarea.form-control {
   line-height: 1.4;
 }
 .ex-badge-muscle {
-  background: rgba(17, 17, 17, 0.09);
+  background: rgba(244, 244, 242, 0.09);
   color: var(--purple-400, #2f3437);
 }
 .ex-badge-type {
-  background: rgba(17, 17, 17, 0.06);
+  background: rgba(244, 244, 242, 0.06);
   color: var(--text-muted, rgba(17, 17, 17, 0.4));
 }
 
@@ -3784,7 +3807,7 @@ textarea.form-control {
   height: 24px;
   padding: 0 7px;
   border-radius: 99px;
-  background: rgba(17, 17, 17, 0.13);
+  background: rgba(244, 244, 242, 0.13);
   color: var(--purple-400, #2f3437);
   font-size: 0.78rem;
   font-weight: 700;
@@ -3797,7 +3820,7 @@ textarea.form-control {
   display: flex;
   gap: 8px;
   margin-bottom: 20px;
-  border-bottom: 1px solid rgba(17, 17, 17, 0.08);
+  border-bottom: 1px solid rgba(244, 244, 242, 0.08);
   padding-bottom: 0;
 }
 .admin-tab {
@@ -3845,7 +3868,7 @@ textarea.form-control {
   color: var(--purple-400, #2f3437);
   margin-bottom: 8px;
   padding-bottom: 6px;
-  border-bottom: 1px solid rgba(17, 17, 17, 0.1);
+  border-bottom: 1px solid rgba(244, 244, 242, 0.1);
 }
 .admin-aluno-card {
   display: flex;
@@ -3864,18 +3887,14 @@ textarea.form-control {
    NOVAS FEATURES — ALUNO
    ============================================================ */
 
-/* Streak badge */
+/* Streak badge: lima = conquista (reforço positivo) */
 .streak-badge {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: linear-gradient(
-    135deg,
-    rgba(149, 100, 0, 0.3),
-    var(--warn-bg)
-  );
-  border: 1px solid rgba(149, 100, 0, 0.3);
-  color: var(--warn-fg);
+  background: var(--win-soft);
+  border: 1px solid rgba(198, 244, 50, 0.35);
+  color: var(--win);
   padding: 5px 14px;
   border-radius: var(--radius-pill);
   font-size: 0.82rem;
@@ -3952,7 +3971,7 @@ textarea.form-control {
   justify-content: center;
   font-size: 0.75rem;
   font-weight: 800;
-  color: #fff;
+  color: var(--text-white); /* fundo vem de getAvatarColor (carvão) */
   flex-shrink: 0;
 }
 
@@ -3966,7 +3985,8 @@ textarea.form-control {
    FASE 4 — Timer, Skeleton, Séries, Carga, Onboarding, Relatório
    ============================================================ */
 
-/* -- Timer de descanso -------------------------------------- */
+/* -- Timer de descanso --------------------------------------
+   Azul (frio) = recuperação; contrasta com o laranja de "fazer". */
 .timer-overlay {
   position: fixed;
   inset: 0;
@@ -3982,7 +4002,7 @@ textarea.form-control {
 }
 .timer-card {
   background: var(--bg-card);
-  border: 1.5px solid var(--border-card);
+  border: 1.5px solid rgba(59, 130, 246, 0.35);
   border-radius: var(--radius-xl);
   padding: 32px 40px;
   text-align: center;
@@ -3990,28 +4010,28 @@ textarea.form-control {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 .timer-label {
-  color: var(--text-secondary);
+  color: var(--info-fg);
   font-size: 0.9rem;
   margin-bottom: 12px;
 }
 .timer-display {
   font-size: 5rem;
   font-weight: 800;
-  color: var(--purple-400);
+  color: var(--text-white);
   line-height: 1;
   margin-bottom: 16px;
   font-variant-numeric: tabular-nums;
 }
 .timer-bar-wrap {
   height: 6px;
-  background: var(--bg-input);
+  background: var(--rest-soft);
   border-radius: var(--radius-pill);
   overflow: hidden;
   margin-bottom: 20px;
 }
 .timer-bar {
   height: 100%;
-  background: var(--gradient-primary);
+  background: var(--rest);
   border-radius: var(--radius-pill);
   width: 100%;
 }
@@ -4040,7 +4060,7 @@ textarea.form-control {
   background: linear-gradient(
     90deg,
     var(--bg-input) 25%,
-    rgba(17, 17, 17, 0.06) 50%,
+    rgba(244, 244, 242, 0.06) 50%,
     var(--bg-input) 75%
   );
   background-size: 800px 100%;
@@ -4067,7 +4087,7 @@ textarea.form-control {
   background: linear-gradient(
     90deg,
     var(--bg-input) 25%,
-    rgba(17, 17, 17, 0.06) 50%,
+    rgba(244, 244, 242, 0.06) 50%,
     var(--bg-input) 75%
   );
   background-size: 800px 100%;
@@ -4087,7 +4107,7 @@ textarea.form-control {
   background: linear-gradient(
     90deg,
     var(--bg-input) 25%,
-    rgba(17, 17, 17, 0.06) 50%,
+    rgba(244, 244, 242, 0.06) 50%,
     var(--bg-input) 75%
   );
   background-size: 800px 100%;
@@ -4098,7 +4118,7 @@ textarea.form-control {
 /* -- Exercise check card (layout novo) ---------------------- */
 .exercise-check-card {
   background: var(--bg-card-2);
-  border: 2px solid rgba(159, 47, 45, 0.3);
+  border: 2px solid rgba(239, 68, 68, 0.3);
   border-radius: var(--radius-lg);
   overflow: hidden;
   transition:
@@ -4111,11 +4131,11 @@ textarea.form-control {
 }
 .exercise-check-card.completed {
   border-color: var(--ok-fg);
-  background: rgba(52, 101, 56, 0.04);
+  background: rgba(34, 197, 94, 0.04);
   box-shadow: none;
 }
 .exercise-check-card.completed .exercise-check-nome {
-  color: rgba(17, 17, 17, 0.6);
+  color: rgba(244, 244, 242, 0.6);
 }
 @keyframes cardComplete {
   0% {
@@ -4142,7 +4162,7 @@ textarea.form-control {
   -webkit-tap-highlight-color: transparent;
 }
 .ex-check-main:active {
-  background: rgba(17, 17, 17, 0.04);
+  background: rgba(244, 244, 242, 0.04);
 }
 .exercise-check-info {
   flex: 1;
@@ -4179,7 +4199,7 @@ textarea.form-control {
 .ex-expand-area {
   padding: 10px 16px 12px;
   border-top: 1px solid var(--border-card);
-  background: rgba(17, 17, 17, 0.03);
+  background: rgba(244, 244, 242, 0.03);
 }
 .ex-expand-area.hidden {
   display: none;
@@ -4234,7 +4254,7 @@ textarea.form-control {
   transform: scale(0.92);
 }
 .serie-pill.serie-done {
-  background: rgba(52, 101, 56, 0.09);
+  background: rgba(34, 197, 94, 0.09);
   border-color: var(--ok-fg);
   color: var(--ok-fg);
 }
@@ -4242,7 +4262,7 @@ textarea.form-control {
   content: "✓ ";
 }
 .serie-pill.serie-done .serie-reps {
-  color: rgba(52, 101, 56, 0.42);
+  color: rgba(34, 197, 94, 0.42);
 }
 
 /* -- Anotação de carga -------------------------------------- */
@@ -4334,7 +4354,7 @@ textarea.form-control {
   width: 24px;
   height: 24px;
   background: var(--purple-600);
-  color: #fff;
+  color: var(--on-accent);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -4442,7 +4462,7 @@ textarea.form-control {
 }
 .sexo-btn.active {
   border-color: var(--purple-600);
-  background: rgba(17, 17, 17, 0.09);
+  background: rgba(244, 244, 242, 0.09);
   color: var(--purple-400);
   box-shadow: none;
 }
@@ -4474,7 +4494,7 @@ textarea.form-control {
 }
 .objetivo-chip.active {
   border-color: var(--purple-600);
-  background: rgba(17, 17, 17, 0.09);
+  background: rgba(244, 244, 242, 0.09);
   color: var(--purple-400);
   box-shadow: none;
 }
@@ -4485,7 +4505,7 @@ textarea.form-control {
   bottom: -2px;
   right: -4px;
   background: var(--purple-600);
-  color: #fff;
+  color: var(--on-accent);
   border-radius: 50%;
   width: 20px;
   height: 20px;
@@ -4521,15 +4541,15 @@ textarea.form-control {
 .btn-video-ex:hover {
   border-color: var(--purple-600);
   color: var(--purple-400);
-  background: rgba(17, 17, 17, 0.05);
+  background: rgba(244, 244, 242, 0.05);
 }
 .btn-video-ex.has-video {
-  border-color: rgba(17, 17, 17, 0.25);
+  border-color: rgba(244, 244, 242, 0.25);
   color: var(--purple-400);
-  background: rgba(17, 17, 17, 0.06);
+  background: rgba(244, 244, 242, 0.06);
 }
 .btn-video-ex.has-video:hover {
-  background: rgba(17, 17, 17, 0.11);
+  background: rgba(244, 244, 242, 0.11);
 }
 
 /* Botão "Ver vídeo" no card do aluno */
@@ -4541,9 +4561,9 @@ textarea.form-control {
   width: 100%;
   padding: 9px 16px;
   margin-top: 10px;
-  border: 1px solid rgba(17, 17, 17, 0.2);
+  border: 1px solid rgba(244, 244, 242, 0.2);
   border-radius: var(--radius-md);
-  background: rgba(17, 17, 17, 0.05);
+  background: rgba(244, 244, 242, 0.05);
   color: var(--purple-400);
   font-size: 0.85rem;
   font-weight: 600;
@@ -4551,7 +4571,7 @@ textarea.form-control {
   transition: var(--transition-fast);
 }
 .btn-ver-video:hover {
-  background: rgba(17, 17, 17, 0.11);
+  background: rgba(244, 244, 242, 0.11);
   border-color: var(--purple-500);
 }
 .btn-ver-video svg {
@@ -4574,7 +4594,7 @@ textarea.form-control {
 }
 .video-upload-area:hover {
   border-color: var(--purple-500);
-  background: rgba(17, 17, 17, 0.04);
+  background: rgba(244, 244, 242, 0.04);
 }
 
 /* Área de upload inline no formulário */
@@ -4594,7 +4614,7 @@ textarea.form-control {
 }
 .video-upload-inline:hover {
   border-color: var(--purple-500);
-  background: rgba(17, 17, 17, 0.04);
+  background: rgba(244, 244, 242, 0.04);
 }
 .video-upload-inline.has-file {
   cursor: default;
@@ -4671,7 +4691,7 @@ textarea.form-control {
 
 .video-player-close {
   flex-shrink: 0;
-  background: rgba(17, 17, 17, 0.08);
+  background: rgba(244, 244, 242, 0.08);
   border: none;
   color: var(--text-secondary);
   width: 32px;
@@ -4793,7 +4813,7 @@ textarea.form-control {
   font-size: 0.72rem;
   font-weight: 600;
   color: var(--purple-400);
-  background: rgba(17, 17, 17, 0.07);
+  background: rgba(244, 244, 242, 0.07);
   border-radius: var(--radius-pill);
   padding: 2px 8px;
   margin-left: 6px;
@@ -4817,7 +4837,7 @@ textarea.form-control {
 }
 .progresso-fase-track {
   height: 8px;
-  background: rgba(17, 17, 17, 0.08);
+  background: rgba(244, 244, 242, 0.08);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -4843,18 +4863,18 @@ textarea.form-control {
   transition: transform 0.15s;
 }
 .conquista-item.earned {
-  background: rgba(17, 17, 17, 0.06);
-  border: 1px solid rgba(17, 17, 17, 0.11);
+  background: var(--win-soft);
+  border: 1px solid rgba(198, 244, 50, 0.3);
 }
 .conquista-item.locked {
-  background: rgba(17, 17, 17, 0.04);
-  border: 1px solid rgba(17, 17, 17, 0.07);
+  background: rgba(244, 244, 242, 0.04);
+  border: 1px solid rgba(244, 244, 242, 0.07);
   opacity: 0.45;
 }
 
 .conquistas-hint {
   font-size: 0.75rem;
-  color: #787774;
+  color: var(--text-muted);
   margin-top: 4px;
   text-align: center;
   padding: 0 8px;
@@ -4866,7 +4886,7 @@ textarea.form-control {
 }
 .conquista-nome {
   font-size: 0.7rem;
-  color: #787774;
+  color: var(--text-muted);
   font-weight: 600;
   line-height: 1.2;
 }
@@ -4874,7 +4894,7 @@ textarea.form-control {
   color: var(--text-primary);
 }
 .fase-unlock-changes {
-  background: rgba(17, 17, 17, 0.04);
+  background: rgba(244, 244, 242, 0.04);
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 4px;
@@ -4885,7 +4905,7 @@ textarea.form-control {
   align-items: center;
   gap: 10px;
   padding: 8px 0;
-  border-bottom: 1px solid rgba(17, 17, 17, 0.06);
+  border-bottom: 1px solid rgba(244, 244, 242, 0.06);
   font-size: 0.88rem;
 }
 .fase-change-item:last-child {
@@ -4981,7 +5001,7 @@ h4 {
 .btn-primary:hover,
 .finish-workout-btn:hover,
 .pwa-install-btn:hover {
-  background: #333333;
+  background: var(--accent-hover);
   transform: none;
   box-shadow: none;
 }
@@ -5015,7 +5035,7 @@ h4 {
 }
 
 .btn-danger:hover {
-  background: #842826;
+  background: #dc2626;
 }
 
 /* Cards: borda de 1px, sem brilho; hover só com sombra quase invisível */
@@ -5058,7 +5078,7 @@ h4 {
   border-width: 0 0 1px;
   backdrop-filter: saturate(180%) blur(12px);
   -webkit-backdrop-filter: saturate(180%) blur(12px);
-  background: rgba(255, 255, 255, 0.86);
+  background: rgba(15, 17, 21, 0.86);
 }
 
 /* Login sem halo radial */
@@ -5084,7 +5104,7 @@ h4 {
 .carga-nota-input:focus {
   border-color: var(--ink-900);
   background: var(--bg-input);
-  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.06);
+  box-shadow: 0 0 0 3px rgba(244, 244, 242, 0.06);
 }
 
 .form-label {
@@ -5127,7 +5147,7 @@ h4 {
 
 .bottom-nav,
 .sidebar {
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(26, 29, 35, 0.92);
   border-color: var(--border-card);
   box-shadow: none;
 }
@@ -5230,10 +5250,10 @@ h4 {
   color: var(--info-fg);
 }
 
-/* Conquistas: troféu em tinta, cadeado apagado */
+/* Conquistas: troféu em lima, cadeado apagado */
 .conquista-emoji {
   display: inline-flex;
-  color: var(--ink-900);
+  color: var(--win);
 }
 .conquista-item.locked .conquista-emoji {
   color: var(--ink-300);
@@ -5244,7 +5264,7 @@ h4 {
 #fase-unlock-icone {
   display: flex;
   justify-content: center;
-  color: var(--ink-900);
+  color: var(--win);
 }
 
 .btn-icon svg,
@@ -5301,7 +5321,7 @@ h4 {
   height: 20px;
   margin-top: 1px;
   flex-shrink: 0;
-  accent-color: var(--ink-900);
+  accent-color: var(--accent);
 }
 
 .consent-check a {

@@ -365,21 +365,21 @@ async function carregarAlunos() {
           ${grupo
             .map((a) => {
               const imcVal = a.imc ? parseFloat(a.imc) : null;
-              let imcBg = "#f1f0ec",
-                imcColor = "#5f5e5b";
+              let imcBg = "#22262d",
+                imcColor = "#9ba1ab";
               if (imcVal) {
                 if (imcVal < 18.5) {
-                  imcBg = "#e1f3fe";
-                  imcColor = "#1f6c9f";
+                  imcBg = "rgba(59,130,246,0.14)";
+                  imcColor = "#60a5fa";
                 } else if (imcVal < 25) {
-                  imcBg = "#edf3ec";
-                  imcColor = "#346538";
+                  imcBg = "rgba(34,197,94,0.12)";
+                  imcColor = "#22c55e";
                 } else if (imcVal < 30) {
-                  imcBg = "#fbf3db";
-                  imcColor = "#956400";
+                  imcBg = "rgba(245,158,11,0.12)";
+                  imcColor = "#f59e0b";
                 } else {
-                  imcBg = "#fdebec";
-                  imcColor = "#9f2f2d";
+                  imcBg = "rgba(239,68,68,0.12)";
+                  imcColor = "#ef4444";
                 }
               }
               return `
@@ -695,7 +695,7 @@ async function carregarSuporteAlunos() {
               <div class="admin-prof-email">${sanitize(a.email || "—")}</div>
             </div>
             <div class="admin-prof-actions" style="align-items:center;gap:8px;">
-              ${naoLidas > 0 ? `<span style="background:var(--err-fg);color:#fff;border-radius:12px;padding:2px 8px;font-size:12px;font-weight:700;">${naoLidas} nova${naoLidas > 1 ? "s" : ""}</span>` : ""}
+              ${naoLidas > 0 ? `<span style="background:var(--err-fg);color:var(--on-accent);border-radius:12px;padding:2px 8px;font-size:12px;font-weight:700;">${naoLidas} nova${naoLidas > 1 ? "s" : ""}</span>` : ""}
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="opacity:.5;">
                 <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
               </svg>
