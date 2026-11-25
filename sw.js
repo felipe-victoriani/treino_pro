@@ -38,7 +38,7 @@ _swMessaging.onBackgroundMessage((payload) => {
   });
 });
 
-const CACHE_NAME = "treino-pro-v2026.11.23-2310";
+const CACHE_NAME = "treino-pro-v2026.11.25-0018";
 const STATIC_ASSETS = [
   "/",
   "/index.html",
