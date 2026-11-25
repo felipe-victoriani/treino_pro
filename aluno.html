@@ -282,24 +282,53 @@
             </button>
           </div>
 
-          <!-- Histórico -->
+          <!-- Histórico (recolhido por padrão; abre ao tocar no cabeçalho) -->
           <div class="mt-28">
-            <div class="section-header">
-              <h2>
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path
-                    d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"
-                  />
-                </svg>
-                Histórico de Treinos
-              </h2>
-            </div>
-            <div id="aluno-historico-list" class="history-list">
+            <h2 class="collapse-heading">
+              <button
+                type="button"
+                class="collapse-toggle"
+                aria-expanded="false"
+                aria-controls="aluno-historico-list"
+                onclick="toggleCollapse(this)"
+              >
+                <span class="collapse-title">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"
+                    />
+                  </svg>
+                  Histórico de Treinos
+                </span>
+                <span class="collapse-meta">
+                  <span
+                    id="aluno-historico-list-count"
+                    class="collapse-count"
+                  ></span>
+                  <svg
+                    class="collapse-chevron"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z" />
+                  </svg>
+                </span>
+              </button>
+            </h2>
+            <div
+              id="aluno-historico-list"
+              class="history-list collapse-body"
+              hidden
+            >
               <div class="empty-state">
                 <h3>Nenhum treino finalizado ainda</h3>
                 <p>Complete seu primeiro treino!</p>

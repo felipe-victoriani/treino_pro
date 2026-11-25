@@ -260,6 +260,20 @@ function getInitials(nome) {
 }
 
 /**
+ * Abre/fecha uma seção recolhível.
+ * O botão aponta para o conteúdo via aria-controls; o estado fica em
+ * aria-expanded (lido pelo CSS para girar a seta) e no atributo hidden.
+ * @param {HTMLButtonElement} btn
+ */
+function toggleCollapse(btn) {
+  const body = document.getElementById(btn.getAttribute("aria-controls"));
+  if (!body) return;
+  const abrir = btn.getAttribute("aria-expanded") !== "true";
+  btn.setAttribute("aria-expanded", String(abrir));
+  body.hidden = !abrir;
+}
+
+/**
  * Gera cor de avatar baseada no nome
  * @param {string} nome
  * @returns {string}

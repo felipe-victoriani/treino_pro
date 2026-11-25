@@ -1014,6 +1014,13 @@ async function loadHistoricoTreinos(alunoId, containerId, limite = 14) {
       .join("");
 
     el.innerHTML = items;
+
+    // Contador no cabeçalho recolhível (se a tela tiver um: <id>-count)
+    const countEl = document.getElementById(`${containerId}-count`);
+    if (countEl) {
+      const n = Object.keys(data).length;
+      countEl.textContent = `${n} ${n === 1 ? "treino" : "treinos"}`;
+    }
   } catch (e) {
     el.innerHTML =
       '<div class="empty-state"><h3>Erro ao carregar histórico</h3></div>';
